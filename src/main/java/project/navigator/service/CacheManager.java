@@ -2,6 +2,7 @@ package project.navigator.service;
 
 import common.CRUD.service.ComService;
 import common.Util.InvitationCodeGenerator;
+import common.Util.ValidateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Component;
 import project.basic.entity.BookClassification;
 import project.basic.entity.InvitationCode;
 import project.navigator.model.Navigation;
-import project.navigator.pojo.Lists;
+import project.navigator.route.Types;
 import project.system.entity.Admin;
 import project.system.entity.AdminRole;
 
@@ -124,7 +125,8 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
 
 
     public static void main(String[] args) {
-
+        System.out.println(Types.getType("ss"));
+        System.out.println(ValidateUtil.checkPositiveNumber("-750187"));
     }
 
 }

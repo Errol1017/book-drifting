@@ -7,7 +7,12 @@ import common.DataFormatter.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import project.navigator.model.Navigation;
+import project.navigator.route.Components;
+import project.navigator.route.Forms;
+import project.navigator.route.Lists;
 import project.system.entity.Admin;
 import project.system.entity.AdminLog;
 import project.system.entity.AdminRole;
@@ -33,7 +38,7 @@ public class AdminController {
     @Autowired
     private ComService comService;
 
-    @RequestMapping(value = "/adminlist/list", produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = Lists.AdminList + "/list", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public @ResponseBody Object getAdminList(HttpServletRequest request) throws Exception {
         String tarPageNum = request.getParameter("tarPageNum");
         String perPageNum = request.getParameter("perPageNum");
@@ -54,7 +59,7 @@ public class AdminController {
         return Result.SUCCESS(result);
     }
 
-    @RequestMapping(value = "/adminform/form", produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = Forms.AdminForm + "/form", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public @ResponseBody Object getAdminForm(HttpServletRequest request) throws Exception {
         String dataId = request.getParameter("dataId");
         Admin admin = comService.getDetail(Admin.class, Integer.parseInt(dataId));
@@ -63,7 +68,7 @@ public class AdminController {
         return Result.SUCCESS(form);
     }
 
-    @RequestMapping(value = "/adminform/submit", produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = Forms.AdminForm + "/submit", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public @ResponseBody Object submitAdminForm(HttpServletRequest request) throws Exception {
         String data = request.getParameter("data");
         AdminForm form = DataManager.string2Object(data, AdminForm.class);
@@ -94,7 +99,7 @@ public class AdminController {
         }
     }
 
-    @RequestMapping(value = "/adminlist/delete", produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = Lists.AdminList + "/delete", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public @ResponseBody Object deleteAdminList(HttpServletRequest request) throws Exception {
         String dataId = request.getParameter("dataId");
         Admin admin = comService.getDetail(Admin.class, Integer.parseInt(dataId));
@@ -103,6 +108,11 @@ public class AdminController {
         comService.deleteDetail(role);
         comService.saveDetail(new AdminLog(AdminValidator.getAdminSession(request), OperationTargets.Admin, OperationTypes.Delete, admin.getId(), "用户名： "+admin.getAdminName()));
         return Result.SUCCESS();
+    }
+
+    @RequestMapping(value = Components.AdminForm_power + "/data", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    public @ResponseBody Object getAdminPower() throws Exception {
+        return Result.SUCCESS(Navigation.getInstance().getPowerCascade());
     }
 
 }

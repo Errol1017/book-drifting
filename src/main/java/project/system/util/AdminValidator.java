@@ -1,9 +1,9 @@
 package project.system.util;
 
 import common.DataFormatter.ErrorCode;
+import project.navigator.route.Types;
 import project.system.model.AdminSession;
 import common.DataFormatter.Result;
-import project.navigator.pojo.Types;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -19,10 +19,8 @@ public class AdminValidator {
             return Result.ERROR(-2);
         } else {
             String reqId = request.getParameter("reqId");
-            String type = request.getParameter("type");
-            try {
-                Types.valueOf(type);
-            } catch (Exception e) {
+            String type = Types.getType(request.getParameter("type"));
+            if (type == null) {
                 return Result.ERROR(ErrorCode.ILLEGAL_OPERATION);
             }
             ArrayList<String> powerList = adminSession.getPowerList();

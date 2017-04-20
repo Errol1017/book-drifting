@@ -342,26 +342,28 @@ body {
     height: 25px;
     font-size: 11px;
     border-radius: 1px;
+    margin: 0 1px;
 }
 .button_style_50_25 {
     width: 50px;
     height: 25px;
     font-size: 11px;
     border-radius: 2px;
+    margin: 0 3px;
 }
 .button_style_60_30 {
     width: 60px;
     height: 30px;
     font-size: 13px;
     border-radius: 3px;
-    margin-right: 5px;
+    margin: 0 3px;
 }
 .button_style_80_30 {
     width: 80px;
     height: 30px;
     font-size: 14px;
     border-radius: 3px;
-    margin-right: 10px;
+    margin: 0 5px;
 }
 .button_style_x_25:hover, .button_style_50_25:hover, .button_style_60_30:hover, .button_style_80_30:hover{
     background-color: #ddd;                     /* #ddd #ddd #ddd (suggested not to change) */
@@ -400,28 +402,31 @@ body {
 
 
 /* input_text_style */
-.input_text_28, .input_text_30, .input_text_35,
+.input_text_25, .input_text_30, .input_text_35,
 .input_text_area_50, .input_text_area_100, .input_text_area_150 {
     outline: none;
     background-color: inherit;
     color: #777;                                   /* #666 #777 #888 */
     border: 1px solid #ccc;
-    padding-left: 5px;
+    padding: 0px;
+    text-indent: 0.5em;
     border-radius: 3px;
     box-shadow: inset 1px 1px 1px #ccc;
 }
-.input_text_28, .input_text_30 {
+.input_text_25 {
+    height: 25px;
     line-height: 25px;
-    font-size: 12px;
-}
-.input_text_28 {
-    height: 28px;
+    font-size: 11px;
+    margin: 0 1px;
 }
 .input_text_30 {
     height: 30px;
+    line-height: 30px;
+    font-size: 12px;
 }
 .input_text_35 {
     height: 35px;
+    line-height: 35px;
     font-size: 13px;
 }
 .input_text_area_50, .input_text_area_100, .input_text_area_150 {
@@ -438,7 +443,7 @@ body {
 .input_text_area_150 {
     height: 150px;
 }
-.input_text_28:focus, .input_text_30:focus, .input_text_35:focus,
+.input_text_25:focus, .input_text_30:focus, .input_text_35:focus,
 .input_text_area_50:focus, .input_text_area_100:focus, .input_text_area_150:focus {
     background-color: #fcfcfc;
 }

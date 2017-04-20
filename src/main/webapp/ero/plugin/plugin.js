@@ -12,13 +12,13 @@
          * param.tableId            id      required
          * param.tableObj           object      required
          * param.msgObj             object      default: $("#" + param.tableId + "_msg")】
+         * param.perPageNum
          * param.data               object
          *      data.list
          *      data.totalNum
          *      data.totalPage
          *      data.curPageNum
          *      data.tarPageNum
-         *      data.perPageNum
          *      data.totalNumChanged
          *      data.totalPageChanged
          * param.header             object
@@ -46,6 +46,7 @@
          *      handle.handleObj        default $("#" + param.tableId + "_HandleBox")
          *      handle.editObj
          *      handle.deleteObj
+         *      handle.reloadObj
          *      handle.data
          *      handle.edit
          *              edit.callback
@@ -62,13 +63,18 @@
         return {
             getList: function () {
                 getList()
+            },
+            deselect: function () {
+                deselect();
             }
         };
         function init() {
             initParam();
             drawHeader();
+            registerBodyEvent();
             drawFooter();
             registerFooterEvent();
+            initHandle();
             initHandleEvent();
             // $.ero.pluginManager.setConfig(pageId, param.tableId, param);
             function initParam() {
@@ -84,17 +90,8 @@
                     totalNumChanged: false,
                     totalPageChanged: false
                 };
-                if (param.data.perPageNum == undefined) {
-                    param.data.perPageNum = 10;
-                }
-                if (param.handle.handleObj == undefined) {
-                    param.handle.handleObj = $("#" + param.tableId + "_HandleBox");
-                }
-                if (param.handle.editObj == undefined) {
-                    param.handle.editObj = $("#" + param.tableId + "_Edit");
-                }
-                if (param.handle.deleteObj == undefined) {
-                    param.handle.deleteObj = $("#" + param.tableId + "_Delete");
+                if (param.perPageNum == undefined) {
+                    param.perPageNum = 10;
                 }
             }
             function drawHeader() {
@@ -127,11 +124,19 @@
                     param.body.bodyObj = tableObj.find("tbody").first();
                 }
             }
+            function registerBodyEvent() {
+                param.body.bodyObj.click(function (e) {
+                    var trObj = $(e.target).parent();
+                    trObj.addClass("lt_tr_slct").siblings().removeClass("lt_tr_slct");
+                    param.handle.handleObj.hide().css("top", e.clientY + document.body.scrollTop + 1 + "px").css("left", e.clientX + 1 + "px").slideDown();
+                    param.handle.data = param.body.data[trObj.index()];
+                })
+            }
             function drawFooter() {
                 var tf = "<tfoot class='list_table_footer'><tr><td class='list_table_footer_td' colspan='" + param.header.colsNum+ "'>匹配数据&nbsp;<span>0</span>&nbsp;条&nbsp;共&nbsp;<span>0</span>&nbsp;页" +
-                    "<span class='float_right'><button class='button_style_50_25' value='1'>首页</button><input type='button' class='button_style_x_25' value='1'/>" +
+                    "<span class='list_table_footer_right'><button class='button_style_50_25' value='1'>首页</button><input type='button' class='button_style_x_25' value='1'/>" +
                     "<input type='button' class='button_style_x_25' value='2'/><input type='button' class='button_style_x_25' value='3'/>" +
-                    "<input type='text' class='input_text_28 span50' placeholder='页数'/><button class='button_style_50_25' value='0'>尾页</button></span></td></tr></tfoot>";
+                    "<input type='text' class='input_text_25 span50' placeholder='页数'/><button class='button_style_50_25' value='0'>尾页</button></span></td></tr></tfoot>";
                 param.tableObj.append(tf);
                 var s1 = param.tableObj.find('td').last().find("span").first();
                 var s2 = s1.next();
@@ -148,18 +153,18 @@
                     rightObj: r,
                     firstPageObj: b1,
                     firstButtonObj: i1,
-                    secondButtonObj: i1,
-                    thirdButtonObj: i1,
-                    inputObj: i1,
+                    secondButtonObj: i2,
+                    thirdButtonObj: i3,
+                    inputObj: i,
                     lastPageObj: b2
                 }
             }
             function registerFooterEvent() {
                 var i = 0;
                 param.footer.rightObj.children().each(function () {
-                    if (i != 4) {
+                    if (i++ != 4) {
                         $(this).click(function () {
-                            param.data.tarPageNum = $(this).val();
+                            param.data.tarPageNum = parseInt($(this).val());
                             getList();
                         })
                     } else {
@@ -178,10 +183,25 @@
                                 num = totalPage;
                             }
                             param.data.tarPageNum = num;
+                            param.footer.inputObj.val(num);
                             getList();
                         })
                     }
                 })
+            }
+            function initHandle() {
+                if (param.handle.handleObj == undefined) {
+                    param.handle.handleObj = $("#" + param.tableId + "_HandleBox");
+                }
+                if (param.handle.editObj == undefined) {
+                    param.handle.editObj = $("#" + param.tableId + "_Edit");
+                }
+                if (param.handle.deleteObj == undefined) {
+                    param.handle.deleteObj = $("#" + param.tableId + "_Delete");
+                }
+                if (param.handle.reloadObj == undefined) {
+                    param.handle.reloadObj = $("#" + param.tableId + "_Reload");
+                }
             }
             function initHandleEvent() {
                 param.handle.handleObj.mouseleave(function () {
@@ -203,6 +223,10 @@
                         }
                         getList();
                     })
+                });
+                param.handle.reloadObj.click(function () {
+                    param.data.tarPageNum = 1;
+                    getList();
                 });
                 function deleteData(success) {
                     $.ajax({
@@ -242,7 +266,7 @@
                     reqId: param.reqId,
                     listId: param.tableId,
                     tarPageNum: param.data.tarPageNum,
-                    perPageNum: param.data.perPageNum
+                    perPageNum: param.perPageNum
                 },
                 datatype: "json",
                 success: function (res) {
@@ -252,7 +276,7 @@
                         if (param.data.totalNum != res.data.totalNum) {
                             param.data.totalNumChanged = true;
                             param.data.totalNum = res.data.totalNum;
-                            var n = Math.ceil(param.data.totalNum / param.data.perPageNum);
+                            var n = Math.ceil(param.data.totalNum / param.perPageNum);
                             if (param.data.totalPage != n) {
                                 param.data.totalPage = n;
                                 param.data.totalPageChanged = true;
@@ -271,6 +295,7 @@
                 }
             });
             function redraw() {
+                param.handle.handleObj.fadeOut();
                 redrawBody();
                 redrawFooter();
                 function redrawBody() {
@@ -304,7 +329,6 @@
                         param.body.data = arr;
                     }
                     param.body.bodyObj.empty().append(trs);
-                    registerBodyEvent();
                 }
                 function redrawFooter() {
                     var data = param.data;
@@ -327,7 +351,7 @@
                                 if (totalPage == 2) {
                                     footer.firstPageObj.hide();
                                     footer.thirdButtonObj.hide();
-                                    footer.inputObj.hide()
+                                    footer.inputObj.hide();
                                     footer.lastPageObj.hide()
                                 } else if (totalPage == 3) {
                                     footer.firstPageObj.hide();
@@ -365,17 +389,11 @@
                         }
                     }
                 }
-                function registerBodyEvent() {
-                    param.body.bodyObj.click(function (e) {
-                        var trObj = $(e.target).parent();
-                        trObj.addClass("lt_tr_slct").siblings().removeClass("lt_tr_slct");
-                        param.handle.handleObj.hide().css("top", e.clientY + document.body.scrollTop + 1 + "px").css("left", e.clientX + 1 + "px").slideDown();
-                        param.handle.data = param.body.data[trObj.index()];
-                    })
-                }
             }
         }
-
+        function deselect() {
+            param.body.bodyObj.find("tr").removeClass("lt_tr_slct");
+        }
     };
     
     //form_detail
@@ -400,7 +418,7 @@
          *      gather.before
          *      gather.after
          * param.submit           object
-         *      submit.before
+         // *      submit.before
          *      submit.after
          *      submit.success
          *      submit.error
@@ -493,9 +511,9 @@
                         return true;
                     }
                     function gather() {
-                        // if (param.gather != undefined && param.gather.before != undefined) {
-                        //     param.gather.before();
-                        // }
+                        if (param.gather != undefined && param.gather.before != undefined) {
+                            param.gather.before();
+                        }
                         param.data = new Object();
                         for (var i=0;i<param.keys.length;i++){
                             param.data[param.keys[i]] = param.inputObjs[i].val()
@@ -505,9 +523,6 @@
                         }
                     }
                     function send() {
-                        // if (param.submit != undefined && param.submit.before != undefined) {
-                        //     param.submit.before();
-                        // }
                         $.ajax({
                             url: "navigator/validator",
                             type: "post",
@@ -527,9 +542,6 @@
                                     }
                                 } else if (res.code == -1) {
                                     param.msgObj.show_msg(res.data);
-                                    // if (param.submit != undefined && param.submit.error != undefined) {
-                                    //     param.submit.error();
-                                    // }
                                 } else {
                                     $.ero.showErrorMessage(res.code, res.data);
                                 }
@@ -539,9 +551,6 @@
                                 $.ero.getAjaxErrorMessage(xhr, msg, obj);
                             }
                         });
-                        // if (param.submit != undefined && param.submit.after != undefined) {
-                        //     param.submit.after();
-                        // }
                     }
                 }
             }
@@ -864,7 +873,187 @@
         /**
          * @param param
          * param.reqId          id
+         * param.compId         default param.valObj.attr("id")
+         * param.valObj         required
+         * param.boxObj         default $("#" + param.compId + "_box")
+         * param.dynamic        boolean
+         * param.data           array
+         * param.callback
          */
+        var pageId = $(this).attr("id");
+        init();
+        return {
+            reset: function () {
+                reset();
+            }
+        };
+        function init() {
+            param.reqId = $.ero.navigator.getReqId($.ero.navigator.getNavigation("", pageId));
+            if (param.compId == undefined) {
+                param.compId = param.valObj.attr("id");
+            }
+            if (param.dynamic == undefined || param.dynamic) {
+                getData();
+            } else {
+                if (param.boxObj == undefined) {
+                    param.boxObj = $("#" + param.compId + "_box");
+                }
+                initEvent();
+            }
+            function getData() {
+                $.ajax({
+                    url: "navigator/validator",
+                    type: "post",
+                    data: {
+                        type: 'data',
+                        reqId: param.reqId,
+                        compId: param.compId
+                    },
+                    success: function (res) {
+                        if (res.code == 0) {
+                            param.data = res.data;
+                            draw();
+                        } else {
+                            $.ero.showErrorMessage(res.code, res.data);
+                        }
+                    },
+                    error: function (xhr, msg, obj) {
+                        $.ero.showErrorMessage(-9);
+                        $.ero.getAjaxErrorMessage(xhr, msg, obj);
+                    }
+                });
+                function draw() {
+                    var domStr = '';
+                    var obj;
+                    for (var i = 0; i < param.data.length; i++) {
+                        obj = param.data[i];
+                        if (obj["level"] == 1) {
+                            if (domStr != "") {
+                                domStr += '</ul></li></ul>';
+                            }
+                            domStr += '<ul class="cascade_checkbox span140"><li class="cc_li_even" data-val="' + obj["val"] + '"><input type="checkbox" class="input_checkbox">' + obj["name"] + '</li><li><ul>';
+                        } else if (obj["level"] == 2) {
+                            domStr += '<li class="cc_li_odd" data-val="' + obj["val"] + '"><input type="checkbox" class="input_checkbox">' + obj["name"] + '</li>';
+                        }
+                    }
+                    param.valObj.after('<div id="' + param.compId + '_box' + '" class="cascade_checkbox_box">' + domStr + '</div>');
+                    param.boxObj = $("#" + param.compId + "_box");
+                    initEvent();
+                }
+            }
+            function initEvent() {
+                param.boxObj.find(".cc_li_even").each(function () {
+                    $(this).click(function () {
+                        var type = $(this).data("type");
+                        var ccObj = $(this).parent();
+                        if (type == undefined || type == "checked") {
+                            check($(this));
+                            $(this).data("type", "checkedAll");
+                            var string = $(this).attr("data-val") + ",";
+                            $(this).next().find("li").each(function () {
+                                string += $(this).attr("data-val") + ",";
+                                check($(this));
+                            });
+                            ccObj.data("values", string);
+                        } else {
+                            uncheck($(this));
+                            $(this).next().find("li").each(function () {
+                                uncheck($(this));
+                            });
+                            ccObj.removeData("values");
+                        }
+                        param.boxObj.data("status", "changed");
+                    })
+                });
+                param.boxObj.find(".cc_li_odd").each(function () {
+                    $(this).click(function () {
+                        var type = $(this).data("type");
+                        var ulObj = $(this).parent();
+                        var evenObj = ulObj.parent().prev();
+                        var ccObj = evenObj.parent();
+                        if (type == undefined) {
+                            check($(this));
+                        } else {
+                            uncheck($(this));
+                        }
+                        var isCheckedAll = true;
+                        var string = "";
+                        ulObj.children().each(function () {
+                            if ($(this).data("type") == "checked") {
+                                string += $(this).attr("data-val") + ",";
+                            } else {
+                                isCheckedAll = false;
+                            }
+                        });
+                        if (string == "") {
+                            uncheck(evenObj);
+                            ccObj.removeData("values");
+                        } else {
+                            check(evenObj);
+                            if (isCheckedAll) {
+                                evenObj.data("type", "checkedAll");
+                            }
+                            ccObj.data("values", evenObj.attr("data-val") + "," + string);
+                        }
+                        param.boxObj.data("status", "changed");
+                    })
+                });
+                param.boxObj.mouseleave(function () {
+                    if ($(this).data("status") == "changed") {
+                        $(this).removeData("status");
+                        var val = "";
+                        $(this).children().each(function () {
+                            var s = $(this).data("values");
+                            if (s != undefined) {
+                                val += s;
+                            }
+                        });
+                        param.valObj.val(val.substr(0, val.length - 1));
+                        if (param.callback != undefined) {
+                            param.callback();
+                        }
+                    }
+                });
+            }
+        }
+        function check(liObj) {
+            liObj.data("type", "checked").children().first().prop("checked", true);
+        }
+        function uncheck(liObj) {
+            liObj.removeData("type").children().first().prop("checked", false);
+        }
+        function reset() {
+            var valArr = param.valObj.val().split(",");
+            var i = 0;
+            param.boxObj.children().each(function () {
+                resetData($(this))
+            });
+            function resetData(ccObj) {
+                var string = "";
+                var isCheckedAll = true;
+                ccObj.find("li").each(function () {
+                    var val = $(this).attr("data-val");
+                    if (val != undefined) {
+                        if (val == valArr[i]) {
+                            check($(this));
+                            string += val + ",";
+                            i++;
+                        } else {
+                            uncheck($(this));
+                            isCheckedAll = false;
+                        }
+                    }
+                });
+                if (string != "") {
+                    ccObj.data("values", string);
+                    if (isCheckedAll) {
+                        ccObj.children().first().data("type", "checkedAll");
+                    }
+                } else {
+                    ccObj.removeData("values");
+                }
+            }
+        }
     }
 
 })(jQuery)
@@ -1070,153 +1259,6 @@
         }
     });
 
-    //cascade_checkbox
-    $.fn.extend({
-        /**
-         * @param obj
-         * obj.boxId            id
-         * obj.valId            id
-         * obj.dynamic          boolean
-         */
-        cascade_checkbox_register: function (obj) {
-            var pluginId = obj.boxId;
-            $("#" + pluginId).set_cascade_checkbox(obj);
-        },
-        set_cascade_checkbox: function (obj) {
-            var boxObj = $(this);
-            boxObj.find(".cc_li_even").each(function () {
-                $(this).set_cc_even(obj.boxId);
-            });
-            boxObj.find(".cc_li_odd").each(function () {
-                $(this).set_cc_odd(obj.boxId);
-            });
-            boxObj.output_cc_value(obj.valId);
-            boxObj.set_cc_val(obj.valId);
-        },
-        set_cc_checked: function () {
-            $(this).data("type", "checked");
-            $(this).children().first().prop("checked", true);
-        },
-        set_cc_unchecked: function () {
-            $(this).removeData("type");
-            $(this).children().first().prop("checked", false);
-        },
-        set_cc_even: function (boxId) {
-            $(this).click(function () {
-                var type = $(this).data("type");
-                var ccObj = $(this).parent();
-                if (type == undefined || type == "checked") {
-                    $(this).set_cc_checked();
-                    $(this).data("type", "checkedAll");
-                    var string = $(this).attr("data-id") + ",";
-                    $(this).next().find(".cc_li_odd").each(function () {
-                        string += $(this).attr("data-id") + ",";
-                        $(this).set_cc_checked();
-                    });
-                    ccObj.data("ids", string);
-                } else {
-                    $(this).set_cc_unchecked();
-                    $(this).next().find(".cc_li_odd").each(function () {
-                        $(this).set_cc_unchecked();
-                    });
-                    ccObj.removeData("ids");
-                }
-                $("#" + boxId).data("status", "changed");
-            })
-        },
-        set_cc_odd: function (boxId) {
-            $(this).click(function () {
-                var type = $(this).data("type");
-                var ulObj = $(this).parent();
-                var evenObj = ulObj.parent().prev();
-                var ccObj = evenObj.parent();
-                if (type == undefined) {
-                    $(this).set_cc_checked();
-                } else {
-                    $(this).set_cc_unchecked();
-                }
-                var isCheckedAll = true;
-                var string = "";
-                ulObj.children().each(function () {
-                    if ($(this).data("type") == "checked") {
-                        string += $(this).attr("data-id") + ",";
-                    } else {
-                        isCheckedAll = false;
-                    }
-                });
-                if (string == "") {
-                    ccObj.removeData("ids");
-                    evenObj.set_cc_unchecked();
-                } else {
-                    var evenDataId = evenObj.attr("data-id");
-                    evenObj.set_cc_checked()
-                    if (isCheckedAll) {
-                        evenObj.data("type", "checkedAll");
-                    }
-                    ccObj.data("ids", evenDataId + "," + string);
-                }
-                $("#" + boxId).data("status", "changed");
-            })
-        },
-        output_cc_value: function (valId) {
-            $(this).mouseleave(function () {
-                var status = $(this).data("status");
-                if (status == "changed") {
-                    $(this).removeData("status");
-                    var val = "";
-                    $(this).children().each(function () {
-                        var ids = $(this).data("ids");
-                        if (ids != undefined) {
-                            val += ids;
-                        }
-                    });
-                    $("#" + valId).val(val.substr(0, val.length - 1));
-                }
-            })
-        },
-        set_cc_data: function (valArr) {
-            var ccObj = $(this);
-            var string = "";
-            var isCheckedAll = true;
-            ccObj.find("li").each(function () {
-                var dataId = $(this).attr("data-id");
-                var isChecked = false;
-                if (dataId != undefined) {
-                    for (var i = 0; i < valArr.length; i++) {
-                        if (dataId == valArr[i]) {
-                            $(this).set_cc_checked();
-                            string += dataId + ",";
-                            isChecked = true;
-                            valArr.splice(i, 1);
-                            break;
-                        }
-                    }
-                    if (!isChecked) {
-                        $(this).set_cc_unchecked();
-                        isCheckedAll = false;
-                    }
-                }
-            });
-            if (string != "") {
-                ccObj.data("ids", string);
-                if (isCheckedAll) {
-                    ccObj.children().first().data("type", "checkedAll");
-                }
-            } else {
-                ccObj.removeData("ids");
-            }
-        },
-        set_cc_val: function (valId) {
-            var boxObj = $(this);
-            var valObj = $("#" + valId);
-            valObj.change(function () {
-                var valArr = valObj.val().split(",");
-                boxObj.children().each(function () {
-                    $(this).set_cc_data(valArr)
-                })
-            })
-        }
-    });
 
     //dynamic_select
     $.fn.extend({

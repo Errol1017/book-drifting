@@ -1,6 +1,9 @@
 package project.navigator.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Errol on 17/3/11.
@@ -80,6 +83,18 @@ public class Navigation {
                     break;
                 }
             }
+        }
+        return list;
+    }
+
+    public List<Map<String, String>> getPowerCascade() {
+        List<Map<String, String>> list = new ArrayList<>();
+        for (Module m : modules) {
+            Map<String, String> map = new HashMap<>();
+            map.put("level", String.valueOf(m.getLevel()));
+            map.put("val", m.getId());
+            map.put("name", m.getName());
+            list.add(map);
         }
         return list;
     }

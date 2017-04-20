@@ -23,11 +23,13 @@ public class ComDaoImpl extends BaseDao {
 
     public <T> long getCount(Class<T> typeValue) {
         Query query = getSessionFactory().getCurrentSession().createQuery("select count(*) from " + typeValue.getSimpleName());
-        return query.uniqueResult() == null ? 0 : ((Long) query.uniqueResult()).longValue();
+        Object res = query.uniqueResult();
+        return res == null ? 0 : ((Long) res).longValue();
     }
     public <T> long getCount(Class<T> typeValue, String condition) {
         Query query = getSessionFactory().getCurrentSession().createQuery("select count(*) from " + typeValue.getSimpleName() + " where " + condition);
-        return query.uniqueResult() == null ? 0 : ((Long) query.uniqueResult()).longValue();
+        Object res = query.uniqueResult();
+        return res == null ? 0 : ((Long) res).longValue();
     }
 
     public <T> List<Object[]> getCountGroupBy(Class<T> typeValue, String countField, String groupField) {
@@ -52,11 +54,13 @@ public class ComDaoImpl extends BaseDao {
 
     public <T> long getSum(Class<T> typeValue, String sumField) {
         Query query = getSessionFactory().getCurrentSession().createQuery("select sum(" + sumField + ") from " + typeValue.getSimpleName());
-        return query.uniqueResult() == null ? 0 : ((Long) query.uniqueResult()).longValue();
+        Object res = query.uniqueResult();
+        return res == null ? 0 : ((Long) res).longValue();
     }
     public <T> long getSum(Class<T> typeValue, String sumField, String condition) {
         Query query = getSessionFactory().getCurrentSession().createQuery("select sum(" + sumField + ") from " + typeValue.getSimpleName() + " where " + condition);
-        return query.uniqueResult() == null ? 0 : ((Long) query.uniqueResult()).longValue();
+        Object res = query.uniqueResult();
+        return res == null ? 0 : ((Long) res).longValue();
     }
 
     public <T> List<Object[]> getSumGroupBy(Class<T> typeValue, String sumField, String groupField) {

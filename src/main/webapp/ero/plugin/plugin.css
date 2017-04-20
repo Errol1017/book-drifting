@@ -195,6 +195,10 @@
 .list_table_footer_td {
     padding: 0 10px;
 }
+.list_table_footer_right {
+    float: right;
+    vertical-align: middle;
+}
 
 
 /* detail_form_style */
@@ -205,6 +209,12 @@
 
 
 /* cascade_checkbox style */
+.cascade_checkbox_box {
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-shadow: inset 1px 1px 1px #ccc;
+    margin-bottom: 3px;
+}
 .cascade_checkbox {
     display: inline-block;
     line-height: 30px;

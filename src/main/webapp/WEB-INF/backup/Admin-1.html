@@ -72,7 +72,7 @@
                 <label for="AdminForm_power" class="ls_mw_100 span20p alain_top">权限</label>
                 <span class="span_box span70p">
                     <input type="hidden" id="AdminForm_power">
-                    <div id="AdminForm_power_box">
+                    <div id="AdminForm_power_box" class="cascade_checkbox_box">
                         <ul class="cascade_checkbox span140">
                             <li class="cc_li_even" data-id="Project"><input type="checkbox" class="input_checkbox">项目管理</li>
                             <li>
@@ -139,35 +139,6 @@
     <input type="hidden" id="AdminFormBindData" value="ok">
     <script>
         jQuery(function () {
-            jQuery("#AdminPage").list_table_register({
-                tableId: "AdminList",
-                msgId: "AdminList_msg",
-                perPageNum: 10,
-                header: {
-                    names: ["!_id", "用户名", "角色/部门", "真实姓名"],
-                    colWith: ["hide", "span30p", "span30p", "span40p"]
-                },
-                body: {
-                    tdConf: ["hide", "", "", "nowrap"]
-                },
-                footer: {
-                    id: "AdminListFooter"
-                },
-//                paging: {
-//                    id: "AdminListPaging"
-//                },
-                form: {
-                    formId: "AdminForm"
-                },
-                handle: {
-                    boxId: "AdminListHandleBox",
-                    deleteqCall: function (fun) {
-                        if (confirm("确认删除数据？")){
-                            fun();
-                        }
-                    }
-                }
-            });
             jQuery("#AdminPage").cascade_checkbox_register({
                 boxId: "AdminForm_power_box",
                 valId: "AdminForm_power",
@@ -185,58 +156,6 @@
                 jQuery("#AdminForm_msg").fadeOut();
             });
 
-            jQuery("#AdminPage").form_detail_register({
-                formId: "AdminForm",
-                inputIds: ["id", "name", "password", "role", "power", "remark"],
-                bind: {
-                    id: "AdminFormBindData",
-                    callback: function () {
-                        $("#AdminForm_power").trigger("change");
-                        $("#AdminForm_password").attr("placeholder", "如不修改密码  请留空");
-                    }
-                },
-                unbind: {
-                    id: "AdminForm_unbind",
-                    callback: function () {
-                        $("#AdminForm_power").trigger("change");
-                        $("#AdminForm_password").attr("placeholder", "不能为空")
-                    }
-                },
-                validate: {
-                    ids: ["name", "role", "remark"],
-                    func: function(m){
-                        $("#AdminForm_name").change(function () {
-                            $(this).required().common_account_rule(6, 18).show_check_msg(m);
-                        });
-                        $("#AdminForm_role").change(function () {
-                            $(this).required().check_simple_length(1, 30).show_check_msg(m);
-                        });
-                        $("#AdminForm_remark").change(function () {
-                            $(this).check_simple_length(0, 250).show_check_msg(m);
-                        });
-                    },
-                    callback: function (m) {
-                        if ($("#AdminForm_submit").text() == "新 增"){
-                            if (jQuery("#AdminForm_power").required().show_check_msg(m)){
-                                return $("#AdminForm_password").required().show_check_msg(m);
-                            }else {
-                                return false;
-                            }
-                        }else {
-                            return jQuery("#AdminForm_power").required().show_check_msg(m);
-                        }
-                    }
-                },
-                submit: {
-                    id: "AdminForm_submit",
-//                    callback: function () {
-//                        alert("submit data")
-//                    }
-                },
-                list: {
-                    tableId: "AdminList"
-                }
-            });
 
 
 
