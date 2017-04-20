@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	   xsi:schemaLocation="http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+   		http://www.springframework.org/schema/beans
+  		http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+  		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.2.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/tx
+  		http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+	<!-- tx配置
+	-->
+	<!-- util配置
+	xmlns:util="http://www.springframework.org/schema/util"
+		http://www.springframework.org/schema/util
+  		http://www.springframework.org/schema/util/spring-util-4.2.xsd
+	-->
+	<!-- aop配置
+     -->
+ 
+ 	<!-- 加载配置文件 -->
+ 	<context:property-placeholder location="classpath:jdbc.properties,classpath:server.properties" />
+ 	
+ 	<!-- 扫描项目文件自动注入bean -->
+	<context:component-scan base-package="common.CRUD.dao" />
+	<context:component-scan base-package="common.CRUD.service" />
+ 	<context:component-scan base-package="project.*.dao" />
+	<context:component-scan base-package="project.*.service" />
+	<context:component-scan base-package="project.*.controller" />
+	
+	<!-- springmvc配置 -->
+	<mvc:annotation-driven>
+		<!-- 返回json数据，使用@response -->
+		<!-- 
+		<mvc:message-converters register-defaults="true">
+			<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+				<property name="supportedMediaTypes">
+					<list>
+						<value>text/html;charset=UTF-8</value>
+						<value>application/json;charset=UTF-8</value>
+						<value>application/x-www-form-urlencoded; charset=UTF-8</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:message-converters>
+		 -->
+	</mvc:annotation-driven>
+	
+	<!-- 静态资源跳转 -->
+	<mvc:default-servlet-handler />
+
+	<!-- springmvc注解映射开启配置 -->
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" />
+	
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter" />
+
+	<!-- 对模型视图名称的解析，即在模型视图名称添加前后缀 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/WEB-INF/" />
+	</bean>
+	<!-- 
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/WEB-INF/views" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	 -->
+	
+	<!-- c3p0数据源配置 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="${jdbc.driver}" />
+		<property name="jdbcUrl" value="${jdbc.url}" />
+		<property name="user" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+		<!-- 初始化时获取的连接数，默认3 -->
+		<property name="initialPoolSize" value="3" />
+		<!-- 保留的最小连接数，默认3 -->
+		<property name="minPoolSize" value="3" />
+		<!-- 保留的最大连接数，默认15 -->
+		<property name="maxPoolSize" value="15" />
+		<!-- 当连接池耗尽，一次获取的连接数，默认3 -->
+		<property name="acquireIncrement" value="3" />
+		<!-- 请求超时时间 -->
+		<property name="checkoutTimeout" value="30000" />
+		<!-- 最大空闲时间，60秒内未使用则被丢弃；默认为0，永不丢弃 -->
+		<property name="maxIdleTime" value="60" />
+		<!-- 每60秒检查所有连接池中的空闲连接，默认为0 -->
+		<property name="idleConnectionTestPeriod" value="60" />
+	</bean>
+	
+	<!-- SessionFactory配置 -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<!-- 注入数据源 -->
+		<property name="dataSource" ref="dataSource"/>
+		<!-- 注入entity实体 -->
+		<property name="packagesToScan">
+			<list>
+				<value>project.*.entity</value>
+			</list>
+        </property>
+        <!-- hibernate配置 -->
+        <property name="hibernateProperties">
+        	<props>
+				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+				<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl_auto}</prop>
+				<!-- 开启ehcache二级缓存 -->
+				<!-- 
+				<prop key="hibernate.cache.use_second_level_cache">${hibernate.cache.use_second_level_cache}</prop>
+				<prop key="hibernate.cache.use_query_cache">${hibernate.cache.use_query_cache}</prop>
+				<prop key="hibernate.cache.region.factory_class">${hibernate.cache.region.factory_class}</prop>
+				<prop key="hibernate.cache.provider_configuration_file_resource_path">${hibernate.cache.provider_configuration_file_resource_path}</prop>
+				 -->
+			</props>
+        </property>
+    </bean>
+    
+    <!-- 事务管理器配置 -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<!-- 启用Aspectj支持，启用@Aspect注解 -->
+	<!--
+	<aop:aspectj-autoproxy />
+	-->
+	
+	<!-- 配置事务增强处理Bean，指定事务管理器 -->
+	<tx:advice id="transactionAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="save*" propagation="REQUIRED" />
+			<tx:method name="delete*" propagation="REQUIRED" />
+			<tx:method name="create*" propagation="REQUIRED" />
+			<tx:method name="update*" propagation="REQUIRED" />
+
+			<tx:method name="get*" propagation="SUPPORTS"/>
+			<tx:method name="retrieve*" propagation="SUPPORTS"/>
+
+			<tx:method name="*" propagation="SUPPORTS"/>
+
+		</tx:attributes>
+	</tx:advice>
+		<!--控制事物处理权限，提高安全性
+			<tx:method name="get*" propagation="SUPPORTS" read-only="true" />
+			<tx:method name="retrieve*" propagation="SUPPORTS" read-only="true" />
+
+			<tx:method name="*" propagation="SUPPORTS" read-only="true" />
+		-->
+
+	<!-- Spring aop事务管理 -->
+	<aop:config>
+		<aop:pointcut id="transactionPointcutCommon" expression="execution(* common.CRUD.service.*Impl.*(..))" />
+		<aop:advisor pointcut-ref="transactionPointcutCommon" advice-ref="transactionAdvice" />
+	</aop:config>
+	<aop:config>
+		<aop:pointcut id="transactionPointcut" expression="execution(* project.*.service.*Impl.*(..))" />
+		<aop:advisor pointcut-ref="transactionPointcut" advice-ref="transactionAdvice" />
+	</aop:config>
+
+		
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="UTF-8"/>
+    </bean>
+
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**"/>
+			<bean class="project.navigator.service.Interceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+ 
+ </beans>

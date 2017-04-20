@@ -1,0 +1,215 @@
+<div id="AdminPage" class="cc_main">
+    <div class="div_box box5">
+        <div class="list_table_title span35p">
+            管理员列表
+        </div>
+        <div class="msg_box">
+            <div id="AdminList_Msg" class="msg_style"></div>
+        </div>
+        <table id="AdminList" class="list_table">
+        </table>
+        <div id="AdminList_HandleBox" class="list_table_handle_box span80">
+            <ul class="list_table_handle_box_ul">
+                <li class="m_m_s" id="AdminList_Edit">编 辑</li>
+                <li class="m_m_s" id="AdminList_Delete">删 除</li>
+            </ul>
+        </div>
+        <div class="list_table_bottom">
+            -&nbsp;单击表格行可执行操作
+        </div>
+    </div>
+    <div class="div_box box_m_l box5">
+        <div class="form_detail_title span30p">
+            管理员详情
+        </div>
+        <div class="msg_box">
+            <div id="AdminForm_Msg" class="msg_style"></div>
+        </div>
+        <div id="AdminForm" class="form_detail">
+            <input type="text" id="AdminForm_id">
+            <div>
+                <label for="AdminForm_name" class="ls_mw_100 span20p">用户名</label>
+                <span class="span_box span70p">
+                    <input type="text" id="AdminForm_name" class="input_text_35 span100p" placeholder="不能为空">
+                </span>
+            </div>
+            <div>
+                <label for="AdminForm_role" class="ls_mw_100 span20p">角色/部门</label>
+                <span class="span_box span70p">
+                    <input type="text" id="AdminForm_role" class="input_text_35 span100p" placeholder="不能为空">
+                </span>
+            </div>
+            <div>
+                <label for="AdminForm_actualName" class="ls_mw_100 span20p">真实姓名</label>
+                <span class="span_box span70p">
+                    <input type="text" id="AdminForm_actualName" class="input_text_35 span100p" placeholder="可以为空">
+                </span>
+            </div>
+            <div>
+                <label for="AdminForm_contactNumber" class="ls_mw_100 span20p">联系电话</label>
+                <span class="span_box span70p">
+                    <input type="text" id="AdminForm_contactNumber" class="input_text_35 span100p" placeholder="可以为空">
+                </span>
+            </div>
+            <div>
+                <label for="AdminForm_password" class="ls_mw_100 span20p">登录密码</label>
+                <span class="span_box span70p">
+                    <input type="password" id="AdminForm_password" class="input_text_35 span100p" placeholder="不能为空">
+                </span>
+            </div>
+            <div class="text_area_box">
+                <label for="AdminForm_power" class="ls_mw_100 span20p alain_top">权限</label>
+                <span class="span_box span70p">
+                    <input type="text" id="AdminForm_power">
+                    <div id="AdminForm_power_box">
+                        <ul class="cascade_checkbox span140">
+                            <li class="cc_li_even" data-id="Project"><input type="checkbox" class="input_checkbox">项目管理</li>
+                            <li>
+                                <ul>
+                                    <li class="cc_li_odd" data-id="ProjectCheck"><input type="checkbox"
+                                                                                        class="input_checkbox">项目列表</li>
+                                    <li class="cc_li_odd" data-id="ProjectCreate"><input type="checkbox"
+                                                                                         class="input_checkbox">新增项目</li>
+                                    <li class="cc_li_odd" data-id="OrderLog"><input type="checkbox"
+                                                                                    class="input_checkbox">预约记录</li>
+                                    <li class="cc_li_odd" data-id="InvestLog"><input type="checkbox"
+                                                                                     class="input_checkbox">投资记录</li>
+                                    <li class="cc_li_odd" data-id="Repayment"><input type="checkbox"
+                                                                                     class="input_checkbox">还款计划</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul class="cascade_checkbox span140">
+                            <li class="cc_li_even" data-id="Member"><input type="checkbox"
+                                                                           class="input_checkbox">会员管理</li>
+                            <li>
+                                <ul>
+                                    <li class="cc_li_odd" data-id="Investor"><input type="checkbox"
+                                                                                    class="input_checkbox">投资人列表</li>
+                                    <li class="cc_li_odd" data-id="TradeFlow"><input type="checkbox"
+                                                                                     class="input_checkbox">投资人交易流水</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul class="cascade_checkbox span140">
+                            <li class="cc_li_even" data-id="Basic"><input type="checkbox"
+                                                                          class="input_checkbox">基础设置</li>
+                            <li>
+                                <ul>
+                                    <li class="cc_li_odd" data-id="Borrower"><input type="checkbox"
+                                                                                    class="input_checkbox">借款人账户设置</li>
+                                    <li class="cc_li_odd" data-id="TicketType"><input type="checkbox"
+                                                                                      class="input_checkbox">奖券类型设置</li>
+                                    <li class="cc_li_odd" data-id="Ticket"><input type="checkbox"
+                                                                                  class="input_checkbox">奖券使用情况</li>
+                                    <li class="cc_li_odd" data-id="SMS"><input type="checkbox" class="input_checkbox">短信设置</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <ul class="cascade_checkbox span140">
+                            <li class="cc_li_even" data-id="System"><input type="checkbox"
+                                                                           class="input_checkbox">系统管理</li>
+                            <li>
+                                <ul>
+                                    <li class="cc_li_odd" data-id="Admin"><input type="checkbox" class="input_checkbox">管理员设置</li>
+                                    <li class="cc_li_odd" data-id="AdminLog"><input type="checkbox"
+                                                                                    class="input_checkbox">操作记录</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </span>
+            </div>
+            <div class="text_area_box">
+                <label for="AdminForm_remark" class="ls_mw_100 span20p alain_top">备注</label>
+                <span class="span_box span70p">
+                    <textarea id="AdminForm_remark" class="input_text_area_50 span100p" placeholder="可以为空"></textarea>
+                </span>
+            </div>
+        </div>
+        <div class="form_detail_bottom">
+            <span class="ls_mw_100 span20p"></span>
+            <span class="form_detail_bottom_handle_box span70p">
+                <button class="button_style_80_30" id="AdminForm_Submit">新 增</button>
+                <button class="button_style_80_30" id="AdminForm_Unbind">清 空</button>
+            </span>
+            <span class="form_detail_bottom_lines span30p"></span>
+        </div>
+    </div>
+
+    <input type="hidden" id="AdminPage_Initialization"/>
+    <script>
+        $(function () {
+            var adminList = $("#AdminPage").list_table({
+                tableId: 'AdminList',
+                header: {
+                    names: ["!_id", "用户名", "角色/部门", "真实姓名"],
+                    colWith: ["hide", "span30p", "span40p", "span30p"]
+                },
+//                body: {
+//                    tdConf: ["hide", "", "", "nowrap"]
+//                },
+                handle: {
+                    edit: {
+                        callback: function (data) {
+                            console.log(data)
+                            adminForm.getForm(data.id)
+                        }
+                    },
+                    delete: {
+                        before: function () {
+                            return confirm("确认删除数据？")
+                        },
+                        success: function (data) {
+                            if ($("#AdminForm_id").val() == data.id) {
+                                adminForm.unbind()
+                            }
+                        }
+                    }
+                }
+
+            });
+            var adminForm = $("#AdminPage").form_detail({
+                formId: "AdminForm",
+                inputIds: ["!_id", "name", "role", "actualName", "contactNumber", "password", "power", "remark"],
+                validator: [
+                    function (o) {
+                        return o.required().common_account_rule(6, 18).show_check_msg();
+                    },
+                    function (o) {
+                        return o.required().check_simple_length(1, 15).show_check_msg();
+                    },
+                    function (o) {
+                        return o.check_simple_length(1, 15).show_check_msg();
+                    },
+                    function (o) {
+                        return o.check_simple_length(1, 15).show_check_msg();
+                    },
+                    function (o) {
+                        if ($("#AdminForm_id").val() != '') {
+                            return o.common_password_rule(6, 18).show_check_msg();
+                        } else {
+                            return o.required().common_password_rule(6, 18).show_check_msg();
+                        }
+                    },
+                    function (o) {
+                        return o.required().show_check_msg();
+                    },
+                    function (o) {
+                        return o.check_simple_length(0, 250).show_check_msg();
+                    }
+                ],
+                submit: {
+                    success: function (data) {
+                        if (data != undefined) {
+                            $("#AdminForm_id").val(data);
+                            adminList.getList();
+                        }
+                    }
+                }
+            })
+
+        })
+    </script>
+
+</div>

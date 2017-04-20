@@ -1,0 +1,28 @@
+<div id="AdminLogPage" class="cc_main">
+    adminLogPage
+    <button id="q">1</button>
+    <button id="w">2</button>
+    <script>
+
+        $(function () {
+            $("#q").click(function () {
+                var arr = new Array();
+                var t1 = new Date().getTime()
+                for (var i=0;i<10000000;i++){
+                    arr[i] = "q"
+                }
+                console.log(new Date().getTime()-t1)
+            })
+
+            $("#w").click(function () {
+                var arr = new Array();
+                var t1 = new Date().getTime()
+                for (var i=0;i<10000000;i++){
+                    arr.push("q")
+                }
+                console.log(new Date().getTime()-t1)
+            })
+        })
+
+    </script>
+</div>
