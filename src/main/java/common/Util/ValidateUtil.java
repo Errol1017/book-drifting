@@ -6,7 +6,7 @@ package common.Util;
 public class ValidateUtil {
 
     public static boolean checkPositiveNumber(String s) {
-        return s.matches("^[0-9]*");
+        return s.matches("^[0-9]+");
     }
 
 }

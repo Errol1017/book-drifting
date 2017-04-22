@@ -138,27 +138,5 @@
     <input type="hidden" id="Admin_Initialization">
     <input type="hidden" id="AdminFormBindData" value="ok">
     <script>
-        jQuery(function () {
-            jQuery("#AdminPage").cascade_checkbox_register({
-                boxId: "AdminForm_power_box",
-                valId: "AdminForm_power",
-                dynamic: true
-            });
-            jQuery("#Admin_Initialization").val("ok");
-            jQuery("#Admin_Initialization").click(function () {
-                jQuery("#AdminList").draw_list_table({
-                    body: {
-                        list: $.ero.tempData.AdminList
-                    },
-                    total: $.ero.tempData.AdminListTotal
-                });
-                jQuery("#AdminList_msg").fadeOut();
-                jQuery("#AdminForm_msg").fadeOut();
-            });
-
-
-
-
-        })
     </script>
 </div>

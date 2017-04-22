@@ -1,29 +1,40 @@
-<input id="AdminLogPage" class="cc_main">
-    adminLogPage
-    <button id="q">1</button>
-    <button id="w">2</button>
-    <br>
+<div id="AdminLogPage" class="cc_main">
+    <div class="div_box box10">
+        <div class="list_table_title span25p">
+            操作记录列表
+        </div>
+        <div class="msg_box">
+            <div id="AdminLogList_Msg" class="msg_style"></div>
+        </div>
+        <table id="AdminLogList" class="list_table">
+        </table>
+        <div id="AdminLogList_HandleBox" class="list_table_handle_box span80">
+            <ul class="list_table_handle_box_ul">
+                <li class="m_m_s" id="AdminLogList_Reload">刷 新</li>
+            </ul>
+        </div>
+        <div class="list_table_bottom">
+            -&nbsp;单击表格行可执行操作
+        </div>
+    </div>
+
     <script>
-
         $(function () {
-            $("#q").click(function () {
-                var arr = new Array();
-                var t1 = new Date().getTime()
-                for (var i=0;i<10000000;i++){
-                    arr[i] = "q"
-                }
-                console.log(new Date().getTime()-t1)
-            })
-
-            $("#w").click(function () {
-                var arr = new Array();
-                var t1 = new Date().getTime()
-                for (var i=0;i<10000000;i++){
-                    arr.push("q")
-                }
-                console.log(new Date().getTime()-t1)
+            var adminLogList = $("#AdminLogPage").list_table({
+                tableId: 'AdminLogList',
+                header: {
+                    names: ["!_id", "管理员用户名", "操作类型", "操作对象", "!_targetId", "备注", "操作时间"],
+                    colWith: ["", "span20p", "span10p", "span20p", "", "span30p", "span20p"]
+                },
+                body: {
+                    tdConf: ["", "", "", "", "", "nowrap", ""]
+                },
+//                handle: {
+//                }
+            });
+            $("#AdminLogPage").reloadData(function () {
+                adminLogList.getList(1);
             })
         })
-
     </script>
 </div>

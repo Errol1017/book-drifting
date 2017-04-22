@@ -48,14 +48,14 @@ public class AdminController {
         for (AdminRole role: roles){
             roleHashMap.put(role.getId(), role);
         }
-        List<AdminList> adminListList = new ArrayList<>();
+        List<AdminList> list = new ArrayList<>();
         for (Admin admin: admins){
-            adminListList.add(new AdminList(admin, roleHashMap.get(admin.getRoleId())));
+            list.add(new AdminList(admin, roleHashMap.get(admin.getRoleId())));
         }
         long total = comService.getCount(Admin.class);
         HashMap<String, Object> result = new HashMap<>();
-        result.put("list", adminListList);
-        result.put("totalNum", total);
+        result.put("list", list);
+        result.put("total", total);
         return Result.SUCCESS(result);
     }
 
@@ -114,5 +114,4 @@ public class AdminController {
     public @ResponseBody Object getAdminPower() throws Exception {
         return Result.SUCCESS(Navigation.getInstance().getPowerCascade());
     }
-
 }

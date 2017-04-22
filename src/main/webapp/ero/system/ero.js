@@ -35,12 +35,9 @@
                 }
                 return navigation['pageObj']
             },
-            initData: function(navigation) {
-                if (navigation['initObj'] == undefined) {
-                    navigation['initObj'] = $("#" + navigation['pageId'] + "_Initialization")
-                }
-                if (navigation['initObj'].length > 0) {
-                    navigation['initObj'].trigger('click')
+            reloadData: function(navigation) {
+                if (navigation['reloadData'] != undefined) {
+                    navigation['reloadData']()
                 }
             }
         },
@@ -79,6 +76,7 @@
                     ero.pluginManager.loadedPages.splice(index, 1);
                     ero.pluginManager.loadedPages.push(tarPageId);
                     switchPage();
+                    ero.navigator.reloadData(tarReqNavigation);
                 }
             }
             function loadPage() {
@@ -124,7 +122,6 @@
                         tarPageObj.removeAttr("style").fadeIn(FadeToggleSpeed);
                     })
                 }
-                ero.navigator.initData(tarReqNavigation);
                 ero.navigator.curReqId = tarReqId;
                 tarReqObj.addClass("sm_slct");
             }
@@ -209,7 +206,11 @@
             var errmsg = "xhr.readyState:"+xhr.readyState+"/xhr.status:"+xhr.status+"/xhr.statusText:"+xhr.statusText+"/status:"+msg+"/error:"+obj;
             // alert(errmsg);
         },
-
+    };
+    $.fn.reloadData = function (fun) {
+        var pageId = $(this).attr("id");
+        var navigation = $.ero.navigator.getNavigation("", pageId);
+        navigation['reloadData'] = fun;
     };
 
     //show prompt message
@@ -300,7 +301,7 @@ jQuery(function ($) {
                         domStr += "<li id="+obj["id"]+" class='m_m_s sul_even'><img class='sul_img' src="+obj["imgUrl"]+"><span class='sule_span'>"+obj["name"]+"</span></li>";
                         domStr += "<li class='sul_odd'><ul>";
                     }else if (obj["level"] == 2) {
-                        $.ero.navigator.data.push({reqId:obj["id"], pageId:obj["pageId"], reqObj:undefined, pageObj:undefined, initObj:undefined});
+                        $.ero.navigator.data.push({reqId:obj["id"], pageId:obj["pageId"], reqObj:undefined, pageObj:undefined, reloadData:undefined});
                         domStr += "<li id="+obj["id"]+" class='s_m_s sulou_li'>"+obj["name"]+"</li>"
                     }
                 }

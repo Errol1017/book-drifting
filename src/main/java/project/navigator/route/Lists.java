@@ -6,10 +6,12 @@ package project.navigator.route;
 public class Lists {
 
     public static final String AdminList = "/Pride and Prejudice";
+    public static final String AdminLogList = "/Mansfield Park";
 
     public static String getList(String list) {
         switch (list) {
             case "AdminList": return Lists.AdminList;
+            case "AdminLogList": return Lists.AdminLogList;
             default: return null;
         }
     }

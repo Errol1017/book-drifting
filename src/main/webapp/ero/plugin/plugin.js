@@ -61,8 +61,8 @@
         getList();
         console.log(param)
         return {
-            getList: function () {
-                getList()
+            getList: function (page) {
+                getList(page)
             },
             deselect: function () {
                 deselect();
@@ -71,11 +71,11 @@
         function init() {
             initParam();
             drawHeader();
-            registerBodyEvent();
             drawFooter();
             registerFooterEvent();
             initHandle();
             initHandleEvent();
+            registerBodyEvent();
             // $.ero.pluginManager.setConfig(pageId, param.tableId, param);
             function initParam() {
                 param.reqId = $.ero.navigator.getReqId($.ero.navigator.getNavigation("", pageId));
@@ -123,14 +123,6 @@
                 }else {
                     param.body.bodyObj = tableObj.find("tbody").first();
                 }
-            }
-            function registerBodyEvent() {
-                param.body.bodyObj.click(function (e) {
-                    var trObj = $(e.target).parent();
-                    trObj.addClass("lt_tr_slct").siblings().removeClass("lt_tr_slct");
-                    param.handle.handleObj.hide().css("top", e.clientY + document.body.scrollTop + 1 + "px").css("left", e.clientX + 1 + "px").slideDown();
-                    param.handle.data = param.body.data[trObj.index()];
-                })
             }
             function drawFooter() {
                 var tf = "<tfoot class='list_table_footer'><tr><td class='list_table_footer_td' colspan='" + param.header.colsNum+ "'>匹配数据&nbsp;<span>0</span>&nbsp;条&nbsp;共&nbsp;<span>0</span>&nbsp;页" +
@@ -190,6 +182,9 @@
                 })
             }
             function initHandle() {
+                if (param.handle == undefined) {
+                    param.handle = new Object()
+                }
                 if (param.handle.handleObj == undefined) {
                     param.handle.handleObj = $("#" + param.tableId + "_HandleBox");
                 }
@@ -204,30 +199,37 @@
                 }
             }
             function initHandleEvent() {
-                param.handle.handleObj.mouseleave(function () {
-                    $(this).fadeOut();
-                });
-                param.handle.editObj.click(function () {
-                    param.handle.edit.callback(param.handle.data)
-                    param.handle.handleObj.fadeOut();
-                });
-                param.handle.deleteObj.click(function () {
-                    if (param.handle.delete.before != undefined) {
-                        if (!param.handle.delete.before()) {
-                            return false;
+                if (param.handle.handleObj.length > 0) {
+                    param.handle.handleObj.mouseleave(function () {
+                        $(this).fadeOut();
+                    });
+                }
+                if (param.handle.editObj.length > 0) {
+                    param.handle.editObj.click(function () {
+                        param.handle.edit.callback(param.handle.data);
+                        param.handle.handleObj.fadeOut();
+                    });
+                }
+                if (param.handle.deleteObj.length > 0) {
+                    param.handle.deleteObj.click(function () {
+                        if (param.handle.delete.before != undefined) {
+                            if (!param.handle.delete.before()) {
+                                return false;
+                            }
                         }
-                    }
-                    deleteData(function () {
-                        if (param.handle.delete.success != undefined) {
-                            param.handle.delete.success(param.handle.data)
-                        }
-                        getList();
-                    })
-                });
-                param.handle.reloadObj.click(function () {
-                    param.data.tarPageNum = 1;
-                    getList();
-                });
+                        deleteData(function () {
+                            if (param.handle.delete.success != undefined) {
+                                param.handle.delete.success(param.handle.data)
+                            }
+                            getList();
+                        })
+                    });
+                }
+                if (param.handle.reloadObj.length > 0) {
+                    param.handle.reloadObj.click(function () {
+                        getList(1);
+                    });
+                }
                 function deleteData(success) {
                     $.ajax({
                         url: "navigator/validator",
@@ -256,8 +258,21 @@
                     });
                 }
             }
+            function registerBodyEvent() {
+                if (param.handle.handleObj.length > 0) {
+                    param.body.bodyObj.click(function (e) {
+                        var trObj = $(e.target).parent();
+                        trObj.addClass("lt_tr_slct").siblings().removeClass("lt_tr_slct");
+                        param.handle.handleObj.hide().css("top", e.clientY + document.body.scrollTop + 1 + "px").css("left", e.clientX + 1 + "px").slideDown();
+                        param.handle.data = param.body.data[trObj.index()];
+                    })
+                }
+            }
         }
-        function getList() {
+        function getList(page) {
+            if (page != undefined) {
+                param.data.tarPageNum = page
+            }
             $.ajax({
                 url: "navigator/validator",
                 type: "post",
@@ -273,9 +288,9 @@
                     if (res.code == 0) {
                         param.data.list = res.data.list;
                         param.data.curPageNum = param.data.tarPageNum;
-                        if (param.data.totalNum != res.data.totalNum) {
+                        if (param.data.totalNum != res.data.total) {
                             param.data.totalNumChanged = true;
-                            param.data.totalNum = res.data.totalNum;
+                            param.data.totalNum = res.data.total;
                             var n = Math.ceil(param.data.totalNum / param.perPageNum);
                             if (param.data.totalPage != n) {
                                 param.data.totalPage = n;

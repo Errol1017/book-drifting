@@ -163,7 +163,8 @@
 }
 /* list table page select */
 .lt_page_slct {
-    background-color: #ddd;
+    background-color: #ccc;
+    color: #fff;
     border: 1px solid #dfdfdf;
 }
 /* list table td nowrap */

@@ -8,6 +8,7 @@ import common.Util.DateUtil;
  */
 public class AdminLogList {
 
+    private String id;
     private String adminName;
     private String type;
     private String target;
@@ -16,12 +17,17 @@ public class AdminLogList {
     private String createTime;
 
     public AdminLogList(AdminLog log) {
+        this.id = String.valueOf(log.getId());
         this.adminName = log.getAdminName();
         this.type = log.getType().getName();
         this.target = log.getTarget().getName();
         this.targetId = String.valueOf(log.getTargetId());
         this.remark = log.getRemark();
         this.createTime = DateUtil.date2String(log.getCreateTime(), DateUtil.PATTERN_G);
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getAdminName() {

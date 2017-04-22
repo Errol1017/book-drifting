@@ -86,13 +86,12 @@
         $(function () {
             var adminList = $("#AdminPage").list_table({
                 tableId: 'AdminList',
-                perPageNum: 1,
                 header: {
                     names: ["!_id", "用户名", "角色/部门", "真实姓名"],
-                    colWith: ["hide", "span30p", "span40p", "span30p"]
+                    colWith: ["", "span30p", "span40p", "span30p"]
                 },
 //                body: {
-//                    tdConf: ["hide", "", "", "nowrap"]
+//                    tdConf: ["", "", "", "nowrap"]
 //                },
                 handle: {
                     edit: {
@@ -167,6 +166,9 @@
                 callback: function () {
                     $("#AdminForm_power").trigger("change")
                 }
+            });
+            $("#AdminPage").reloadData(function () {
+                adminList.getList(1);
             })
         })
     </script>
