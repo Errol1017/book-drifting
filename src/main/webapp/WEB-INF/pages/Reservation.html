@@ -1,3 +1,17 @@
 <div id="ReservationPage" class="cc_main">
     projectCheckPage
+    <div>
+        <label for="date" class="ls_mw_100 span20p">预约日期</label>
+        <span class="span_box span70p">
+                        <input type="text" id="date" class="input_text_35 span100p" placeholder="不能为空">
+                    </span>
+    </div>
+
+    <script>
+        $(function () {
+            $("#date").date_picker({
+                shortDate: false
+            })
+        })
+    </script>
 </div>

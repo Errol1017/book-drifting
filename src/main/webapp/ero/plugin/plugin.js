@@ -4,7 +4,7 @@
 
 ;(function ($) {
 
-    //list_table
+    //list table
     $.fn.list_table = function (param) {
         /**
          * @param param
@@ -411,7 +411,7 @@
         }
     };
     
-    //form_detail
+    //form detail
     $.fn.form_detail = function (param) {
         /**
          * @param param
@@ -1069,6 +1069,431 @@
                 }
             }
         }
+    };
+
+    //date picker
+    $.fn.date_picker = function (param) {
+        /**
+         * @param param
+         * param.subObj
+         * param.valObj
+         * param.shortDate      boolean default true
+         * param.chinese        boolean default true
+         * param.arr
+         * param.curDate        当前选定date，默认当天
+         * param.tarDate        目标date，默认和curDate相同
+         * param.boxObj
+         * param.headObj        the control row
+         * param.bodyObj
+         * param.dateType       date/time/month/year
+         */
+        param.subObj = $(this);
+        init();
+        return {
+
+        };
+        function init() {
+            initData();
+            initValObj();
+            initBox();
+            initHandleEvent();
+            initHeadEvent();
+            initBodyEvent();
+            function initData() {
+                param.dateType = "date";
+                if (param.shortDate == undefined) {
+                    param.shortDate = true;
+                }
+                if (param.chinese == undefined) {
+                    param.chinese = true;
+                }
+                if (param.chinese) {
+                    param.arr = ['年','月','日',' ','时','分','秒']
+                } else {
+                    param.arr = ['-','-','',' ',':',':','']
+                }
+            }
+            function initValObj() {
+                var id = param.subObj.attr("id");
+                param.subObj.attr("id", id + '_Sub');
+                param.subObj.before('<input type="hidden" id="' + id + '"/>');
+                param.valObj = param.subObj.prev();
+            }
+            function initBox() {
+                if (param.chinese) {
+                    var weekStr = "<tr class='date_picker_thead'><th>日</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th></tr>";
+                } else {
+                    var weekStr = "<tr class='date_picker_thead'><th>Sun.</th><th>Mon.</th><th>Tue.</th><th>Wed.</th><th>Thu.</th><th>Fri.</th><th>Sat.</th></tr>";
+                }
+                var colGroupStr = "<colgroup><col class='date_picker_col'><col class='date_picker_col'><col class='date_picker_col'><col class='date_picker_col'>" +
+                    "<col class='date_picker_col'><col class='date_picker_col'><col class='date_picker_col'></colgroup>";
+                var headStr = "<table class='date_picker_table' style='border-bottom: none'><thead class='date_picker_thead'><tr></tr></thead></table>";
+                var bodyStr = "<table class='date_picker_table' style='border-top: none'>" + colGroupStr + "<thead class='date_picker_thead'>" + weekStr + "</thead><tbody class='date_picker_tbody'></tbody></table>";
+                param.subObj.after("<div class='dynamic_plugin_box'>" + headStr + bodyStr + "</div>");
+                param.boxObj = param.subObj.next();
+                param.headObj = param.boxObj.find("tr").first();
+                param.bodyObj = param.boxObj.find("tbody").first();
+            }
+            function initHandleEvent() {
+                initSubObjEvent();
+                initBoxObjEvent();
+                function initSubObjEvent() {
+                    param.subObj.click(function () {
+                        setDate();
+                        drawTable();
+                        param.boxObj.fadeIn();
+                    }).change(function () {
+                        if (param.chinese) {
+                            var s= $(this).val();
+                            s = s.replace(param.arr[0], '-');
+                            s = s.replace(param.arr[1], '-');
+                            s = s.replace(param.arr[2], '');
+                            s = s.replace(param.arr[4], ':');
+                            s = s.replace(param.arr[5], ':');
+                            s = s.replace(param.arr[6], ':');
+                            param.valObj.val(s);
+                        } else {
+                            param.valObj.val($(this).val())
+                        }
+                    }).keyup(function () {
+                        param.boxObj.fadeOut();
+                    }).blur(function () {
+                        if (!param.boxObj.data("prevent")) {
+                            param.boxObj.fadeOut();
+                        }
+                    });
+                    function setDate() {
+                        var dateStr = param.valObj.val();
+                        if (dateStr == "" || new Date(dateStr) == "Invalid Date") {
+                            param.curDate = new Date();
+                            param.tarDate = new Date();
+                            param.subObj.val('');
+                            param.valObj.val('');
+                        } else {
+                            param.curDate = new Date(dateStr);
+                            param.tarDate = new Date(dateStr);
+                        }
+                        param.tarDate.setDate(1);
+                        param.dateType = "date";
+                    }
+                }
+                function initBoxObjEvent() {
+                    param.boxObj.mouseenter(function () {
+                        $(this).data("prevent", true);
+                    }).mouseleave(function () {
+                        param.boxObj.fadeOut().data("prevent", false);
+                    });
+                }
+            }
+            function initHeadEvent() {
+                param.headObj.click(function (e) {
+                    var index = $(e.target).index();
+                    switch (index) {
+                        case 0:
+                            if (param.dateType == "date") {
+                                param.tarDate.setMonth(param.tarDate.getMonth() - 1);
+                            } else if (param.dateType == "month") {
+                                param.tarDate.setFullYear(param.tarDate.getFullYear() - 1);
+                            } else if (param.dateType == "year") {
+                                param.tarDate.setFullYear(param.tarDate.getFullYear() - 10);
+                            } else if (param.dateType == "time") {
+                                return false;
+                            }
+                            break;
+                        case 2:
+                            if (param.dateType == "date") {
+                                param.tarDate.setMonth(param.tarDate.getMonth() + 1);
+                            } else if (param.dateType == "month") {
+                                param.tarDate.setFullYear(param.tarDate.getFullYear() + 1);
+                            } else if (param.dateType == "year") {
+                                param.tarDate.setFullYear(param.tarDate.getFullYear() + 10);
+                            } else if (param.dateType == "time") {
+                                return false;
+                            }
+                            break;
+                        case 1:
+                            if (param.dateType == "date") {
+                                param.dateType = "month";
+                            } else if (param.dateType == "month") {
+                                param.dateType = "year";
+                            } else if (param.dateType == "time") {
+                                param.dateType = "date";
+                            }
+                            break;
+                        case 3:
+                            if (param.shortDate) {
+                                return false;
+                            }
+                            if (param.dateType == "time") {
+                                param.dateType = "date";
+                                param.valObj.val(param.tarDate.toString());
+                                param.subObj.val(param.tarDate.getFullYear() + param.arr[0] + (param.tarDate.getMonth() + 1) + param.arr[1] + param.tarDate.getDate() + param.arr[2] + param.arr[3]
+                                    + param.tarDate.getHours() + param.arr[4] + param.tarDate.getMinutes() + param.arr[5] + param.tarDate.getSeconds() + param.arr[6]);
+                                param.boxObj.data("prevent", false);
+                            } else {
+                                param.dateType = "time";
+                            }
+                    }
+                    drawTable();
+                    console.log(param)
+                })
+            }
+            function initBodyEvent() {
+                param.bodyObj.click(function (e) {
+                    var tarObj = $(e.target);
+                    if (param.dateType == "date") {
+                        var date = parseInt(tarObj.attr("data-v"));
+                        if (tarObj.hasClass("date_picker_beyond_target_month")) {
+                            param.tarDate.setMonth(parseInt(date) > 15 ? param.tarDate.getMonth() - 1 : param.tarDate.getMonth() + 1);
+                        }
+                        param.tarDate.setDate(date);
+                        param.valObj.val(param.tarDate.toString());
+                        if (param.shortDate) {
+                            param.subObj.val(param.tarDate.getFullYear() + param.arr[0] + (param.tarDate.getMonth() + 1) + param.arr[1] + param.tarDate.getDate() + param.arr[2]);
+                        } else {
+                            param.subObj.val(param.tarDate.getFullYear() + param.arr[0] + (param.tarDate.getMonth() + 1) + param.arr[1] + param.tarDate.getDate() + param.arr[2] + param.arr[3]
+                                + param.tarDate.getHours() + param.arr[4] + param.tarDate.getMinutes() + param.arr[5] + param.tarDate.getSeconds() + param.arr[6]);
+                        }
+                        if (param.shortDate) {
+                            param.boxObj.fadeOut().data("prevent", false);
+                        } else {
+                            param.boxObj.data("prevent", false);
+                        }
+                    } else if (param.dateType == "month") {
+                        param.tarDate.setMonth(parseInt(tarObj.attr("data-v")));
+                        param.dateType = "date";
+                        drawTable();
+                    } else if (param.dateType == "year") {
+                        param.tarDate.setFullYear(parseInt(tarObj.attr("data-v")));
+                        param.dateType = "month";
+                        drawTable();
+                    } else if (param.dateType == "time") {
+                        if (tarObj.text() == "：") {
+                            return false;
+                        }
+                        var o = tarObj.parent();
+                        var i = o.parent().index();
+                        var j = o.index();
+                        var reg1 = new RegExp("\^(((0|1)?[0-9])|20|21|22|23)$");
+                        var reg2 = new RegExp("\^(0|1|2|3|4|5)?[0-9]$");
+                        var ips = param.bodyObj.find("input");
+                        switch (j) {
+                            case 1:
+                                switch (i) {
+                                    case 1:
+                                        tarObj.blur(function () {
+                                            $(this).val($(this).val().match(reg1) ? parseInt($(this).val()) : 0);
+                                            param.tarDate.setHours($(this).val());
+                                        });
+                                        break;
+                                    case 0:
+                                    case 2:
+                                        var h = param.tarDate.getHours() + (i == 0 ? 1 : -1);
+                                        h = h == 24 ? 0 : h == -1 ? 23 : h;
+                                        ips.first().val(h);
+                                        param.tarDate.setHours(h);
+                                }
+                                break;
+                            case 3:
+                                switch (i) {
+                                    case 1:
+                                        tarObj.blur(function () {
+                                            $(this).val($(this).val().match(reg2) ? parseInt($(this).val()) : 0);
+                                            param.tarDate.setMinutes($(this).val());
+                                        });
+                                        break;
+                                    case 0:
+                                    case 2:
+                                        var m = param.tarDate.getMinutes() + (i == 0 ? 1 : -1);
+                                        m = m == 60 ? 0 : m == -1 ? 59 : m;
+                                        ips.eq(1).val(m);
+                                        param.tarDate.setMinutes(m);
+                                }
+                                break;
+                            case 5:
+                                switch (i) {
+                                    case 1:
+                                        tarObj.blur(function () {
+                                            $(this).val($(this).val().match(reg2) ? parseInt($(this).val()) : 0);
+                                            param.tarDate.setSeconds($(this).val());
+                                        });
+                                        break;
+                                    case 0:
+                                    case 2:
+                                        var m = param.tarDate.getSeconds() + (i == 0 ? 1 : -1);
+                                        m = m == 60 ? 0 : m == -1 ? 59 : m;
+                                        ips.last().val(m);
+                                        param.tarDate.setSeconds(m);
+                                }
+                                break;
+                            default:
+                                return false;
+                        }
+                    }
+                })
+            }
+            function drawTable() {
+                drawHead();
+                if (param.dateType == "date") {
+                    drawDate();
+                } else if (param.dateType == "month") {
+                    drawMonth();
+                } else if (param.dateType == "year") {
+                    drawYear();
+                } else if (param.dateType == "time") {
+                    drawTime();
+                }
+                function drawHead() {
+                    if (param.dateType == "date" || param.dateType == "time") {
+                        var tt = param.tarDate.getFullYear() + " - " + (param.tarDate.getMonth() + 1);
+                    } else if (param.dateType == "month") {
+                        var tt = param.tarDate.getFullYear();
+                    } else if (param.dateType == "year") {
+                        var y1 = parseInt(param.tarDate.getFullYear() / 10) * 10;
+                        var tt = (y1) + "-" + (y1 + 11);
+                    }
+                    if (param.shortDate) {
+                        var cc = new Date().getHours() + "：" + new Date().getMinutes();
+                        var aa = "";
+                    } else {
+                        var cc = param.tarDate.getHours() + "：" + param.tarDate.getMinutes() + "：" + param.tarDate.getSeconds();
+                        var aa = " class='date_picker_title'";
+                    }
+                    param.headObj.empty().append("<th class='date_picker_title' style='width: 14%'><</th><th colspan='2' class='date_picker_title' style='width: 28.4%'>" + tt
+                        + "</th><th class='date_picker_title' style='width: 14.1%'>></th><th" + aa + " colspan='3' style='width: 43%'>" + cc + "</th>");
+                }
+                function drawDate() {
+                    setDateArray();
+                    function setDateArray() {
+                        var baseDateArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28];
+                        var dateArray = new Array();
+                        var date_0_0;
+                        var date_5_6;
+                        var FirstDateOfPickedMonth = -(param.tarDate.getDate() % 7) + param.tarDate.getDay() + 1;
+                        if (FirstDateOfPickedMonth < 0) {
+                            FirstDateOfPickedMonth += 7;
+                        }
+                        if (FirstDateOfPickedMonth == 0) {
+                            date_0_0 = -6;
+                        } else {
+                            date_0_0 = 1 - FirstDateOfPickedMonth;
+                        }
+                        date_5_6 = date_0_0 + 41;
+                        var firstDate = new Date(param.tarDate.getFullYear(), param.tarDate.getMonth(), param.tarDate.getDate());
+                        firstDate.setDate(date_0_0);
+                        var lastDate = new Date(param.tarDate.getFullYear(), param.tarDate.getMonth(), param.tarDate.getDate());
+                        lastDate.setDate(date_5_6);
+                        for (var i = 0; i <= (0 - date_0_0); i++) {
+                            dateArray.push(firstDate.getDate() + i);
+                        }
+                        dateArray = dateArray.concat(baseDateArray);
+                        for (var i = 1; i <= ((date_5_6 - lastDate.getDate()) - 28); i++) {
+                            dateArray.push(28 + i);
+                        }
+                        for (var i = 1; i <= lastDate.getDate(); i++) {
+                            dateArray.push(i);
+                        }
+                        drawBody(dateArray);
+                    }
+                    function drawBody(dateArray) {
+                        param.bodyObj.prev().show();
+                        var indexDate = new Date(param.tarDate.toString());
+                        indexDate.setMonth(indexDate.getMonth() - 1);
+                        var index = 0;
+                        var isTargetMonth = false;
+                        var domStr = "";
+                        var tdClass;
+                        for (var i = 0; i < 6; i++) {
+                            domStr += "<tr>";
+                            for (var j = 0; j < 7; j++) {
+                                tdClass = "";
+                                if (!isTargetMonth) {
+                                    tdClass += "date_picker_beyond_target_month ";
+                                }
+                                if (dateArray[index] == param.curDate.getDate() && param.curDate.getMonth() == indexDate.getMonth() && param.curDate.getFullYear() == indexDate.getFullYear()) {
+                                    tdClass += "date_picker_date_cur";
+                                }
+                                domStr += "<td data-v='" + dateArray[index] +"' class='" + tdClass + "'>" + dateArray[index] + "</td>";
+                                if (dateArray[index] > dateArray[index + 1]) {
+                                    isTargetMonth = !isTargetMonth;
+                                    indexDate.setMonth(indexDate.getMonth() + 1)
+                                }
+                                index++;
+                            }
+                            domStr += "</tr>";
+                        }
+                        param.bodyObj.addClass("date_picker_tbody").empty().append(domStr);
+                    }
+                }
+                function drawMonth() {
+                    param.bodyObj.prev().hide();
+                    var arr = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
+                    var domStr = "";
+                    var index = 0;
+                    var tdClass;
+                    for (var i = 1; i < 4; i++) {
+                        domStr += "<tr class='date_picker_date_month'>";
+                        for (var j = 1; j < 5; j++) {
+                            tdClass = "";
+                            if (index == param.curDate.getMonth() && param.tarDate.getFullYear() == param.curDate.getFullYear()) {
+                                tdClass += "date_picker_date_cur";
+                            }
+                            domStr += "<td data-v='" + index + "' class='" + tdClass + "'>" + arr[index] + "</td>";
+                            index++;
+                        }
+                        domStr += "</tr>";
+                    }
+                    param.bodyObj.empty().append(domStr);
+                }
+                function drawYear() {
+                    var y0 = parseInt(param.tarDate.getFullYear() / 10) * 10;
+                    var arr = new Array();
+                    for (var i = 0; i < 12; i++) {
+                        arr[i] = y0 + i;
+                    }
+                    var domStr = "";
+                    var index = 0;
+                    var tdClass;
+                    for (var i = 1; i < 4; i++) {
+                        domStr += "<tr class='date_picker_date_month'>";
+                        for (var j = 1; j < 5; j++) {
+                            tdClass = "";
+                            if (index == 0 || index == 11) {
+                                tdClass += "date_picker_beyond_target_month "
+                            }
+                            if (arr[index] == param.curDate.getFullYear()) {
+                                tdClass += "date_picker_date_cur";
+                            }
+                            domStr += "<td data-v='" + arr[index] + "' class='" + tdClass + "'>" + arr[index] + "</td>";
+                            index++;
+                        }
+                        domStr += "</tr>";
+                    }
+                    param.bodyObj.empty().append(domStr);
+                }
+                function drawTime() {
+                    param.bodyObj.prev().hide();
+                    var domStr = "";
+                    var arr = ["<img class='date_picker_time_img' src='./com-res/common/img/arrow/arrow_up.png'>",
+                        "<input type='text' class='date_picker_time_input'>",
+                        "<img class='date_picker_time_img' src='./com-res/common/img/arrow/arrow_down.png'>"];
+                    var arr2 = ["", "：", ""];
+                    for (var i = 0; i < 3; i++) {
+                        domStr += "<tr><td style='width: 50px'>&nbsp;</td>";
+                        for (var j = 0; j < 2; j++) {
+                            domStr += "<td>" + arr[i] + "</td><td style='width: 20px;'>" + arr2[i] + "</td>";
+                        }
+                        domStr += "<td>" + arr[i] + "</td><td style='width: 50px'></td></tr>";
+                    }
+                    param.bodyObj.removeClass("date_picker_tbody").empty().append(domStr);
+                    var tt = [param.tarDate.getHours(), param.tarDate.getMinutes(), param.tarDate.getSeconds()];
+                    var i = 0;
+                    param.bodyObj.find("input").each(function () {
+                        $(this).val(tt[i++]);
+                    });
+                }
+            }
+        }
     }
 
 })(jQuery)
@@ -1693,399 +2118,7 @@
         }
     });
 
-    //date picker
-    $.fn.extend({
-        /**
-         * @param obj
-         * obj.valId            id
-         * obj.shortDate        boolean
-         */
-        date_picker_register: function (obj) {
-            var valObj = $(this);
-            valObj.date_picker_parse_date_picked().trigger("change");
-            valObj.date_picker_prepare_table(obj);
-        },
-        date_picker_parse_date_picked: function () {
-            var valObj = $(this);
-            valObj.click(function () {
-                var valDate = $(this).val();
-                var dateData = new Object();
-                if (valDate == "" || new Date(valDate) == "Invalid Date") {
-                    dateData.datePicked = new Date();
-                    dateData.dateTarget = new Date();
-                } else {
-                    dateData.datePicked = new Date(valDate);
-                    dateData.dateTarget = new Date(valDate);
-                }
-                valObj.data("dateData", dateData);
-            }).keyup(function () {
-                $(this).next().fadeOut();
-            });
-            return this;
-        },
-        date_picker_prepare_table: function (obj) {
-            var valObj = $(this);
-            var weekStr = "<tr class='date_picker_thead'><th>Sun.</th><th>Mon.</th><th>Tue.</th><th>Wed.</th><th>Thu.</th><th>Fri.</th><th>Sat.</th></tr>";
-            var colGroupStr = "<colgroup><col class='date_picker_col'><col class='date_picker_col'><col class='date_picker_col'><col class='date_picker_col'>" +
-                "<col class='date_picker_col'><col class='date_picker_col'><col class='date_picker_col'></colgroup>";
-            var headStr = "<table class='date_picker_table' style='border-bottom: none'><thead class='date_picker_thead'><tr></tr></thead></table>";
-            var bodyStr = "<table class='date_picker_table' style='border-top: none'>" + colGroupStr + "<thead class='date_picker_thead'>" + weekStr + "</thead><tbody class='date_picker_tbody'></tbody></table>";
-            valObj.after("<div class='dynamic_plugin_box'>" + headStr + bodyStr + "</div>");
-            var boxObj = valObj.next();
-            var headTrObj = boxObj.find("tr").first();
-            var tbodyObj = boxObj.find("tbody").first();
-            valObj.date_picker_event_thead(obj, headTrObj, tbodyObj);
-            valObj.date_picker_event_tbody(obj, headTrObj, tbodyObj);
-            valObj.click(function () {
-                // valObj.data("type", "date");
-                valObj.date_picker_draw_table(obj, headTrObj, tbodyObj, "date");
-                boxObj.fadeIn();
-            }).blur(function () {
-                if (!boxObj.data("prevent")) {
-                    boxObj.fadeOut();
-                }
-            });
-            boxObj.mouseenter(function () {
-                $(this).data("prevent", true);
-            }).mouseleave(function () {
-                boxObj.fadeOut().data("prevent", false);
-            })
-        },
-        date_picker_draw_table: function (obj, headTrObj, tbodyObj, type, dateData) {
-            var valObj = $(this);
-            dateData = dateData == undefined ? valObj.data("dateData") : dateData;
-            headTrObj.date_picker_draw_thead(obj, dateData, type);
-            valObj.data("type", type);
-            if (type == "date") {
-                valObj.date_picker_build_date_array(dateData);
-                tbodyObj.date_picker_draw_tbody_date(dateData);
-            } else if (type == "month") {
-                tbodyObj.date_picker_draw_tbody_month(dateData);
-            } else if (type == "year") {
-                tbodyObj.date_picker_draw_tbody_year(dateData);
-            } else if (type == "time") {
-                tbodyObj.date_picker_draw_tbody_time(dateData);
-            }
-        },
-        date_picker_build_date_array: function (dateData) {
-            var valObj = $(this);
-            var baseDateArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28];
-            var dateArray = new Array();
-            var dateTarget = dateData.dateTarget;
-            var dateTargetDay = dateTarget.getDay();
-            var date_0_0;
-            var date_5_6;
-            var monthPickedFirstDay = -(dateTarget.getDate() % 7) + dateTargetDay + 1;
-            if (monthPickedFirstDay < 0) {
-                monthPickedFirstDay += 7;
-            }
-            if (monthPickedFirstDay == 0) {
-                date_0_0 = -6;
-            } else {
-                date_0_0 = 1 - monthPickedFirstDay;
-            }
-            date_5_6 = date_0_0 + 41;
-            var firstDate = new Date(dateTarget.getFullYear(), dateTarget.getMonth(), dateTarget.getDate());
-            firstDate.setDate(date_0_0);
-            var lastDate = new Date(dateTarget.getFullYear(), dateTarget.getMonth(), dateTarget.getDate());
-            lastDate.setDate(date_5_6);
-            for (var i = 0; i <= (0 - date_0_0); i++) {
-                dateArray.push(firstDate.getDate() + i);
-            }
-            dateArray = dateArray.concat(baseDateArray);
-            for (var i = 1; i <= ((date_5_6 - lastDate.getDate()) - 28); i++) {
-                dateArray.push(28 + i);
-            }
-            for (var i = 1; i <= lastDate.getDate(); i++) {
-                dateArray.push(i);
-            }
-            dateData.dateArray = dateArray;
-            valObj.data("dateData", dateData);
-            return this;
-        },
-        date_picker_draw_thead: function (obj, dateData, type) {
-            var headTrObj = $(this);
-            var dateTarget = dateData.dateTarget;
-            if (type == "date" || type == "time") {
-                var tt = dateTarget.getFullYear() + " - " + (dateTarget.getMonth() + 1);
-            } else if (type == "month") {
-                var tt = dateTarget.getFullYear();
-            } else if (type == "year") {
-                var y1 = parseInt(dateTarget.getFullYear() / 10) * 10;
-                var tt = (y1) + "-" + (y1 + 11);
-            }
-            if (obj.shortDate) {
-                var cc = new Date().getHours() + "：" + new Date().getMinutes();
-                var aa = "";
-            } else {
-                var cc = dateTarget.getHours() + "：" + dateTarget.getMinutes() + "：" + dateTarget.getSeconds();
-                var aa = " class='date_picker_title'";
-            }
-            headTrObj.empty().append("<th class='date_picker_title' style='width: 14%'><</th><th colspan='2' class='date_picker_title' style='width: 28.4%'>" + tt
-                + "</th><th class='date_picker_title' style='width: 14.1%'>></th><th" + aa + " colspan='3' style='width: 43%'>" + cc + "</th>");
-            return this;
-        },
-        date_picker_draw_tbody_date: function (dateData) {
-            var tbodyObj = $(this);
-            tbodyObj.prev().show();
-            var index = 0;
-            var dateTarget = dateData.dateTarget;
-            var datePicked = dateData.datePicked;
-            var indexDate = new Date(dateTarget.toDateString());
-            indexDate.setMonth(indexDate.getMonth() - 1);
-            var isTargetMonth = false;
-            var arr = dateData.dateArray;
-            var dateToday = new Date();
-            var domStr = "";
-            var tdClass;
-            for (var i = 0; i < 6; i++) {
-                domStr += "<tr>";
-                for (var j = 0; j < 7; j++) {
-                    tdClass = "";
-                    if (!isTargetMonth) {
-                        tdClass += "date_picker_beyond_target_month ";
-                    }
-                    if (arr[index] == datePicked.getDate() && datePicked.getMonth() == indexDate.getMonth() && datePicked.getFullYear() == indexDate.getFullYear()) {
-                        tdClass += "date_picker_date_picked ";
-                    }
-                    if (arr[index] == dateToday.getDate() && dateToday.getMonth() == indexDate.getMonth() && dateToday.getFullYear() == indexDate.getFullYear()) {
-                        tdClass += "date_picker_date_today ";
-                    }
-                    domStr += "<td class='" + tdClass + "'>" + arr[index] + "</td>";
-                    if (arr[index] > arr[index + 1]) {
-                        isTargetMonth = !isTargetMonth;
-                        indexDate.setMonth(indexDate.getMonth() + 1)
-                    }
-                    index++;
-                }
-                domStr += "</tr>";
-            }
-            tbodyObj.addClass("date_picker_tbody").empty().append(domStr);
-            return this;
-        },
-        date_picker_draw_tbody_month: function (dateData) {
-            var tbodyObj = $(this);
-            tbodyObj.prev().hide();
-            var arr = ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"];
-            var datePicked = dateData.datePicked;
-            var sameYear = dateData.dateTarget.getFullYear() == datePicked.getFullYear();
-            var domStr = "";
-            var index = 0;
-            var tdClass;
-            for (var i = 1; i < 4; i++) {
-                domStr += "<tr class='date_picker_date_month'>";
-                for (var j = 1; j < 5; j++) {
-                    tdClass = "";
-                    if (sameYear && index == datePicked.getMonth()) {
-                        tdClass += "class='date_picker_date_picked'";
-                    }
-                    domStr += "<td data-v='" + index + "' " + tdClass + ">" + arr[index] + "</td>";
-                    index++;
-                }
-                domStr += "</tr>";
-            }
-            tbodyObj.empty().append(domStr);
-            return this;
-        },
-        date_picker_draw_tbody_year: function (dateData) {
-            var tbodyObj = $(this);
-            var targetYear = dateData.datePicked.getFullYear();
-            var y0 = parseInt(dateData.dateTarget.getFullYear() / 10) * 10;
-            var arr = new Array();
-            for (var i = 0; i < 12; i++) {
-                arr[i] = y0 + i;
-            }
-            var domStr = "";
-            var index = 0;
-            var tdClass;
-            for (var i = 1; i < 4; i++) {
-                domStr += "<tr class='date_picker_date_month'>";
-                for (var j = 1; j < 5; j++) {
-                    tdClass = "";
-                    if (index == 0 || index == 11) {
-                        tdClass += "date_picker_beyond_target_month "
-                    }
-                    if (targetYear == arr[index]) {
-                        tdClass += "date_picker_date_picked";
-                    }
-                    domStr += "<td data-v='" + index + "' class='" + tdClass + "'>" + arr[index] + "</td>";
-                    index++;
-                }
-                domStr += "</tr>";
-            }
-            tbodyObj.empty().append(domStr);
-            return this;
-        },
-        date_picker_draw_tbody_time: function (dateData) {
-            var tbodyObj = $(this);
-            tbodyObj.prev().hide();
-            var dateTarget = dateData.dateTarget;
-            var domStr = "";
-            var arr = ["<img class='date_picker_time date_picker_time_img' src='com-res/common/image/arrow/arrow_up.png'>",
-                "<input type='text' class='date_picker_time' style='font-size: 18px;color: #333;text-indent: 0.7em'>", "<img class='date_picker_time' src='com-res/common/image/arrow/arrow_down.png'>"];
-            var arr2 = ["", "：", ""];
-            for (var i = 0; i < 3; i++) {
-                domStr += "<tr class='date_picker_date_month' style='font-size: 20px'><td style='width: 50px'></td>";
-                for (var j = 0; j < 2; j++) {
-                    domStr += "<td>" + arr[i] + "</td><td style='width: 20px;'>" + arr2[i] + "</td>";
-                }
-                domStr += "<td>" + arr[i] + "</td><td style='width: 50px'></td></tr>";
-            }
-            tbodyObj.removeClass("date_picker_tbody").empty().append(domStr);
-            var tt = [dateTarget.getHours(), dateTarget.getMinutes(), dateTarget.getSeconds()];
-            var i = 0;
-            tbodyObj.find("input").each(function () {
-                $(this).val(tt[i++]);
-            });
-            return this;
-        },
-        date_picker_event_thead: function (obj, headTrObj, tbodyObj) {
-            var valObj = $(this);
-            headTrObj.click(function (e) {
-                var index = $(e.target).index();
-                var dateData = valObj.data("dateData");
-                var type = valObj.data("type");
-                switch (index) {
-                    case 0:
-                        if (type == "date") {
-                            dateData.dateTarget.setMonth(dateData.dateTarget.getMonth() - 1);
-                        } else if (type == "month") {
-                            dateData.dateTarget.setFullYear(dateData.dateTarget.getFullYear() - 1);
-                        } else if (type == "year") {
-                            dateData.dateTarget.setFullYear(dateData.dateTarget.getFullYear() - 10);
-                        } else if (type == "time") {
-                            return false;
-                        }
-                        break;
-                    case 2:
-                        if (type == "date") {
-                            dateData.dateTarget.setMonth(dateData.dateTarget.getMonth() + 1);
-                        } else if (type == "month") {
-                            dateData.dateTarget.setFullYear(dateData.dateTarget.getFullYear() + 1);
-                        } else if (type == "year") {
-                            dateData.dateTarget.setFullYear(dateData.dateTarget.getFullYear() + 10);
-                        } else if (type == "time") {
-                            return false;
-                        }
-                        break;
-                    case 1:
-                        if (type == "date") {
-                            type = "month";
-                        } else if (type == "month") {
-                            type = "year";
-                        } else if (type == "time") {
-                            type = "date";
-                        }
-                        break;
-                    case 3:
-                        if (obj.shortDate) {
-                            return false;
-                        }
-                        if (type == "time") {
-                            type = "date";
-                        } else {
-                            type = "time";
-                        }
-                }
-                valObj.date_picker_draw_table(obj, headTrObj, tbodyObj, type, dateData);
-            })
-        },
-        date_picker_event_tbody: function (obj, headTrObj, tbodyObj) {
-            var valObj = $(this);
-            tbodyObj.click(function (e) {
-                var type = valObj.data("type");
-                var dateData = valObj.data("dateData");
-                var dateTarget = dateData.dateTarget;
-                if (type == "date") {
-                    var date = $(e.target).text();
-                    if ($(e.target).hasClass("date_picker_beyond_target_month")) {
-                        dateTarget.setMonth(date > 15 ? dateTarget.getMonth() - 1 : dateTarget.getMonth() + 1);
-                    }
-                    dateTarget.setDate(date);
-                    if (obj.shortDate) {
-                        valObj.val(dateTarget.getFullYear() + "-" + (dateTarget.getMonth() + 1) + "-" + dateTarget.getDate()).next().fadeOut().data("prevent", false);
-                    } else {
-                        valObj.val(dateTarget.getFullYear() + "-" + (dateTarget.getMonth() + 1) + "-" + dateTarget.getDate() + " " + dateTarget.getHours() + ":" +
-                            dateTarget.getMinutes() + ":" + dateTarget.getSeconds()).next().fadeOut().data("prevent", false);
-                    }
-                } else if (type == "month") {
-                    dateTarget.setMonth($(e.target).attr("data-v"));
-                    valObj.date_picker_draw_table(obj, headTrObj, tbodyObj, "date", dateData);
-                } else if (type == "year") {
-                    dateTarget.setFullYear($(e.target).text());
-                    valObj.date_picker_draw_table(obj, headTrObj, tbodyObj, "month", dateData);
-                } else if (type == "time") {
-                    if ($(e.target).text() == "：") {
-                        return false;
-                    }
-                    var o = $(e.target).parent();
-                    var i = o.parent().index();
-                    var j = o.index();
-                    var reg1 = new RegExp("\^(((0|1)?[0-9])|20|21|22|23)$");
-                    var reg2 = new RegExp("\^(0|1|2|3|4|5)?[0-9]$");
-                    var ips = tbodyObj.find("input");
-                    switch (j) {
-                        case 1:
-                            switch (i) {
-                                case 1:
-                                    $(e.target).blur(function () {
-                                        $(this).val($(this).val().match(reg1) ? parseInt($(this).val()) : 0);
-                                        dateTarget.setHours($(this).val());
-                                        console.log(dateTarget.getHours())
-                                    });
-                                    break;
-                                case 0:
-                                case 2:
-                                    var h = dateTarget.getHours() + (i == 0 ? 1 : -1);
-                                    h = h == 24 ? 0 : h == -1 ? 23 : h;
-                                    ips.first().val(h);
-                                    dateTarget.setHours(h);
-                                    console.log(dateTarget.getHours())
-                            }
-                            break;
-                        case 3:
-                            switch (i) {
-                                case 1:
-                                    $(e.target).blur(function () {
-                                        $(this).val($(this).val().match(reg2) ? parseInt($(this).val()) : 0);
-                                        dateTarget.setMinutes($(this).val());
-                                        console.log(dateTarget.getMinutes())
-                                    });
-                                    break;
-                                case 0:
-                                case 2:
-                                    var m = dateTarget.getMinutes() + (i == 0 ? 1 : -1);
-                                    m = m == 60 ? 0 : m == -1 ? 59 : m;
-                                    ips.eq(1).val(m);
-                                    dateTarget.setMinutes(m);
-                                    console.log(dateTarget.getMinutes())
-                            }
-                            break;
-                        case 5:
-                            switch (i) {
-                                case 1:
-                                    $(e.target).blur(function () {
-                                        $(this).val($(this).val().match(reg2) ? parseInt($(this).val()) : 0);
-                                        dateTarget.setSeconds($(this).val());
-                                        console.log(dateTarget.getSeconds())
-                                    });
-                                    break;
-                                case 0:
-                                case 2:
-                                    var m = dateTarget.getSeconds() + (i == 0 ? 1 : -1);
-                                    m = m == 60 ? 0 : m == -1 ? 59 : m;
-                                    ips.last().val(m);
-                                    dateTarget.setSeconds(m);
-                                    console.log(dateTarget.getSeconds())
-                            }
-                            break;
-                        default:
-                            return false;
-                    }
-                }
-            })
-        }
-    });
+
 
     //input formatter
     $.fn.extend({

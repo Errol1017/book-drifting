@@ -125,8 +125,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
 
 
     public static void main(String[] args) {
-        System.out.println(Types.getType("ss"));
-        System.out.println(ValidateUtil.checkPositiveNumber(""));
+
     }
 
 }

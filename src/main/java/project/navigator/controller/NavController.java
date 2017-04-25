@@ -50,7 +50,6 @@ public class NavController {
     @ResponseBody
     Object getPage(HttpServletRequest request) throws Exception {
         String reqId = request.getParameter("reqId");
-        System.out.println(Types.page);
         try {
             String[] pageNameAndPageId = Navigation.getInstance().getPageNameAndPageId(reqId);
             String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath() + "/";

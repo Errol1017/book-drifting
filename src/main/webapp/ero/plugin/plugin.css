@@ -354,11 +354,11 @@
 .date_picker_tbody td:hover{
     background-color: #ddd;
 }
-.date_picker_date_today {
-    border: 1px solid #aaa;
+.date_picker_date_cur {
+    background-color: #ddd;
 }
-.date_picker_date_picked {
-    background-color: #ccc;
+.date_picker_date_tar {
+    border: 1px solid #aaa;
 }
 .date_picker_beyond_target_month {
     color: #999;
@@ -366,11 +366,20 @@
 .date_picker_date_month {
     line-height: 70px;
 }
-.date_picker_time {
+.date_picker_time_img {
     width: 50px;
     height: 50px;
+    display: inline-block;
 }
 .date_picker_time_img:hover {
     background-color: #ddd;
+}
+.date_picker_time_input {
+    width: 46px;
+    height: 46px;
+    font-size: 18px;
+    color: #333;
+    text-indent: 0.7em;
+    padding: 0;
 }
 
