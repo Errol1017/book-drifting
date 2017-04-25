@@ -29,6 +29,7 @@ public class AdminLogController {
     public @ResponseBody Object getAdminLogList(HttpServletRequest request) throws Exception {
         String tarPageNum = request.getParameter("tarPageNum");
         String perPageNum = request.getParameter("perPageNum");
+        System.out.println(request.getParameter("query"));
         List<AdminLog> adminLogs = comService.getList(AdminLog.class, Integer.parseInt(tarPageNum), Integer.parseInt(perPageNum), "createTime desc");
         long total = comService.getCount(AdminLog.class);
         List<AdminLogList> list = new ArrayList<>();

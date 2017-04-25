@@ -55,14 +55,15 @@
          *              delete.key      default 'id'
          *              delete.success
          *              delete.error
+         * param.queryData          jsonStr
          */
         var pageId = $(this).attr("id");
         init();
         getList();
         console.log(param)
         return {
-            getList: function (page) {
-                getList(page)
+            getList: function (p) {
+                getList(p)
             },
             deselect: function () {
                 deselect();
@@ -76,7 +77,6 @@
             initHandle();
             initHandleEvent();
             registerBodyEvent();
-            // $.ero.pluginManager.setConfig(pageId, param.tableId, param);
             function initParam() {
                 param.reqId = $.ero.navigator.getReqId($.ero.navigator.getNavigation("", pageId));
                 if (param.msgObj == undefined) {
@@ -93,6 +93,7 @@
                 if (param.perPageNum == undefined) {
                     param.perPageNum = 10;
                 }
+                param.queryData = '';
             }
             function drawHeader() {
                 var names = param.header.names;
@@ -120,12 +121,12 @@
                     param.body = {
                         bodyObj: tableObj.find("tbody").first()
                     }
-                }else {
+                } else {
                     param.body.bodyObj = tableObj.find("tbody").first();
                 }
             }
             function drawFooter() {
-                var tf = "<tfoot class='list_table_footer'><tr><td class='list_table_footer_td' colspan='" + param.header.colsNum+ "'>匹配数据&nbsp;<span>0</span>&nbsp;条&nbsp;共&nbsp;<span>0</span>&nbsp;页" +
+                var tf = "<tfoot class='list_table_footer'><tr><td class='list_table_footer_td' colspan='" + param.header.colsNum + "'>匹配数据&nbsp;<span>0</span>&nbsp;条&nbsp;共&nbsp;<span>0</span>&nbsp;页" +
                     "<span class='list_table_footer_right'><button class='button_style_50_25' value='1'>首页</button><input type='button' class='button_style_x_25' value='1'/>" +
                     "<input type='button' class='button_style_x_25' value='2'/><input type='button' class='button_style_x_25' value='3'/>" +
                     "<input type='text' class='input_text_25 span50' placeholder='页数'/><button class='button_style_50_25' value='0'>尾页</button></span></td></tr></tfoot>";
@@ -238,7 +239,7 @@
                             type: "delete",
                             reqId: param.reqId,
                             listId: param.tableId,
-                            dataId: param.handle.data[param.handle.delete.key==undefined?'id':param.handle.delete.key]
+                            dataId: param.handle.data[param.handle.delete.key == undefined ? 'id' : param.handle.delete.key]
                         },
                         datatype: "json",
                         success: function (res) {
@@ -269,9 +270,17 @@
                 }
             }
         }
-        function getList(page) {
-            if (page != undefined) {
-                param.data.tarPageNum = page
+        function getList(p) {
+            if (p != undefined) {
+                if (typeof (p) == 'number') {
+                    param.data.tarPageNum = p;
+                } else if (typeof (p) == 'string') {
+                    param.queryData = p;
+                    param.data.tarPageNum = 1;
+                } else {
+                    param.data.tarPageNum = p.page;
+                    param.queryData = p.query;
+                }
             }
             $.ajax({
                 url: "navigator/validator",
@@ -281,7 +290,8 @@
                     reqId: param.reqId,
                     listId: param.tableId,
                     tarPageNum: param.data.tarPageNum,
-                    perPageNum: param.perPageNum
+                    perPageNum: param.perPageNum,
+                    query: param.queryData
                 },
                 datatype: "json",
                 success: function (res) {
@@ -410,7 +420,7 @@
             param.body.bodyObj.find("tr").removeClass("lt_tr_slct");
         }
     };
-    
+
     //form detail
     $.fn.form_detail = function (param) {
         /**
@@ -893,7 +903,7 @@
          * param.boxObj         default $("#" + param.compId + "_box")
          * param.dynamic        boolean
          * param.data           array
-         * param.callback
+         * param.callback       default valObj.trigger('change')
          */
         var pageId = $(this).attr("id");
         init();
@@ -914,6 +924,9 @@
                     param.boxObj = $("#" + param.compId + "_box");
                 }
                 initEvent();
+            }
+            if (param.callback == undefined) {
+                param.callback = param.valObj.trigger("change");
             }
             function getData() {
                 $.ajax({
@@ -1024,9 +1037,7 @@
                             }
                         });
                         param.valObj.val(val.substr(0, val.length - 1));
-                        if (param.callback != undefined) {
-                            param.callback();
-                        }
+                        param.callback();
                     }
                 });
             }
@@ -1086,11 +1097,19 @@
          * param.headObj        the control row
          * param.bodyObj
          * param.dateType       date/time/month/year
+         * param.dateChanged
+         * param.timeChanged
+         * param.callback       default param.valObj.trigger("change")
          */
+        if (param == undefined) {
+            param = {}
+        }
         param.subObj = $(this);
         init();
         return {
-
+            reset: function () {
+                reset();
+            }
         };
         function init() {
             initData();
@@ -1108,9 +1127,14 @@
                     param.chinese = true;
                 }
                 if (param.chinese) {
-                    param.arr = ['年','月','日',' ','时','分','秒']
+                    param.arr = ['年', '月', '日', ' ', '时', '分', '秒']
                 } else {
-                    param.arr = ['-','-','',' ',':',':','']
+                    param.arr = ['-', '-', '', ' ', ':', ':', '']
+                }
+                if (param.callback == undefined) {
+                    param.callback = function () {
+                        param.valObj.trigger("change");
+                    }
                 }
             }
             function initValObj() {
@@ -1144,7 +1168,7 @@
                         param.boxObj.fadeIn();
                     }).change(function () {
                         if (param.chinese) {
-                            var s= $(this).val();
+                            var s = $(this).val();
                             s = s.replace(param.arr[0], '-');
                             s = s.replace(param.arr[1], '-');
                             s = s.replace(param.arr[2], '');
@@ -1158,7 +1182,7 @@
                     }).keyup(function () {
                         param.boxObj.fadeOut();
                     }).blur(function () {
-                        if (!param.boxObj.data("prevent")) {
+                        if (param.dateChanged == undefined || param.dateChanged) {
                             param.boxObj.fadeOut();
                         }
                     });
@@ -1173,15 +1197,30 @@
                             param.curDate = new Date(dateStr);
                             param.tarDate = new Date(dateStr);
                         }
-                        param.tarDate.setDate(1);
+                        if (param.shortDate) {
+                            param.curDate.setHours(0);
+                            param.curDate.setMinutes(0);
+                            param.curDate.setSeconds(0);
+                            param.tarDate.setHours(0);
+                            param.tarDate.setMinutes(0);
+                            param.tarDate.setSeconds(0);
+                        }
                         param.dateType = "date";
                     }
                 }
                 function initBoxObjEvent() {
                     param.boxObj.mouseenter(function () {
-                        $(this).data("prevent", true);
+                        param.dateChanged = false;
                     }).mouseleave(function () {
-                        param.boxObj.fadeOut().data("prevent", false);
+                        if (param.dateType == "time" && param.timeChanged) {
+                            setVal();
+                        }
+                        if (!param.shortDate && (param.dateChanged || param.timeChanged)) {
+                            param.callback();
+                        }
+                        param.dateChanged = undefined;
+                        param.timeChanged = undefined;
+                        param.boxObj.fadeOut();
                     });
                 }
             }
@@ -1226,16 +1265,14 @@
                             }
                             if (param.dateType == "time") {
                                 param.dateType = "date";
-                                param.valObj.val(param.tarDate.toString());
-                                param.subObj.val(param.tarDate.getFullYear() + param.arr[0] + (param.tarDate.getMonth() + 1) + param.arr[1] + param.tarDate.getDate() + param.arr[2] + param.arr[3]
-                                    + param.tarDate.getHours() + param.arr[4] + param.tarDate.getMinutes() + param.arr[5] + param.tarDate.getSeconds() + param.arr[6]);
-                                param.boxObj.data("prevent", false);
+                                if (param.timeChanged) {
+                                    setVal();
+                                }
                             } else {
                                 param.dateType = "time";
                             }
                     }
                     drawTable();
-                    console.log(param)
                 })
             }
             function initBodyEvent() {
@@ -1255,10 +1292,10 @@
                                 + param.tarDate.getHours() + param.arr[4] + param.tarDate.getMinutes() + param.arr[5] + param.tarDate.getSeconds() + param.arr[6]);
                         }
                         if (param.shortDate) {
-                            param.boxObj.fadeOut().data("prevent", false);
-                        } else {
-                            param.boxObj.data("prevent", false);
+                            param.boxObj.fadeOut();
+                            param.callback();
                         }
+                        param.dateChanged = true;
                     } else if (param.dateType == "month") {
                         param.tarDate.setMonth(parseInt(tarObj.attr("data-v")));
                         param.dateType = "date";
@@ -1267,70 +1304,14 @@
                         param.tarDate.setFullYear(parseInt(tarObj.attr("data-v")));
                         param.dateType = "month";
                         drawTable();
-                    } else if (param.dateType == "time") {
-                        if (tarObj.text() == "：") {
-                            return false;
-                        }
-                        var o = tarObj.parent();
-                        var i = o.parent().index();
-                        var j = o.index();
-                        var reg1 = new RegExp("\^(((0|1)?[0-9])|20|21|22|23)$");
-                        var reg2 = new RegExp("\^(0|1|2|3|4|5)?[0-9]$");
-                        var ips = param.bodyObj.find("input");
-                        switch (j) {
-                            case 1:
-                                switch (i) {
-                                    case 1:
-                                        tarObj.blur(function () {
-                                            $(this).val($(this).val().match(reg1) ? parseInt($(this).val()) : 0);
-                                            param.tarDate.setHours($(this).val());
-                                        });
-                                        break;
-                                    case 0:
-                                    case 2:
-                                        var h = param.tarDate.getHours() + (i == 0 ? 1 : -1);
-                                        h = h == 24 ? 0 : h == -1 ? 23 : h;
-                                        ips.first().val(h);
-                                        param.tarDate.setHours(h);
-                                }
-                                break;
-                            case 3:
-                                switch (i) {
-                                    case 1:
-                                        tarObj.blur(function () {
-                                            $(this).val($(this).val().match(reg2) ? parseInt($(this).val()) : 0);
-                                            param.tarDate.setMinutes($(this).val());
-                                        });
-                                        break;
-                                    case 0:
-                                    case 2:
-                                        var m = param.tarDate.getMinutes() + (i == 0 ? 1 : -1);
-                                        m = m == 60 ? 0 : m == -1 ? 59 : m;
-                                        ips.eq(1).val(m);
-                                        param.tarDate.setMinutes(m);
-                                }
-                                break;
-                            case 5:
-                                switch (i) {
-                                    case 1:
-                                        tarObj.blur(function () {
-                                            $(this).val($(this).val().match(reg2) ? parseInt($(this).val()) : 0);
-                                            param.tarDate.setSeconds($(this).val());
-                                        });
-                                        break;
-                                    case 0:
-                                    case 2:
-                                        var m = param.tarDate.getSeconds() + (i == 0 ? 1 : -1);
-                                        m = m == 60 ? 0 : m == -1 ? 59 : m;
-                                        ips.last().val(m);
-                                        param.tarDate.setSeconds(m);
-                                }
-                                break;
-                            default:
-                                return false;
-                        }
                     }
                 })
+            }
+            function setVal() {
+                param.valObj.val(param.tarDate.toString());
+                param.subObj.val(param.tarDate.getFullYear() + param.arr[0] + (param.tarDate.getMonth() + 1) + param.arr[1] + param.tarDate.getDate() + param.arr[2] + param.arr[3]
+                    + param.tarDate.getHours() + param.arr[4] + param.tarDate.getMinutes() + param.arr[5] + param.tarDate.getSeconds() + param.arr[6]);
+                param.dateChanged = true;
             }
             function drawTable() {
                 drawHead();
@@ -1413,7 +1394,7 @@
                                 if (dateArray[index] == param.curDate.getDate() && param.curDate.getMonth() == indexDate.getMonth() && param.curDate.getFullYear() == indexDate.getFullYear()) {
                                     tdClass += "date_picker_date_cur";
                                 }
-                                domStr += "<td data-v='" + dateArray[index] +"' class='" + tdClass + "'>" + dateArray[index] + "</td>";
+                                domStr += "<td data-v='" + dateArray[index] + "' class='" + tdClass + "'>" + dateArray[index] + "</td>";
                                 if (dateArray[index] > dateArray[index + 1]) {
                                     isTargetMonth = !isTargetMonth;
                                     indexDate.setMonth(indexDate.getMonth() + 1)
@@ -1491,10 +1472,173 @@
                     param.bodyObj.find("input").each(function () {
                         $(this).val(tt[i++]);
                     });
+                    registerTimeBoxEvent();
+                    function registerTimeBoxEvent() {
+                        var reg1 = new RegExp("\^(((0|1)?[0-9])|20|21|22|23)$");
+                        var reg2 = new RegExp("\^(0|1|2|3|4|5)?[0-9]$");
+                        var imgs = param.bodyObj.find("img");
+                        var inputs = param.bodyObj.find("input");
+                        imgs.first().click(function () {
+                            var h = param.tarDate.getHours() + 1;
+                            param.tarDate.setHours(h);
+                            h = h == 24 ? 0 : h == -1 ? 23 : h;
+                            inputs.first().val(h);
+                            param.timeChanged = true;
+                        });
+                        imgs.eq(1).click(function () {
+                            var m = param.tarDate.getMinutes() + 1;
+                            param.tarDate.setMinutes(m);
+                            m = m == 60 ? 0 : m == -1 ? 59 : m;
+                            inputs.eq(1).val(m);
+                            inputs.first().val(param.tarDate.getHours());
+                            param.timeChanged = true;
+                        });
+                        imgs.eq(2).click(function () {
+                            var m = param.tarDate.getSeconds() + 1;
+                            param.tarDate.setSeconds(m);
+                            m = m == 60 ? 0 : m == -1 ? 59 : m;
+                            inputs.last().val(m);
+                            inputs.eq(1).val(param.tarDate.getMinutes());
+                            param.timeChanged = true;
+                        });
+                        imgs.eq(3).click(function () {
+                            var h = param.tarDate.getHours() - 1;
+                            param.tarDate.setHours(h);
+                            h = h == 24 ? 0 : h == -1 ? 23 : h;
+                            inputs.first().val(h);
+                            param.timeChanged = true;
+                        });
+                        imgs.eq(4).click(function () {
+                            var m = param.tarDate.getMinutes() - 1;
+                            param.tarDate.setMinutes(m);
+                            m = m == 60 ? 0 : m == -1 ? 59 : m;
+                            inputs.eq(1).val(m);
+                            inputs.first().val(param.tarDate.getHours());
+                            param.timeChanged = true;
+                        });
+                        imgs.last().click(function () {
+                            var m = param.tarDate.getSeconds() - 1;
+                            param.tarDate.setSeconds(m);
+                            m = m == 60 ? 0 : m == -1 ? 59 : m;
+                            inputs.last().val(m);
+                            inputs.eq(1).val(param.tarDate.getMinutes());
+                            param.timeChanged = true;
+                        });
+                        inputs.first().blur(function () {
+                            $(this).val($(this).val().match(reg1) ? parseInt($(this).val()) : 0);
+                            param.tarDate.setHours($(this).val());
+                            param.timeChanged = true;
+                        });
+                        inputs.eq(1).blur(function () {
+                            $(this).val($(this).val().match(reg2) ? parseInt($(this).val()) : 0);
+                            param.tarDate.setMinutes($(this).val());
+                            param.timeChanged = true;
+                        });
+                        inputs.last().blur(function () {
+                            $(this).val($(this).val().match(reg2) ? parseInt($(this).val()) : 0);
+                            param.tarDate.setSeconds($(this).val());
+                            param.timeChanged = true;
+                        });
+                    }
                 }
             }
         }
-    }
+        function reset() {
+            param.subObj.val(param.valObj.val());
+        }
+    };
+
+    //query manager
+    $.fn.query_manager = function (param) {
+        /**
+         * @param param
+         * param.prefix
+         * param.manually       default true
+         * param.keys
+         * param.ids
+         * param.keyObjs
+         * param.queryData
+         * param.callback
+         * param.handle
+         *      handle.submitObj
+         *      handle.submitCall
+         *      handle.resetObj
+         *      handle.resetCall
+         */
+        param.prefix = $(this).attr("id") + '_';
+        init();
+        return {
+        };
+        function init() {
+            initData();
+            initQueryObj();
+            initEvent();
+            initHandle();
+            function initData() {
+                param.queryData = new Object();
+                param.ids = new Array();
+                param.keyObjs = new Array();
+                if (param.manually == undefined) {
+                    param.manually = true;
+                }
+                if (param.manually) {
+                    param.cc = function () {}
+                } else {
+                    param.cc = param.callback;
+                }
+                if (param.handle == undefined) {
+                    param.handle = new Object();
+                }
+            }
+            function initQueryObj() {
+                console.log(param.keys.length)
+                for (var i = 0; i < param.keys.length; i++) {
+                    var k = param.prefix + param.keys[i];
+                    param.keyObjs[i] = $("#" + k);
+                    param.queryData[param.keys[i]] = param.keyObjs[i].val();
+                    param.ids[i] = k;
+                }
+            }
+            function initEvent() {
+                for (var i = 0; i < param.keyObjs.length; i++) {
+                    param.keyObjs[i].change(function () {
+                        param.queryData[param.keys[$.indexOf(param.ids, $(this).attr("id"))]] = $(this).val();
+                        param.cc(JSON.stringify(param.queryData));
+                    })
+                }
+            }
+            function initHandle() {
+                initSubmitEvent();
+                function initSubmitEvent() {
+                    if (param.manually) {
+                        if (param.handle.submitObj == undefined) {
+                            param.handle.submitObj = $("#" + param.prefix + "Submit");
+                        }
+                        param.handle.submitObj.click(function () {
+                            param.callback(JSON.stringify(param.queryData));
+                            if (param.handle.submitCall != undefined) {
+                                param.handle.submitCall();
+                            }
+                        })
+                    }
+                }
+                initResetEvent();
+                function initResetEvent() {
+                    if (param.handle.resetObj == undefined) {
+                        param.handle.resetObj = $("#" + param.prefix + "Reset");
+                    }
+                    param.handle.resetObj.click(function () {
+                        for (var i = 0; i < param.keyObjs.length; i++) {
+                            param.keyObjs[i].val('');
+                        }
+                        if (param.handle.resetCall != undefined) {
+                            param.handle.resetCall();
+                        }
+                    })
+                }
+            }
+        }
+    };
 
 })(jQuery)
 

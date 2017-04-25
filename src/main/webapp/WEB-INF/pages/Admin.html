@@ -84,19 +84,16 @@
     <input type="hidden" id="AdminPage_Initialization"/>
     <script>
         $(function () {
-            var adminList = $("#AdminPage").list_table({
+            var list = $("#AdminPage").list_table({
                 tableId: 'AdminList',
                 header: {
                     names: ["!_id", "用户名", "角色/部门", "真实姓名"],
                     colWith: ["", "span30p", "span40p", "span30p"]
                 },
-//                body: {
-//                    tdConf: ["", "", "", "nowrap"]
-//                },
                 handle: {
                     edit: {
                         callback: function (data) {
-                            adminForm.getForm(data.id)
+                            form.getForm(data.id)
                         }
                     },
                     delete: {
@@ -105,13 +102,13 @@
                         },
                         success: function (data) {
                             if ($("#AdminForm_id").val() == data.id) {
-                                adminForm.unbind()
+                                form.unbind()
                             }
                         }
                     }
                 }
             });
-            var adminForm = $("#AdminPage").form_detail({
+            var form = $("#AdminPage").form_detail({
                 formId: "AdminForm",
                 inputIds: ["!_id", "name", "role", "actualName", "contactNumber", "password", "power", "remark"],
                 validator: [
@@ -143,13 +140,13 @@
                 ],
                 bind: {
                     after: function () {
-                        adminPower.reset();
+                        power.reset();
                     }
                 },
                 unbind: {
                     after: function () {
-                        adminPower.reset();
-                        adminList.deselect();
+                        power.reset();
+                        list.deselect();
                     }
                 },
                 submit: {
@@ -157,18 +154,15 @@
                         if (data != undefined) {
                             $("#AdminForm_id").val(data);
                         }
-                        adminList.getList();
+                        list.getList();
                     }
                 }
             });
-            var adminPower = $("#AdminPage").cascade_checkbox({
-                valObj: $("#AdminForm_power"),
-                callback: function () {
-                    $("#AdminForm_power").trigger("change")
-                }
+            var power = $("#AdminPage").cascade_checkbox({
+                valObj: $("#AdminForm_power")
             });
             $("#AdminPage").reloadData(function () {
-                adminList.getList(1);
+                list.getList(1);
             })
         })
     </script>

@@ -201,6 +201,10 @@
     vertical-align: middle;
 }
 
+.list_query {
+    margin-top: 10px;
+}
+
 
 /* detail_form_style */
 .form_detail {

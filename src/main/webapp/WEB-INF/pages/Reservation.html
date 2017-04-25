@@ -3,14 +3,29 @@
     <div>
         <label for="date" class="ls_mw_100 span20p">预约日期</label>
         <span class="span_box span70p">
-                        <input type="text" id="date" class="input_text_35 span100p" placeholder="不能为空">
-                    </span>
+            <input type="text" id="date" class="input_text_35 span100p" placeholder="不能为空">
+        </span>
+    </div>
+    <div>
+        <label for="time" class="ls_mw_100 span20p">预约日期</label>
+        <span class="span_box span70p">
+            <input type="text" id="time" class="input_text_35 span100p" placeholder="不能为空">
+        </span>
     </div>
 
     <script>
         $(function () {
             $("#date").date_picker({
                 shortDate: false
+            })
+            $("#date").change(function () {
+                console.log("change")
+            })
+            var d = new Date("2017-1-1 00:00:00")
+            console.log(d)
+            $("#time").date_picker();
+            $("#time").change(function () {
+                console.log("time change")
             })
         })
     </script>
