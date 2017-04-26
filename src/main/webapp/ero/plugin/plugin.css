@@ -8,9 +8,10 @@
     color: #888;
 }
 .list_table_bottom {
-    line-height: 40px;
+    line-height: 30px;
+    margin-top: 5px;
     font-size: 12px;
-    text-indent: 1em;
+    padding-left: 1em;
     color: #888;
     letter-spacing: 0.1em;
 }

@@ -1,6 +1,7 @@
 package project.navigator.service;
 
 import common.CRUD.service.ComService;
+import common.Util.DateUtil;
 import common.Util.InvitationCodeGenerator;
 import common.Util.ValidateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import project.system.entity.Admin;
 import project.system.entity.AdminRole;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -125,7 +127,9 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
 
 
     public static void main(String[] args) {
-
+        System.out.println(DateUtil.string2Date("201607", DateUtil.PATTERN_H));
+        System.out.println(new Date(Long.parseLong("1493183327995")));
+        System.out.println(new Date().getTime());
     }
 
 }

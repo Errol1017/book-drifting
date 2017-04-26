@@ -926,7 +926,9 @@
                 initEvent();
             }
             if (param.callback == undefined) {
-                param.callback = param.valObj.trigger("change");
+                param.callback = function () {
+                    param.valObj.trigger("change");
+                }
             }
             function getData() {
                 $.ajax({
@@ -1167,20 +1169,29 @@
                         drawTable();
                         param.boxObj.fadeIn();
                     }).change(function () {
-                        if (param.chinese) {
-                            var s = $(this).val();
-                            s = s.replace(param.arr[0], '-');
-                            s = s.replace(param.arr[1], '-');
-                            s = s.replace(param.arr[2], '');
-                            s = s.replace(param.arr[4], ':');
-                            s = s.replace(param.arr[5], ':');
-                            s = s.replace(param.arr[6], ':');
-                            param.valObj.val(s);
+                        var s = $(this).val();
+                        if (s != '') {
+                            if (param.chinese) {
+                                s = s.replace(param.arr[0], '-');
+                                s = s.replace(param.arr[1], '-');
+                                s = s.replace(param.arr[2], '');
+                                s = s.replace(param.arr[4], ':');
+                                s = s.replace(param.arr[5], ':');
+                                s = s.replace(param.arr[6], ':');
+                            }
+                            if (new Date(s) == "Invalid Date") {
+                                s = '';
+                                param.valObj.val(s);
+                                param.subObj.val(s);
+                            } else {
+                                param.valObj.val(new Date(s).getTime())
+                            }
                         } else {
-                            param.valObj.val($(this).val())
+                            param.valObj.val('');
                         }
                     }).keyup(function () {
                         param.boxObj.fadeOut();
+                        param.input = true;
                     }).blur(function () {
                         if (param.dateChanged == undefined || param.dateChanged) {
                             param.boxObj.fadeOut();
@@ -1188,14 +1199,14 @@
                     });
                     function setDate() {
                         var dateStr = param.valObj.val();
-                        if (dateStr == "" || new Date(dateStr) == "Invalid Date") {
+                        if (dateStr == "" || new Date(parseInt(dateStr)) == "Invalid Date") {
                             param.curDate = new Date();
                             param.tarDate = new Date();
                             param.subObj.val('');
                             param.valObj.val('');
                         } else {
-                            param.curDate = new Date(dateStr);
-                            param.tarDate = new Date(dateStr);
+                            param.curDate = new Date(parseInt(dateStr));
+                            param.tarDate = new Date(parseInt(dateStr));
                         }
                         if (param.shortDate) {
                             param.curDate.setHours(0);
@@ -1284,18 +1295,11 @@
                             param.tarDate.setMonth(parseInt(date) > 15 ? param.tarDate.getMonth() - 1 : param.tarDate.getMonth() + 1);
                         }
                         param.tarDate.setDate(date);
-                        param.valObj.val(param.tarDate.toString());
-                        if (param.shortDate) {
-                            param.subObj.val(param.tarDate.getFullYear() + param.arr[0] + (param.tarDate.getMonth() + 1) + param.arr[1] + param.tarDate.getDate() + param.arr[2]);
-                        } else {
-                            param.subObj.val(param.tarDate.getFullYear() + param.arr[0] + (param.tarDate.getMonth() + 1) + param.arr[1] + param.tarDate.getDate() + param.arr[2] + param.arr[3]
-                                + param.tarDate.getHours() + param.arr[4] + param.tarDate.getMinutes() + param.arr[5] + param.tarDate.getSeconds() + param.arr[6]);
-                        }
+                        setVal();
                         if (param.shortDate) {
                             param.boxObj.fadeOut();
                             param.callback();
                         }
-                        param.dateChanged = true;
                     } else if (param.dateType == "month") {
                         param.tarDate.setMonth(parseInt(tarObj.attr("data-v")));
                         param.dateType = "date";
@@ -1308,9 +1312,13 @@
                 })
             }
             function setVal() {
-                param.valObj.val(param.tarDate.toString());
-                param.subObj.val(param.tarDate.getFullYear() + param.arr[0] + (param.tarDate.getMonth() + 1) + param.arr[1] + param.tarDate.getDate() + param.arr[2] + param.arr[3]
-                    + param.tarDate.getHours() + param.arr[4] + param.tarDate.getMinutes() + param.arr[5] + param.tarDate.getSeconds() + param.arr[6]);
+                param.valObj.val(param.tarDate.getTime());
+                if (param.shortDate) {
+                    param.subObj.val(param.tarDate.getFullYear() + param.arr[0] + (param.tarDate.getMonth() + 1) + param.arr[1] + param.tarDate.getDate() + param.arr[2]);
+                } else {
+                    param.subObj.val(param.tarDate.getFullYear() + param.arr[0] + (param.tarDate.getMonth() + 1) + param.arr[1] + param.tarDate.getDate() + param.arr[2] + param.arr[3]
+                        + param.tarDate.getHours() + param.arr[4] + param.tarDate.getMinutes() + param.arr[5] + param.tarDate.getSeconds() + param.arr[6]);
+                }
                 param.dateChanged = true;
             }
             function drawTable() {
@@ -1544,7 +1552,8 @@
             }
         }
         function reset() {
-            param.subObj.val(param.valObj.val());
+            param.valObj.val('');
+            param.subObj.val('');
         }
     };
 
@@ -1609,6 +1618,7 @@
             }
             function initHandle() {
                 initSubmitEvent();
+                initResetEvent();
                 function initSubmitEvent() {
                     if (param.manually) {
                         if (param.handle.submitObj == undefined) {
@@ -1622,13 +1632,13 @@
                         })
                     }
                 }
-                initResetEvent();
                 function initResetEvent() {
                     if (param.handle.resetObj == undefined) {
                         param.handle.resetObj = $("#" + param.prefix + "Reset");
                     }
                     param.handle.resetObj.click(function () {
                         for (var i = 0; i < param.keyObjs.length; i++) {
+                            param.queryData[param.keys[i]] = "";
                             param.keyObjs[i].val('');
                         }
                         if (param.handle.resetCall != undefined) {

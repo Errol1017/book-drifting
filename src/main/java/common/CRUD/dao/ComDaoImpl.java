@@ -27,7 +27,8 @@ public class ComDaoImpl extends BaseDao {
         return res == null ? 0 : ((Long) res).longValue();
     }
     public <T> long getCount(Class<T> typeValue, String condition) {
-        Query query = getSessionFactory().getCurrentSession().createQuery("select count(*) from " + typeValue.getSimpleName() + " where " + condition);
+        String c = condition.equals("") ? "" : " where " + condition;
+        Query query = getSessionFactory().getCurrentSession().createQuery("select count(*) from " + typeValue.getSimpleName() + c);
         Object res = query.uniqueResult();
         return res == null ? 0 : ((Long) res).longValue();
     }
@@ -48,7 +49,9 @@ public class ComDaoImpl extends BaseDao {
         return query.list();
     }
     public <T> List<Object[]> getCountGroupBy(Class<T> typeValue, String countField, String groupField, String condition, String sortField) {
-        Query query = getSessionFactory().getCurrentSession().createQuery("select " + groupField + ", count(" + countField + ") from " + typeValue.getSimpleName() + " where " + condition + " group by " + groupField + " order by " + sortField);
+        String c = condition.equals("") ? "" : " where " + condition;
+        String s = sortField.equals("") ? "" : " order by " + sortField;
+        Query query = getSessionFactory().getCurrentSession().createQuery("select " + groupField + ", count(" + countField + ") from " + typeValue.getSimpleName() + c + " group by " + groupField + s);
         return query.list();
     }
 
@@ -58,7 +61,8 @@ public class ComDaoImpl extends BaseDao {
         return res == null ? 0 : ((Long) res).longValue();
     }
     public <T> long getSum(Class<T> typeValue, String sumField, String condition) {
-        Query query = getSessionFactory().getCurrentSession().createQuery("select sum(" + sumField + ") from " + typeValue.getSimpleName() + " where " + condition);
+        String c = condition.equals("") ? "" : " where " + condition;
+        Query query = getSessionFactory().getCurrentSession().createQuery("select sum(" + sumField + ") from " + typeValue.getSimpleName() + c);
         Object res = query.uniqueResult();
         return res == null ? 0 : ((Long) res).longValue();
     }
@@ -94,7 +98,9 @@ public class ComDaoImpl extends BaseDao {
         for (int i=0; i<arr.length; i++) {
             sum.append(",sum(" + arr[i] + ")");
         }
-        Query query = getSessionFactory().getCurrentSession().createQuery("select " + groupField + sum.toString() + " from " + typeValue.getSimpleName() + " where " + condition + " group by " + groupField + " order by " + sortField);
+        String c = condition.equals("") ? "" : " where " + condition;
+        String s = sortField.equals("") ? "" : " order by " + sortField;
+        Query query = getSessionFactory().getCurrentSession().createQuery("select " + groupField + sum.toString() + " from " + typeValue.getSimpleName() + c + " group by " + groupField + s);
         return query.list();
     }
 
@@ -112,7 +118,9 @@ public class ComDaoImpl extends BaseDao {
         return list;
     }
     public <T> List<T> getList(Class<T> typeValue, String condition, String sortField) {
-        return (List<T>) this.getHibernateTemplate().find("from " + typeValue.getSimpleName() + " where " + condition + " order by " + sortField);
+        String c = condition.equals("") ? "" : " where " + condition;
+        String s = sortField.equals("") ? "" : " order by " + sortField;
+        return (List<T>) this.getHibernateTemplate().find("from " + typeValue.getSimpleName() + c + s);
     }
     public <T> List<T> getList(Class<T> typeValue, int page, int size) {
         int min = Math.max(page * size - size, 0);
@@ -137,7 +145,9 @@ public class ComDaoImpl extends BaseDao {
     }
     public <T> List<T> getList(Class<T> typeValue, int page, int size, String condition, String sortField) {
         int min = Math.max(page * size - size, 0);
-        Query query = getSessionFactory().getCurrentSession().createQuery("from " + typeValue.getSimpleName() + " where " + condition + " order by " + sortField);
+        String c = condition.equals("") ? "" : " where " + condition;
+        String s = sortField.equals("") ? "" : " order by " + sortField;
+        Query query = getSessionFactory().getCurrentSession().createQuery("from " + typeValue.getSimpleName() + c + s);
         query.setFirstResult(min);
         query.setMaxResults(size);
         return query.list();
@@ -159,7 +169,9 @@ public class ComDaoImpl extends BaseDao {
         return query.list();
     }
     public <T> List<Object[]> getFields(Class<T> typeValue, String fields, String condition, String sortField) {
-        Query query = getSessionFactory().getCurrentSession().createQuery("select " + fields + " from " + typeValue.getSimpleName() + " where " + condition + " order by " + sortField);
+        String c = condition.equals("") ? "" : " where " + condition;
+        String s = sortField.equals("") ? "" : " order by " + sortField;
+        Query query = getSessionFactory().getCurrentSession().createQuery("select " + fields + " from " + typeValue.getSimpleName() + c + s);
         return query.list();
     }
     public <T> List<Object[]> getFields(Class<T> typeValue, String fields, int page, int size) {
@@ -185,7 +197,9 @@ public class ComDaoImpl extends BaseDao {
     }
     public <T> List<Object[]> getFields(Class<T> typeValue, String fields, int page, int size, String condition, String sortField) {
         int min = Math.max(page * size - size, 0);
-        Query query = getSessionFactory().getCurrentSession().createQuery("select " + fields + " from " + typeValue.getSimpleName() + " where " + condition + " order by " + sortField);
+        String c = condition.equals("") ? "" : " where " + condition;
+        String s = sortField.equals("") ? "" : " order by " + sortField;
+        Query query = getSessionFactory().getCurrentSession().createQuery("select " + fields + " from " + typeValue.getSimpleName() + c + s);
         query.setFirstResult(min);
         query.setMaxResults(size);
         return query.list();
@@ -219,7 +233,9 @@ public class ComDaoImpl extends BaseDao {
         }
     }
     public <T> T getFirst(Class<T> typeValue, String condition, String sortField) {
-        Query query = getSessionFactory().getCurrentSession().createQuery("from " + typeValue.getSimpleName() + " where " + condition + " order by " + sortField);
+        String c = condition.equals("") ? "" : " where " + condition;
+        String s = sortField.equals("") ? "" : " order by " + sortField;
+        Query query = getSessionFactory().getCurrentSession().createQuery("from " + typeValue.getSimpleName() + c + s);
         query.setFirstResult(0);
         query.setMaxResults(1);
         List<T> list = query.list();
@@ -270,7 +286,8 @@ public class ComDaoImpl extends BaseDao {
         query.executeUpdate();
     }
     public <T> void updateDetail(Class<T> typeValue, String condition, String setString) {
-        Query query = getSessionFactory().getCurrentSession().createQuery("update " + typeValue.getSimpleName() + " set " + setString + " where " + condition);
+        String c = condition.equals("") ? "" : " where " + condition;
+        Query query = getSessionFactory().getCurrentSession().createQuery("update " + typeValue.getSimpleName() + " set " + setString + c);
         query.executeUpdate();
     }
 
@@ -278,13 +295,15 @@ public class ComDaoImpl extends BaseDao {
         this.getHibernateTemplate().delete(object);
     }
     public <T> void deleteDetail(Class<T> typeValue, String condition) {
-        Query query = getSessionFactory().getCurrentSession().createQuery("delete from " + typeValue.getSimpleName() + " where " + condition);
+        String c = condition.equals("") ? "" : " where " + condition;
+        Query query = getSessionFactory().getCurrentSession().createQuery("delete from " + typeValue.getSimpleName() + c);
         query.executeUpdate();
 
     }
 
     public <T> boolean hasExist(Class<T> typeValue, String condition) {
-        Query query = getSessionFactory().getCurrentSession().createQuery("from " + typeValue.getSimpleName() + " where " + condition);
+        String c = condition.equals("") ? "" : " where " + condition;
+        Query query = getSessionFactory().getCurrentSession().createQuery("from " + typeValue.getSimpleName() + c);
         query.setFirstResult(0);
         query.setMaxResults(1);
         List<T> list = query.list();

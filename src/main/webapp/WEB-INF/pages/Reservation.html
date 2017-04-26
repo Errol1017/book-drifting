@@ -21,12 +21,12 @@
             $("#date").change(function () {
                 console.log("change")
             })
-            var d = new Date("2017-1-1 00:00:00")
-            console.log(d)
             $("#time").date_picker();
             $("#time").change(function () {
                 console.log("time change")
             })
+            var d = new Date()
+            console.log(d.getTime())
         })
     </script>
 </div>

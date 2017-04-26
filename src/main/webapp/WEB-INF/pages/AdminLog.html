@@ -28,7 +28,7 @@
             </ul>
         </div>
         <div class="list_table_bottom">
-            -&nbsp;单击表格行可执行操作
+            -&nbsp;单击表格行可执行操作<br>
             -&nbsp;手动输入的日期的格式，需与系统显示的格式保持一致
         </div>
     </div>
@@ -53,13 +53,14 @@
                 manually: false,
                 keys: ["start", "end"],
                 callback: function (q) {
-                    console.log("callback")
+                    console.log(q)
                     list.getList(q)
                 },
                 handle: {
                     resetCall: function () {
                         start.reset();
                         end.reset();
+                        list.getList('')
                     }
                 }
             });

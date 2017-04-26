@@ -27,15 +27,40 @@ public class DateUtil {
         return new SimpleDateFormat(pattern).format(date);
     }
 
-    public static Date string2Date(String dateStr) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat();
-        Date date = new Date();
-        try {
-            date = simpleDateFormat.parse(dateStr);
-        } catch (ParseException pe) {
-            pe.printStackTrace();
+    public static Date string2Date(String dateStr, String pattern) {
+        if (dateStr.equals("")) {
+            return null;
         }
-        return date;
+        try {
+            return new SimpleDateFormat(pattern).parse(dateStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static Date stamp2Date(String timestamp) {
+        if (timestamp.equals("")) {
+            return null;
+        }
+        try {
+            return new Date(Long.parseLong(timestamp));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String stamp2String(String timestamp, String pattern) {
+        if (timestamp.equals("")) {
+            return null;
+        }
+        try {
+            return new SimpleDateFormat(pattern).format(new Date(Long.parseLong(timestamp)));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -51,7 +76,6 @@ public class DateUtil {
         if (source == null) {
             return null;
         }
-
         Calendar cal = Calendar.getInstance();
         cal.setTime(source);
         cal.add(Calendar.HOUR_OF_DAY, hours);
