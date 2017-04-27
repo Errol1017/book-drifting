@@ -249,7 +249,6 @@ public class ComDaoImpl extends BaseDao {
     public void saveDetail(Object object) {
         this.getHibernateTemplate().saveOrUpdate(object);
     }
-
     /**
      * getCurrentSession().save() 自动提交数据 ？ 打印 sql 语句， 但是数据表查不到值
      * getCurrentSession() 获取当前线程 session ，会自动 commit
@@ -270,12 +269,6 @@ public class ComDaoImpl extends BaseDao {
 //        transaction.commit();
 //        session.close();
     }
-//    public void insertDetail(Object object) {
-//        this.getHibernateTemplate().save(object);
-//    }
-//    public void updateDetail(Object object) {
-//        this.getHibernateTemplate().update(object);
-//    }
 
     public <T> void updateDetail(Class<T> typeValue, int dataId, String setString) {
         Query query = getSessionFactory().getCurrentSession().createQuery("update " + typeValue.getSimpleName() + " set " + setString + " where id=" + dataId);
@@ -314,4 +307,11 @@ public class ComDaoImpl extends BaseDao {
         }
     }
 
+    public List<Object[]> query(String hql, int page, int size) {
+        int min = Math.max(page * size - size, 0);
+        Query query = getSessionFactory().getCurrentSession().createQuery(hql);
+        query.setFirstResult(min);
+        query.setMaxResults(size);
+        return query.list();
+    }
 }

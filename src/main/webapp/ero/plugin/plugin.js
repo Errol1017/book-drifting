@@ -60,7 +60,6 @@
         var pageId = $(this).attr("id");
         init();
         getList();
-        console.log(param)
         return {
             getList: function (p) {
                 getList(p)
@@ -453,13 +452,12 @@
          */
         var pageId = $(this).attr("id");
         init();
-        console.log(param)
         return {
             getForm: function (dataId) {
                 getForm(dataId)
             },
-            unbind: function () {
-                unbind()
+            unbind: function (id) {
+                unbind(id)
             }
         };
         function init() {
@@ -619,7 +617,10 @@
                 param.handle.submitObj.text('更 新');
             }
         }
-        function unbind() {
+        function unbind(id) {
+            if (id != undefined && param.inputObjs[0].val() != id) {
+                return false
+            }
             if (param.unbind != undefined && param.unbind.before != undefined) {
                 param.unbind.before();
             }
@@ -1600,7 +1601,6 @@
                 }
             }
             function initQueryObj() {
-                console.log(param.keys.length)
                 for (var i = 0; i < param.keys.length; i++) {
                     var k = param.prefix + param.keys[i];
                     param.keyObjs[i] = $("#" + k);

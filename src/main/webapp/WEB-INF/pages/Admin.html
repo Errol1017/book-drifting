@@ -101,9 +101,7 @@
                             return confirm("确认删除数据？")
                         },
                         success: function (data) {
-                            if ($("#AdminForm_id").val() == data.id) {
-                                form.unbind()
-                            }
+                            form.unbind(data.id)
                         }
                     }
                 }

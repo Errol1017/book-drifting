@@ -42,7 +42,7 @@ public class Client {
     private Date loginTime = new Date();
     //当前借阅的书数量
     @Column(nullable = false)
-    private int borrowingNSum;
+    private int borrowingSum;
 
     public Client() {
     }
@@ -111,11 +111,11 @@ public class Client {
         this.loginTime = loginTime;
     }
 
-    public int getBorrowingNSum() {
-        return borrowingNSum;
+    public int getBorrowingSum() {
+        return borrowingSum;
     }
 
-    public void setBorrowingNSum(int borrowingNSum) {
-        this.borrowingNSum = borrowingNSum;
+    public void setBorrowingSum(int borrowingSum) {
+        this.borrowingSum = borrowingSum;
     }
 }

@@ -40,9 +40,9 @@ public class AdminController {
 
     @RequestMapping(value = Lists.AdminList + "/list", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
     public @ResponseBody Object getAdminList(HttpServletRequest request) throws Exception {
-        String tarPageNum = request.getParameter("tarPageNum");
-        String perPageNum = request.getParameter("perPageNum");
-        List<Admin> admins = comService.getList(Admin.class, Integer.parseInt(tarPageNum), Integer.parseInt(perPageNum));
+        int tarPageNum = Integer.parseInt(request.getParameter("tarPageNum"));
+        int perPageNum = Integer.parseInt(request.getParameter("perPageNum"));
+        List<Admin> admins = comService.getList(Admin.class, tarPageNum, perPageNum);
         List<AdminRole> roles = comService.getList(AdminRole.class);
         HashMap<Integer, AdminRole> roleHashMap = new HashMap<>();
         for (AdminRole role: roles){

@@ -47,8 +47,6 @@ public interface ComService {
 
     void saveDetail(Object object);
     <T> void saveDetail(List<T> objects);
-//    void insertDetail(Object object);
-//    void updateDetail(Object object);
 
     <T> void updateDetail(Class<T> typeValue, int dataId, String setString);
     <T> void updateDetail(Class<T> typeValue, long dataId, String setString);
@@ -58,4 +56,6 @@ public interface ComService {
     <T> void deleteDetail(Class<T> typeValue, String condition);
 
     <T> boolean hasExist(Class<T> typeValue, String condition);
+
+    List<Object[]> query(String hql, int page, int size);
 }

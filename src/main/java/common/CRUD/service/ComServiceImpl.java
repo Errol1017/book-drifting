@@ -147,15 +147,6 @@ public class ComServiceImpl implements ComService {
     public <T> void saveDetail(List<T> objects) {
         comDao.saveDetail(objects);
     }
-//    @Override
-//    public void insertDetail(Object object) {
-//        comDao.insertDetail(object);
-//    }
-//    @Override
-//    public void updateDetail(Object object) {
-//        comDao.updateDetail(object);
-//    }
-
 
     @Override
     public <T> void updateDetail(Class<T> typeValue, int dataId, String setString) {
@@ -184,4 +175,10 @@ public class ComServiceImpl implements ComService {
     public <T> boolean hasExist(Class<T> typeValue, String condition) {
         return comDao.hasExist(typeValue, condition);
     }
+
+    @Override
+    public List<Object[]> query(String hql, int page, int size) {
+        return comDao.query(hql, page, size);
+    }
+
 }

@@ -29,6 +29,15 @@ public class Agency {
     public Agency() {
     }
 
+    /**
+     * 开发阶段初始化单位信息
+     */
+    public Agency(String name, String location, String openTime) {
+        this.name = name;
+        this.location = location;
+        this.openTime = openTime;
+    }
+
     public int getId() {
         return id;
     }

@@ -1,3 +1,50 @@
 <div id="InvitationPage" class="cc_main">
-    projectCheckPage
+    <div class="div_box box10">
+        <div class="list_table_title span25p">
+            邀请码列表
+        </div>
+        <!--<div id="Invitation_Query" class="list_query">-->
+            <!--<label for="Invitation_Query_start" class="ls_mw_100">开始时间</label>-->
+            <!--<span class="span_box">-->
+                <!--<input type="text" id="Invitation_Query_start" class="input_text_30 span200">-->
+            <!--</span>-->
+            <!--<label for="Invitation_Query_end" class="ls_mw_100">结束时间</label>-->
+            <!--<span class="span_box">-->
+                <!--<input type="text" id="Invitation_Query_end" class="input_text_30 span200">-->
+            <!--</span>-->
+            <!--<span class="span_box float_right">-->
+                <!--&lt;!&ndash;<button id="Invitation_Query_Submit" class="button_style_80_30">筛 选</button>&ndash;&gt;-->
+                <!--<button id="Invitation_Query_Reset" class="button_style_80_30">重 置</button>-->
+            <!--</span>-->
+        <!--</div>-->
+        <div class="msg_box">
+            <div id="InvitationList_Msg" class="msg_style"></div>
+        </div>
+        <table id="InvitationList" class="list_table">
+        </table>
+        <div id="InvitationList_HandleBox" class="list_table_handle_box span80">
+            <ul class="list_table_handle_box_ul">
+                <li class="m_m_s" id="InvitationList_Reload">刷 新</li>
+            </ul>
+        </div>
+        <div class="list_table_bottom">
+            -&nbsp;单击表格行可执行操作<br>
+            -&nbsp;手动输入的日期的格式，需与系统显示的格式保持一致
+        </div>
+    </div>
+    
+    <script>
+        $(function () {
+            var list = $("#InvitationPage").list_table({
+                tableId: 'InvitationList',
+                header: {
+                    names: ["邀请码", "用户姓名", "联系电话", "所在单位"],
+                    colWith: ["span20p", "span10p", "span30p", "span40p"]
+                },
+                body: {
+                    tdConf: ["", "", "", "nowrap"]
+                }
+            })
+        })
+    </script>
 </div>

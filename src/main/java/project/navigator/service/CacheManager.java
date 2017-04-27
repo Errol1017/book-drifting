@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import project.basic.entity.Agency;
 import project.basic.entity.BookClassification;
 import project.basic.entity.InvitationCode;
 import project.navigator.model.Navigation;
@@ -29,6 +30,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     private ComService comService;
 
     private List<BookClassification> bookClassificationList = new ArrayList<>();
+    private List<Agency> agencyList = new ArrayList<>();
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
@@ -70,7 +72,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
                     "历史、地理,自然科学总论,数理科学和化学,天文学、地球科学,生物科学,医药、卫生,农业科学,工业技术,交通运输,航空、航天,环境科学、安全科学,综合性图书";
             String[] arr = s.split(",");
             List<BookClassification> list = new ArrayList<>();
-            for (int i = 0; i<arr.length; i++) {
+            for (int i = 0; i < arr.length; i++) {
                 list.add(new BookClassification(arr[i]));
             }
             comService.saveDetail(list);
@@ -80,14 +82,24 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
          * 初始化邀请码
          */
         InvitationCode ic = comService.getFirst(InvitationCode.class, "id asc");
-            List<String> codes = InvitationCodeGenerator.getMany(100);
         if (ic == null) {
+            List<String> codes = InvitationCodeGenerator.getMany(100);
             List<InvitationCode> list = new ArrayList<>();
-            for (String s: codes) {
+            for (String s : codes) {
                 System.out.println(s);
                 list.add(new InvitationCode(s));
             }
             comService.saveDetail(list);
+        }
+
+        /**
+         * 初始化单位信息
+         */
+        Agency ag = comService.getFirst(Agency.class, "id asc");
+        if (ag == null) {
+            comService.saveDetail(new Agency("国土局","海虞北路","8:30-11:00 am , 13:00-16:30 pm"));
+            comService.saveDetail(new Agency("常熟海关","枫林路","9:00-11:00 am , 13:00-16:00 pm"));
+            comService.saveDetail(new Agency("地税","长江路","8:00-11:00 am , 12:30-16:30 pm"));
         }
     }
 
@@ -97,22 +109,26 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     }
 
 
+    /**
+     * 图书分类相关方法
+     */
     //获取图书分类下拉列表
     public List<BookClassification> getBookClassificationList() {
         return bookClassificationList;
     }
     //获取图书分类名称
     public String getBookClassificationName(int id) {
-        for (BookClassification bc: bookClassificationList) {
+        for (BookClassification bc : bookClassificationList) {
             if (bc.getId() == id) {
                 return bc.getName();
             }
         }
-        return "";
+//        return "";
+        return null;
     }
     //检查图书分类id是否存在
     public boolean checkBookClassificationId(int id) {
-        for (BookClassification bc: bookClassificationList) {
+        for (BookClassification bc : bookClassificationList) {
             if (bc.getId() == id) {
                 return true;
             }
@@ -121,10 +137,29 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     }
     //修改图书分类后重置缓存
     public void resetBookClassificationList() {
-        bookClassificationList = new ArrayList<>();
+//        bookClassificationList = new ArrayList<>();
         bookClassificationList = comService.getList(BookClassification.class);
     }
 
+    /**
+     * 单位信息相关方法
+     */
+    //获取单位下拉列表
+    //获取单位信息
+    public Agency getAgency(int id) {
+        for (Agency agency: agencyList) {
+            if (agency.getId() == id) {
+                return agency;
+            }
+        }
+        return null;
+    }
+    //检查单位id是否存在
+    //修改单位信息后重置缓存
+    public void resetAgencyList() {
+//        agencyList = new ArrayList<>();
+        agencyList = comService.getList(Agency.class);
+    }
 
     public static void main(String[] args) {
         System.out.println(DateUtil.string2Date("201607", DateUtil.PATTERN_H));
