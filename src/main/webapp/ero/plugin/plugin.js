@@ -894,13 +894,329 @@
         }
     });
 
+    //dynamic select
+    $.fn.dynamic_select = function (param) {
+        /**
+         * @param param
+         * param.reqId          id
+         * param.valObj         required
+         * param.subObj
+         * param.compId         default param.valObj.attr("id")
+         * param.boxObj         default $("#" + param.compId + "_box")
+         * param.ulObj
+         * param.liObjs
+         * param.dynamic        boolean default true
+         * param.writable       boolean default true
+         * param.lines          number  default 7
+         * param.data           array
+         * param.index
+         * param.match
+         * param.matchIndex
+         * param.css
+         *      css.lineHeight
+         *      css.paddingTop
+         * param.callback       default valObj.trigger('change')
+         * param.out
+         */
+        var pageId = $(this).attr("id");
+        init();
+        return {
+            reset: function () {
+                reset();
+            }
+        };
+        function init() {
+            param.reqId = $.ero.navigator.getReqId($.ero.navigator.getNavigation("", pageId));
+            initValObj();
+            initData();
+            function initValObj() {
+                param.subObj = param.valObj;
+                var id = param.subObj.attr("id");
+                param.subObj.attr("id", id + '_Sub');
+                param.subObj.before('<input type="hidden" id="' + id + '"/>');
+                param.valObj = param.subObj.prev();
+                if (param.compId == undefined) {
+                    param.compId = id;
+                }
+            }
+            function initData() {
+                if (param.dynamic == undefined || param.dynamic) {
+                    getData();
+                } else {
+                    if (param.boxObj == undefined) {
+                        param.boxObj = $("#" + param.compId + "_box");
+                    }
+                    param.liObjs = param.boxObj.find("li");
+                    getCss();
+                    initEvent();
+                }
+                if (param.writable == undefined) {
+                    param.writable = true;
+                }
+                if (param.callback == undefined) {
+                    param.callback = function () {
+                        param.valObj.trigger("change");
+                    }
+                }
+                param.out = true;
+            }
+            function getData() {
+                $.ajax({
+                    url: "navigator/validator",
+                    type: "post",
+                    data: {
+                        type: 'data',
+                        reqId: param.reqId,
+                        compId: param.compId
+                    },
+                    success: function (res) {
+                        if (res.code == 0) {
+                            param.data = res.data;
+                            draw();
+                        } else {
+                            $.ero.showErrorMessage(res.code, res.data);
+                        }
+                    },
+                    error: function (xhr, msg, obj) {
+                        $.ero.showErrorMessage(-9);
+                        $.ero.getAjaxErrorMessage(xhr, msg, obj);
+                    }
+                });
+                function draw() {
+                    var liStr = "";
+                    for (var i = 0; i < param.data.length; i++) {
+                        liStr += "<li class='dynamic_select_li'>" + param.data[i]['text'] + "</li>";
+                    }
+                    param.subObj.after("<div class='dynamic_plugin_box' style='width:" + param.subObj.css("width") + "'><ul class='dynamic_select_ul'>" + liStr + "</ul></div>");
+                    param.boxObj = param.subObj.next();
+                    param.liObjs = param.boxObj.find("li");
+                    getCss();
+                    initEvent();
+                }
+            }
+            function getCss() {
+                param.ulObj = param.boxObj.children().first();
+                param.lineHeight = parseInt(param.ulObj.css("line-height").slice(0, -2)) + 1;
+                param.paddingTop = parseInt(param.ulObj.css("padding-top").slice(0, -2));
+            }
+            function initEvent() {
+                initHandleEvent();
+                initBoxObjEvent();
+                function initHandleEvent() {
+                    param.subObj.click(function () {
+                        boxIn();
+                    });
+                    if (param.writable) {
+                        param.subObj.focus(function () {
+                            boxIn();
+                        }).keyup(function (e) {
+                            param.boxObj.fadeIn();
+                            if (param.out) {
+                                param.out = false;
+                            }
+                            search(e);
+                        }).blur(function () {
+                            boxOut()
+                        })
+                    } else {
+                        param.subObj.focus(function () {
+                            boxIn();
+                            param.subObj.blur();
+                        });
+                    }
+                    param.boxObj.mouseleave(function () {
+                        boxOut();
+                    })
+                }
+                function initBoxObjEvent() {
+                    param.liObjs.each(function () {
+                        $(this).click(function () {
+                            clearIndex();
+                            param.index = $(this).index();
+                            $(this).addClass("dynamic_select_li_select");
+                            setVal();
+                            setSub();
+                            boxOut();
+                        })
+                    });
+                }
+                function boxIn() {
+                    if (param.out) {
+                        param.out = false;
+                        var s = param.valObj.val();
+                        if (s != '') {
+                            select(param.index);
+                        }
+                        param.boxObj.fadeIn();
+                        scroll(param.index);
+                    }
+                }
+                function boxOut() {
+                    if (!param.out) {
+                        param.out = true;
+                        if (param.valObj.val() == '') {
+                            param.subObj.val('')
+                        }
+                        if (param.matchIndex != undefined) {
+                            deselect(getIndex());
+                            param.matchIndex = undefined;
+                        }
+                        param.boxObj.fadeOut(function () {
+                            clearMatch();
+                        });
+                    }
+                }
+                function search(e) {
+                    var eWhich = e.which;
+                    if (eWhich == 9 || eWhich == 16 || param.data.length == 0) {
+                        return false;
+                    }
+                    if (eWhich == 27) {
+                        boxOut();
+                        return false;
+                    }
+                    if (eWhich == 38 || eWhich == 40 || eWhich == 13) {
+                        if (param.match != undefined && param.match.length == 0) {
+                            return false;
+                        }
+                        var maxIndex = param.match == undefined ? param.data.length - 1 : param.match.length - 1;
+                        if (param.matchIndex == undefined && param.index != undefined) {
+                            param.matchIndex = param.index;
+                        }
+                        switch (eWhich) {
+                            case 38:
+                                if (param.matchIndex == undefined || param.matchIndex == 0) {
+                                    param.matchIndex = maxIndex;
+                                } else {
+                                    deselect(getIndex());
+                                    param.matchIndex--;
+                                }
+                                scroll(param.matchIndex);
+                                select(getIndex());
+                                break;
+                            case 40:
+                                if (param.matchIndex == undefined || param.matchIndex == maxIndex) {
+                                    param.matchIndex = 0;
+                                } else {
+                                    deselect(getIndex());
+                                    param.matchIndex++;
+                                }
+                                scroll(param.matchIndex);
+                                select(getIndex());
+                                break;
+                            case 13:
+                                console.log("13")
+                                if (param.matchIndex == undefined) {
+                                    if (param.subObj.val() == '') {
+                                        param.callback();
+                                    }
+                                    param.valObj.val('');
+                                    param.index = undefined;
+                                } else {
+                                    param.index = getIndex();
+                                    param.matchIndex = undefined;
+                                    setVal();
+                                    setSub();
+                                }
+                                param.subObj.blur();
+                                break;
+                            default:
+                                return false;
+                        }
+                    } else {
+                        param.valObj.val("");
+                        clearIndex();
+                        deselect(getIndex());
+                        var curText = param.subObj.val();
+                        if (curText == "") {
+                            clearMatch();
+                        } else {
+                            curText = curText;
+                            var i = 0;
+                            param.match = new Array();
+                            param.liObjs.each(function () {
+                                if (param.data[i]['val'].toUpperCase().indexOf(curText.toUpperCase()) != -1 || param.data[i]['text'].indexOf(curText) != -1) {
+                                    $(this).show();
+                                    param.match.push($(this).index());
+                                } else {
+                                    $(this).hide();
+                                }
+                                i++;
+                            });
+                        }
+                    }
+                }
+                function scroll(index) {
+                    if (index != undefined) {
+                        param.ulObj.scrollTop(index < 3 ? 0 : ((index - 2) * (param.lineHeight)) + param.paddingTop);
+                    } else {
+                        param.ulObj.scrollTop(0);
+                    }
+                }
+                function clearMatch() {
+                    if (param.match != undefined) {
+                        param.match = undefined;
+                        param.liObjs.each(function () {
+                            $(this).show();
+                        });
+                    }
+                }
+                function getIndex() {
+                    return param.match == undefined ? param.matchIndex : param.match[param.matchIndex];
+                }
+            }
+        }
+        function setVal() {
+            param.valObj.val(param.data[param.index]['val']);
+            param.callback();
+        }
+        function setSub() {
+            param.subObj.val(param.data[param.index]['text']);
+        }
+        function select(index) {
+            param.liObjs.eq(index).addClass("dynamic_select_li_select");
+        }
+        function deselect(index) {
+            param.liObjs.eq(index).removeClass("dynamic_select_li_select");
+        }
+        function setIndex(valStr) {
+            for (var i = 0; i < param.data.length; i++) {
+                if (param.data[i]['val'] == valStr) {
+                    param.index = i;
+                    break;
+                }
+            }
+        }
+        function clearIndex() {
+            if (param.index != undefined) {
+                deselect(param.index);
+                param.index = undefined;
+            }
+        }
+        function reset() {
+            clearIndex();
+            var valStr = param.valObj.val();
+            if (valStr == '') {
+                param.subObj.val('');
+            } else {
+                setIndex(valStr);
+                if (param.index == undefined) {
+                    param.valObj.val('');
+                    param.subObj.val('');
+                } else {
+                    setSub();
+                }
+            }
+        }
+    };
+
     //cascade checkbox
     $.fn.cascade_checkbox = function (param) {
         /**
          * @param param
          * param.reqId          id
-         * param.compId         default param.valObj.attr("id")
          * param.valObj         required
+         * param.compId         default param.valObj.attr("id")
          * param.boxObj         default $("#" + param.compId + "_box")
          * param.dynamic        boolean
          * param.data           array
@@ -915,20 +1231,23 @@
         };
         function init() {
             param.reqId = $.ero.navigator.getReqId($.ero.navigator.getNavigation("", pageId));
-            if (param.compId == undefined) {
-                param.compId = param.valObj.attr("id");
-            }
-            if (param.dynamic == undefined || param.dynamic) {
-                getData();
-            } else {
-                if (param.boxObj == undefined) {
-                    param.boxObj = $("#" + param.compId + "_box");
+            initData();
+            function initData() {
+                if (param.compId == undefined) {
+                    param.compId = param.valObj.attr("id");
                 }
-                initEvent();
-            }
-            if (param.callback == undefined) {
-                param.callback = function () {
-                    param.valObj.trigger("change");
+                if (param.dynamic == undefined || param.dynamic) {
+                    getData();
+                } else {
+                    if (param.boxObj == undefined) {
+                        param.boxObj = $("#" + param.compId + "_box");
+                    }
+                    initEvent();
+                }
+                if (param.callback == undefined) {
+                    param.callback = function () {
+                        param.valObj.trigger("change");
+                    }
                 }
             }
             function getData() {
@@ -962,13 +1281,13 @@
                             if (domStr != "") {
                                 domStr += '</ul></li></ul>';
                             }
-                            domStr += '<ul class="cascade_checkbox span140"><li class="cc_li_even" data-val="' + obj["val"] + '"><input type="checkbox" class="input_checkbox">' + obj["name"] + '</li><li><ul>';
+                            domStr += '<ul class="cascade_checkbox span140"><li class="cc_li_even" data-val="' + obj["val"] + '"><input type="checkbox" class="input_checkbox">' + obj["text"] + '</li><li><ul>';
                         } else if (obj["level"] == 2) {
-                            domStr += '<li class="cc_li_odd" data-val="' + obj["val"] + '"><input type="checkbox" class="input_checkbox">' + obj["name"] + '</li>';
+                            domStr += '<li class="cc_li_odd" data-val="' + obj["val"] + '"><input type="checkbox" class="input_checkbox">' + obj["text"] + '</li>';
                         }
                     }
-                    param.valObj.after('<div id="' + param.compId + '_box' + '" class="cascade_checkbox_box">' + domStr + '</div>');
-                    param.boxObj = $("#" + param.compId + "_box");
+                    param.valObj.after('<div class="cascade_checkbox_box">' + domStr + '</div>');
+                    param.boxObj = param.valObj.next();
                     initEvent();
                 }
             }
@@ -1093,6 +1412,7 @@
          * param.valObj
          * param.shortDate      boolean default true
          * param.chinese        boolean default true
+         * param.writable       boolean default true
          * param.arr
          * param.curDate        当前选定date，默认当天
          * param.tarDate        目标date，默认和curDate相同
@@ -1115,12 +1435,18 @@
             }
         };
         function init() {
-            initData();
             initValObj();
+            initData();
             initBox();
             initHandleEvent();
             initHeadEvent();
             initBodyEvent();
+            function initValObj() {
+                var id = param.subObj.attr("id");
+                param.subObj.attr("id", id + '_Sub');
+                param.subObj.before('<input type="hidden" id="' + id + '"/>');
+                param.valObj = param.subObj.prev();
+            }
             function initData() {
                 param.dateType = "date";
                 if (param.shortDate == undefined) {
@@ -1134,17 +1460,14 @@
                 } else {
                     param.arr = ['-', '-', '', ' ', ':', ':', '']
                 }
+                if (param.writable == undefined) {
+                    param.writable = true;
+                }
                 if (param.callback == undefined) {
                     param.callback = function () {
                         param.valObj.trigger("change");
                     }
                 }
-            }
-            function initValObj() {
-                var id = param.subObj.attr("id");
-                param.subObj.attr("id", id + '_Sub');
-                param.subObj.before('<input type="hidden" id="' + id + '"/>');
-                param.valObj = param.subObj.prev();
             }
             function initBox() {
                 if (param.chinese) {
@@ -1166,58 +1489,72 @@
                 initBoxObjEvent();
                 function initSubObjEvent() {
                     param.subObj.click(function () {
+                        boxIn();
+                    });
+                    if (param.writable) {
+                        param.subObj.change(function () {
+                            var s = $(this).val();
+                            if (s != '') {
+                                if (param.chinese) {
+                                    s = s.replace(param.arr[0], '-');
+                                    s = s.replace(param.arr[1], '-');
+                                    s = s.replace(param.arr[2], '');
+                                    s = s.replace(param.arr[4], ':');
+                                    s = s.replace(param.arr[5], ':');
+                                    s = s.replace(param.arr[6], ':');
+                                }
+                                if (new Date(s) == "Invalid Date") {
+                                    s = '';
+                                    param.valObj.val(s);
+                                    param.subObj.val(s);
+                                } else {
+                                    param.valObj.val(new Date(s).getTime())
+                                }
+                            } else {
+                                param.valObj.val('');
+                            }
+                        }).keyup(function (e) {
+                            param.boxObj.fadeOut();
+                            if (e.which == 13) {
+                                param.subObj.trigger("change").blur();
+                                param.callback();
+                            }
+                        }).blur(function () {
+                            if (param.dateChanged == undefined || param.dateChanged) {
+                                param.boxObj.fadeOut();
+                            }
+                        });
+                    } else {
+                        param.subObj.focus(function () {
+                            boxIn();
+                            param.subObj.blur();
+                        })
+                    }
+                    function boxIn() {
                         setDate();
                         drawTable();
                         param.boxObj.fadeIn();
-                    }).change(function () {
-                        var s = $(this).val();
-                        if (s != '') {
-                            if (param.chinese) {
-                                s = s.replace(param.arr[0], '-');
-                                s = s.replace(param.arr[1], '-');
-                                s = s.replace(param.arr[2], '');
-                                s = s.replace(param.arr[4], ':');
-                                s = s.replace(param.arr[5], ':');
-                                s = s.replace(param.arr[6], ':');
-                            }
-                            if (new Date(s) == "Invalid Date") {
-                                s = '';
-                                param.valObj.val(s);
-                                param.subObj.val(s);
+                        function setDate() {
+                            var dateStr = param.valObj.val();
+                            if (dateStr == "" || new Date(parseInt(dateStr)) == "Invalid Date") {
+                                param.curDate = new Date();
+                                param.tarDate = new Date();
+                                param.subObj.val('');
+                                param.valObj.val('');
                             } else {
-                                param.valObj.val(new Date(s).getTime())
+                                param.curDate = new Date(parseInt(dateStr));
+                                param.tarDate = new Date(parseInt(dateStr));
                             }
-                        } else {
-                            param.valObj.val('');
+                            if (param.shortDate) {
+                                param.curDate.setHours(0);
+                                param.curDate.setMinutes(0);
+                                param.curDate.setSeconds(0);
+                                param.tarDate.setHours(0);
+                                param.tarDate.setMinutes(0);
+                                param.tarDate.setSeconds(0);
+                            }
+                            param.dateType = "date";
                         }
-                    }).keyup(function () {
-                        param.boxObj.fadeOut();
-                        param.input = true;
-                    }).blur(function () {
-                        if (param.dateChanged == undefined || param.dateChanged) {
-                            param.boxObj.fadeOut();
-                        }
-                    });
-                    function setDate() {
-                        var dateStr = param.valObj.val();
-                        if (dateStr == "" || new Date(parseInt(dateStr)) == "Invalid Date") {
-                            param.curDate = new Date();
-                            param.tarDate = new Date();
-                            param.subObj.val('');
-                            param.valObj.val('');
-                        } else {
-                            param.curDate = new Date(parseInt(dateStr));
-                            param.tarDate = new Date(parseInt(dateStr));
-                        }
-                        if (param.shortDate) {
-                            param.curDate.setHours(0);
-                            param.curDate.setMinutes(0);
-                            param.curDate.setSeconds(0);
-                            param.tarDate.setHours(0);
-                            param.tarDate.setMinutes(0);
-                            param.tarDate.setSeconds(0);
-                        }
-                        param.dateType = "date";
                     }
                 }
                 function initBoxObjEvent() {
@@ -1314,12 +1651,7 @@
             }
             function setVal() {
                 param.valObj.val(param.tarDate.getTime());
-                if (param.shortDate) {
-                    param.subObj.val(param.tarDate.getFullYear() + param.arr[0] + (param.tarDate.getMonth() + 1) + param.arr[1] + param.tarDate.getDate() + param.arr[2]);
-                } else {
-                    param.subObj.val(param.tarDate.getFullYear() + param.arr[0] + (param.tarDate.getMonth() + 1) + param.arr[1] + param.tarDate.getDate() + param.arr[2] + param.arr[3]
-                        + param.tarDate.getHours() + param.arr[4] + param.tarDate.getMinutes() + param.arr[5] + param.tarDate.getSeconds() + param.arr[6]);
-                }
+                setSub();
                 param.dateChanged = true;
             }
             function drawTable() {
@@ -1533,18 +1865,19 @@
                             inputs.eq(1).val(param.tarDate.getMinutes());
                             param.timeChanged = true;
                         });
-                        inputs.first().blur(function () {
-                            $(this).val($(this).val().match(reg1) ? parseInt($(this).val()) : 0);
+                        inputs.first().change(function () {
+                            console.log("blur")
+                            $(this).val($(this).val().match(reg1) ? parseInt($(this).val()) : 0).blur();
                             param.tarDate.setHours($(this).val());
                             param.timeChanged = true;
                         });
-                        inputs.eq(1).blur(function () {
-                            $(this).val($(this).val().match(reg2) ? parseInt($(this).val()) : 0);
+                        inputs.eq(1).change(function () {
+                            $(this).val($(this).val().match(reg2) ? parseInt($(this).val()) : 0).blur();
                             param.tarDate.setMinutes($(this).val());
                             param.timeChanged = true;
                         });
-                        inputs.last().blur(function () {
-                            $(this).val($(this).val().match(reg2) ? parseInt($(this).val()) : 0);
+                        inputs.last().change(function () {
+                            $(this).val($(this).val().match(reg2) ? parseInt($(this).val()) : 0).blur();
                             param.tarDate.setSeconds($(this).val());
                             param.timeChanged = true;
                         });
@@ -1552,9 +1885,27 @@
                 }
             }
         }
+        function setSub() {
+            if (param.shortDate) {
+                param.subObj.val(param.tarDate.getFullYear() + param.arr[0] + (param.tarDate.getMonth() + 1) + param.arr[1] + param.tarDate.getDate() + param.arr[2]);
+            } else {
+                param.subObj.val(param.tarDate.getFullYear() + param.arr[0] + (param.tarDate.getMonth() + 1) + param.arr[1] + param.tarDate.getDate() + param.arr[2] + param.arr[3]
+                    + param.tarDate.getHours() + param.arr[4] + param.tarDate.getMinutes() + param.arr[5] + param.tarDate.getSeconds() + param.arr[6]);
+            }
+        }
         function reset() {
-            param.valObj.val('');
-            param.subObj.val('');
+            var s = param.valObj.val();
+            if (s == '') {
+                param.subObj.val('');
+            } else {
+                if (new Date(parseInt(s)) == "Invalid Date") {
+                    param.valObj.val('');
+                    param.subObj.val('');
+                } else {
+                    param.tarDate = new Date(parseInt(s));
+                    setSub();
+                }
+            }
         }
     };
 
@@ -1863,61 +2214,61 @@
          * obj.textId           id
          * obj.msgId            id
          */
-        dynamic_select_register: function (obj) {
-            var textObj = $(this);
-            textObj.data("obj", obj).dynamic_select_get_data(obj).click(function () {
-                $(this).next().dynamic_select_show();
-            }).focus(function () {
-                $(this).next().dynamic_select_show();
-            })
-        },
-        dynamic_select_show: function () {
-            $(this).fadeIn();
-            return this;
-        },
-        dynamic_select_hide: function () {
-            $(this).fadeOut().children().first().dynamic_select_pre_deselect();
-            return this;
-        },
-        dynamic_select_get_data: function (obj) {
-            var textObj = $(this);
-            $.ajax({
-                url: "navigator/validator",
-                type: "post",
-                data: {
-                    type: "select",
-                    reqId: obj.pageId,
-                    key: obj.key
-                },
-                datatype: "json",
-                success: function (res) {
-                    if (res.code == 0) {
-                        textObj.dynamic_select_draw(obj, res.data);
-                    } else if (res.code == -1) {
-                        $("#" + obj.msgId).show_msg(res.data);
-                    } else {
-                        $.ero.showErrorMessage(res.code, res.data);
-                    }
-                },
-                error: function (xhr, msg, obj) {
-                    $.ero.showErrorMessage(-10);
-                    $.ero.getAjaxErrorMessage(xhr, msg, obj);
-                }
-            });
-            return this;
-        },
-        dynamic_select_draw: function (obj, data) {
-            var textObj = $(this);
-            var val = data.val;
-            var text = data.text == undefined ? val : data.text;
-            var lis = "";
-            var liLength = val.length;
-            for (var i = 0; i < liLength; i++) {
-                lis += "<li data-val='" + val[i] + "' class='dynamic_select_li'>" + text[i] + "</li>";
-            }
-            textObj.after("<div class='dynamic_plugin_box' style='width:" + textObj.css("width") + "'><ul id='ss' class='dynamic_select_ul'>" + lis + "</ul></div>");
-            textObj.next().dynamic_select_event(obj, liLength);
-        },
+        // dynamic_select_register: function (obj) {
+        //     var textObj = $(this);
+        //     textObj.data("obj", obj).dynamic_select_get_data(obj).click(function () {
+        //         $(this).next().dynamic_select_show();
+        //     }).focus(function () {
+        //         $(this).next().dynamic_select_show();
+        //     })
+        // },
+        // dynamic_select_show: function () {
+        //     $(this).fadeIn();
+        //     return this;
+        // },
+        // dynamic_select_hide: function () {
+        //     $(this).fadeOut().children().first().dynamic_select_pre_deselect();
+        //     return this;
+        // },
+        // dynamic_select_get_data: function (obj) {
+        //     var textObj = $(this);
+        //     $.ajax({
+        //         url: "navigator/validator",
+        //         type: "post",
+        //         data: {
+        //             type: "select",
+        //             reqId: obj.pageId,
+        //             key: obj.key
+        //         },
+        //         datatype: "json",
+        //         success: function (res) {
+        //             if (res.code == 0) {
+        //                 textObj.dynamic_select_draw(obj, res.data);
+        //             } else if (res.code == -1) {
+        //                 $("#" + obj.msgId).show_msg(res.data);
+        //             } else {
+        //                 $.ero.showErrorMessage(res.code, res.data);
+        //             }
+        //         },
+        //         error: function (xhr, msg, obj) {
+        //             $.ero.showErrorMessage(-10);
+        //             $.ero.getAjaxErrorMessage(xhr, msg, obj);
+        //         }
+        //     });
+        //     return this;
+        // },
+        // dynamic_select_draw: function (obj, data) {
+        //     var textObj = $(this);
+        //     var val = data.val;
+        //     var text = data.text == undefined ? val : data.text;
+        //     var lis = "";
+        //     var liLength = val.length;
+        //     for (var i = 0; i < liLength; i++) {
+        //         lis += "<li data-val='" + val[i] + "' class='dynamic_select_li'>" + text[i] + "</li>";
+        //     }
+        //     textObj.after("<div class='dynamic_plugin_box' style='width:" + textObj.css("width") + "'><ul id='ss' class='dynamic_select_ul'>" + lis + "</ul></div>");
+        //     textObj.next().dynamic_select_event(obj, liLength);
+        // },
         dynamic_select_event: function (obj, liLength) {
             var divObj = $(this);
             divObj.dynamic_select_li_click(obj).dynamic_select_blur(obj).mouseleave(function () {
@@ -1929,65 +2280,65 @@
             ulObj.data("padTop", parseInt(ulObj.css("padding-top").slice(0, -2)));
             ulObj.data("liHei", parseInt(ulObj.css("line-height").slice(0, -2)) + 1);
         },
-        dynamic_select_li_click: function (obj) {
-            var divObj = $(this);
-            var ulObj = divObj.children().first();
-            ulObj.children().each(function () {
-                $(this).click(function () {
-                    if (ulObj.data("index") != undefined) {
-                        ulObj.dynamic_select_deselect(ulObj.data("index"));
-                    }
-                    $(this).addClass("dynamic_select_li_select");
-                    ulObj.data("index", $(this).index());
-                    $("#" + obj.textId).val($(this).text());
-                    $("#" + obj.valId).val($(this).attr("data-val"));
-                    divObj.dynamic_select_hide();
-                })
-            });
-            return this;
-        },
-        dynamic_select_blur: function (obj) {
-            var divObj = $(this);
-            $("#" + obj.textId).blur(function () {
-                divObj.dynamic_select_hide();
-                if (divObj.children().first().data("index") == undefined) {
-                    divObj.prev().val("");
-                }
-            });
-            return this;
-        },
-        dynamic_select_deselect: function (index) {
-            $(this).children().eq(index).removeClass("dynamic_select_li_select");
-        },
-        dynamic_select_bind: function (obj) {
-            var ulObj = $(this);
-            var textObj = $("#" + obj.textId);
-            $("#" + obj.valId).change(function () {
-                if (ulObj.data("index") != undefined) {
-                    ulObj.dynamic_select_deselect(ulObj.data("index"));
-                }
-                var curVal = $(this).val();
-                if (curVal != "") {
-                    var isExist = false;
-                    ulObj.children().each(function () {
-                        if ($(this).attr("data-val") == curVal) {
-                            $(this).addClass("dynamic_select_li_select");
-                            ulObj.data("index", $(this).index());
-                            textObj.val($(this).text());
-                            isExist = true;
-                            return false;
-                        }
-                    });
-                    if (!isExist) {
-                        $(this).val("");
-                        textObj.val("");
-                    }
-                } else {
-                    textObj.val("");
-                }
-            });
-            return this;
-        },
+        // dynamic_select_li_click: function (obj) {
+        //     var divObj = $(this);
+        //     var ulObj = divObj.children().first();
+        //     ulObj.children().each(function () {
+        //         $(this).click(function () {
+        //             if (ulObj.data("index") != undefined) {
+        //                 ulObj.dynamic_select_deselect(ulObj.data("index"));
+        //             }
+        //             $(this).addClass("dynamic_select_li_select");
+        //             ulObj.data("index", $(this).index());
+        //             $("#" + obj.textId).val($(this).text());
+        //             $("#" + obj.valId).val($(this).attr("data-val"));
+        //             divObj.dynamic_select_hide();
+        //         })
+        //     });
+        //     return this;
+        // },
+        // dynamic_select_blur: function (obj) {
+        //     var divObj = $(this);
+        //     $("#" + obj.textId).blur(function () {
+        //         divObj.dynamic_select_hide();
+        //         if (divObj.children().first().data("index") == undefined) {
+        //             divObj.prev().val("");
+        //         }
+        //     });
+        //     return this;
+        // },
+        // dynamic_select_deselect: function (index) {
+        //     $(this).children().eq(index).removeClass("dynamic_select_li_select");
+        // },
+        // dynamic_select_bind: function (obj) {
+        //     var ulObj = $(this);
+        //     var textObj = $("#" + obj.textId);
+        //     $("#" + obj.valId).change(function () {
+        //         if (ulObj.data("index") != undefined) {
+        //             ulObj.dynamic_select_deselect(ulObj.data("index"));
+        //         }
+        //         var curVal = $(this).val();
+        //         if (curVal != "") {
+        //             var isExist = false;
+        //             ulObj.children().each(function () {
+        //                 if ($(this).attr("data-val") == curVal) {
+        //                     $(this).addClass("dynamic_select_li_select");
+        //                     ulObj.data("index", $(this).index());
+        //                     textObj.val($(this).text());
+        //                     isExist = true;
+        //                     return false;
+        //                 }
+        //             });
+        //             if (!isExist) {
+        //                 $(this).val("");
+        //                 textObj.val("");
+        //             }
+        //         } else {
+        //             textObj.val("");
+        //         }
+        //     });
+        //     return this;
+        // },
         dynamic_select_pre_select: function (pre, match) {
             $(this).data("pre", pre).children().eq(match == undefined ? pre : match[pre]).addClass("dynamic_select_li_select");
         },

@@ -93,7 +93,7 @@ public class Navigation {
             Map<String, String> map = new HashMap<>();
             map.put("level", String.valueOf(m.getLevel()));
             map.put("val", m.getId());
-            map.put("name", m.getName());
+            map.put("text", m.getName());
             list.add(map);
         }
         return list;

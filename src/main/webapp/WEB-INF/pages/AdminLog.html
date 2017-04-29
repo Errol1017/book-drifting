@@ -47,8 +47,12 @@
 //                handle: {
 //                }
             });
-            var start = $("#AdminLog_Query_start").date_picker();
-            var end = $("#AdminLog_Query_end").date_picker();
+            var start = $("#AdminLog_Query_start").date_picker({
+                shortDate: false
+            });
+            var end = $("#AdminLog_Query_end").date_picker({
+                writable: false,
+            });
             var query = $("#AdminLog_Query").query_manager({
                 manually: false,
                 keys: ["start", "end"],

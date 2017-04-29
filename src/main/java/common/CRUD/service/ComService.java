@@ -58,4 +58,7 @@ public interface ComService {
     <T> boolean hasExist(Class<T> typeValue, String condition);
 
     List<Object[]> query(String hql, int page, int size);
+
+
+    void test();
 }

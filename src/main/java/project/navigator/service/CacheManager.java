@@ -3,7 +3,6 @@ package project.navigator.service;
 import common.CRUD.service.ComService;
 import common.Util.DateUtil;
 import common.Util.InvitationCodeGenerator;
-import common.Util.ValidateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -12,13 +11,10 @@ import project.basic.entity.Agency;
 import project.basic.entity.BookClassification;
 import project.basic.entity.InvitationCode;
 import project.navigator.model.Navigation;
-import project.navigator.route.Types;
 import project.system.entity.Admin;
 import project.system.entity.AdminRole;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Errol on 16/10/19.
@@ -29,8 +25,13 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     @Autowired
     private ComService comService;
 
-    private List<BookClassification> bookClassificationList = new ArrayList<>();
-    private List<Agency> agencyList = new ArrayList<>();
+    //cache
+    private Map<Integer, String> bookClassificationCache;
+    private Map<Integer, Agency> agencyCache;
+
+    //dynamic select
+    private List<Map<String, String>> bookClassificationSelect;
+    private List<Map<String, String>> agencySelect;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
@@ -42,6 +43,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
         /** 加载缓存 */
         initCache();
 
+        test();
     }
 
     private void initRootAdmin() {
@@ -86,7 +88,6 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
             List<String> codes = InvitationCodeGenerator.getMany(100);
             List<InvitationCode> list = new ArrayList<>();
             for (String s : codes) {
-                System.out.println(s);
                 list.add(new InvitationCode(s));
             }
             comService.saveDetail(list);
@@ -106,6 +107,8 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     private void initCache() {
         //加载图书分类缓存
         resetBookClassificationList();
+        //加载单位信息
+        resetAgencyList();
     }
 
 
@@ -113,32 +116,33 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
      * 图书分类相关方法
      */
     //获取图书分类下拉列表
-    public List<BookClassification> getBookClassificationList() {
-        return bookClassificationList;
+    public List<Map<String, String>> getBookClassificationSelect() {
+        return bookClassificationSelect;
     }
     //获取图书分类名称
     public String getBookClassificationName(int id) {
-        for (BookClassification bc : bookClassificationList) {
-            if (bc.getId() == id) {
-                return bc.getName();
-            }
-        }
-//        return "";
-        return null;
+        return bookClassificationCache.get(id);
     }
     //检查图书分类id是否存在
     public boolean checkBookClassificationId(int id) {
-        for (BookClassification bc : bookClassificationList) {
-            if (bc.getId() == id) {
-                return true;
-            }
+        if (bookClassificationCache.containsKey(id)) {
+            return true;
+        } else {
+            return false;
         }
-        return false;
     }
     //修改图书分类后重置缓存
     public void resetBookClassificationList() {
-//        bookClassificationList = new ArrayList<>();
-        bookClassificationList = comService.getList(BookClassification.class);
+        bookClassificationSelect = new ArrayList<>();
+        bookClassificationCache = new HashMap<>();
+        List<BookClassification> list = comService.getList(BookClassification.class);
+        for (BookClassification bc: list) {
+            Map<String, String> map = new HashMap<>();
+            map.put("val", String.valueOf(bc.getId()));
+            map.put("text", bc.getName());
+            bookClassificationSelect.add(map);
+            bookClassificationCache.put(bc.getId(), bc.getName());
+        }
     }
 
     /**
@@ -147,24 +151,33 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     //获取单位下拉列表
     //获取单位信息
     public Agency getAgency(int id) {
-        for (Agency agency: agencyList) {
-            if (agency.getId() == id) {
-                return agency;
-            }
-        }
-        return null;
+        return agencyCache.get(id);
     }
     //检查单位id是否存在
     //修改单位信息后重置缓存
     public void resetAgencyList() {
-//        agencyList = new ArrayList<>();
-        agencyList = comService.getList(Agency.class);
+        agencySelect = new ArrayList<>();
+        agencyCache = new HashMap<>();
+        List<Agency> list = comService.getList(Agency.class);
+        for (Agency ag: list) {
+            Map<String, String> map = new HashMap<>();
+            map.put("val", String.valueOf(ag.getId()));
+            map.put("text", ag.getName());
+            agencySelect.add(map);
+            agencyCache.put(ag.getId(), ag);
+        }
+    }
+
+
+    private void test() {
+//        comService.test();
     }
 
     public static void main(String[] args) {
         System.out.println(DateUtil.string2Date("201607", DateUtil.PATTERN_H));
         System.out.println(new Date(Long.parseLong("1493183327995")));
         System.out.println(new Date().getTime());
+        System.out.println(DateUtil.date2String(new Date(), DateUtil.PATTERN_J));
     }
 
 }

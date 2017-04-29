@@ -1,9 +1,6 @@
 package project.basic.entity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -15,7 +12,10 @@ import java.util.Date;
 public class InvitationCode {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    @Column(nullable = false)
+    private String code;
     @Column(nullable = false)
     private long clientId = -1;
 //    @Column(nullable = false)
@@ -24,16 +24,24 @@ public class InvitationCode {
     public InvitationCode() {
     }
 
-    public InvitationCode(String id) {
-        this.id = id;
+    public InvitationCode(String code) {
+        this.code = code;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public long getClientId() {

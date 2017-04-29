@@ -5,6 +5,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.stereotype.Repository;
+import project.system.entity.Admin;
 
 import java.util.List;
 
@@ -256,12 +257,13 @@ public class ComDaoImpl extends BaseDao {
      */
     public <T> void saveDetail(List<T> objects) {
         Session session = getSessionFactory().getCurrentSession();
+//        Session session = getSessionFactory().openSession();
 //        Transaction transaction = session.beginTransaction();
 //        int i = 0;
         for (T object: objects) {
             session.save(object);
 //            i++;
-//            if (i%10 == 0) {
+//            if (i%1000 == 0) {
 //                session.flush();
 //                session.clear();
 //            }
@@ -313,5 +315,9 @@ public class ComDaoImpl extends BaseDao {
         query.setFirstResult(min);
         query.setMaxResults(size);
         return query.list();
+    }
+
+
+    public void test() {
     }
 }

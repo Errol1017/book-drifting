@@ -181,4 +181,11 @@ public class ComServiceImpl implements ComService {
         return comDao.query(hql, page, size);
     }
 
+
+
+
+    @Override
+    public void test() {
+        comDao.test();
+    }
 }

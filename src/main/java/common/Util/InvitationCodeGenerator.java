@@ -10,12 +10,12 @@ import java.util.List;
 public class InvitationCodeGenerator {
 
     private static int number = 0;
-    private static String month = DateUtil.date2String(new Date(), DateUtil.PATTERN_I);
+    private static String month = DateUtil.date2String(new Date(), DateUtil.PATTERN_J);
 
     private static void checkNumber() {
-        if (!month.equals(DateUtil.date2String(new Date(), DateUtil.PATTERN_I))) {
+        if (!month.equals(DateUtil.date2String(new Date(), DateUtil.PATTERN_J))) {
             number = 0;
-            month = DateUtil.date2String(new Date(), DateUtil.PATTERN_I);
+            month = DateUtil.date2String(new Date(), DateUtil.PATTERN_J);
         }
     }
 

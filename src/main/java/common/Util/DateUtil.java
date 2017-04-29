@@ -19,6 +19,7 @@ public class DateUtil {
     public static final String PATTERN_G = "yyyy-MM-dd  HH:mm";
     public static final String PATTERN_H = "yyyyMM";
     public static final String PATTERN_I = "yyMM";
+    public static final String PATTERN_J = "yyM";
 
     public static String date2String(Date date, String pattern) {
         if (date == null) {
