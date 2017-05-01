@@ -5,6 +5,7 @@
 ;(function ($) {
 
     $.ero = {
+        reqIdForPlugin: undefined,
         navigator: {
             curReqId: undefined,
             data: new Array(),
@@ -90,6 +91,7 @@
                     datatype: "json",
                     success: function (res) {
                         if (res.code == 0) {
+                            ero.reqIdForPlugin = tarReqId;
                             PageContainerObj.append(res.data);
                             switchPage();
                             if (ero.pluginManager.loadedPages.push(tarPageId) > LoadedPagesMaxLength) {
@@ -345,27 +347,4 @@ jQuery(function ($) {
     $("#login_out").click(function(){
         window.location.href = "admin/login_out";
     });
-
-    // $.fn.extend({
-    //     bind_data: function (data) {
-    //         TempMemoryofData = data;
-    //         var tarId = $(this).attr("id");
-    //         var count = 0;
-    //         var timer = setInterval(function () {
-    //             count++;
-    //             var tarObj = $("#" + tarId + "BindData");
-    //             if (tarObj.val() == "ok"){
-    //                 clearInterval(timer);
-    //                 tarObj.trigger("click");
-    //                 TempMemoryofData = null;
-    //             }else {
-    //                 if (++count > 100){
-    //                     clearInterval(timer);
-    //                     $.show_err_msg(-8);
-    //                 }
-    //             }
-    //         }, 2)
-    //     }
-    // })
-
 });

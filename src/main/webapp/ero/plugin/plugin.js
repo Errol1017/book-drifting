@@ -8,8 +8,8 @@
     $.fn.list_table = function (param) {
         /**
          * @param param
-         * param.reqId              id      required
-         * param.tableId            id      required
+         * param.reqId              id
+         * param.tableId            id
          * param.tableObj           object      required
          * param.msgObj             object      default: $("#" + param.tableId + "_msg")】
          * param.perPageNum
@@ -57,7 +57,7 @@
          *              delete.error
          * param.queryData          jsonStr
          */
-        var pageId = $(this).attr("id");
+        param.tableObj = $(this);
         init();
         getList();
         return {
@@ -77,11 +77,11 @@
             initHandleEvent();
             registerBodyEvent();
             function initParam() {
-                param.reqId = $.ero.navigator.getReqId($.ero.navigator.getNavigation("", pageId));
+                param.reqId = $.ero.reqIdForPlugin;
+                param.tableId = param.tableObj.attr("id");
                 if (param.msgObj == undefined) {
                     param.msgObj = $("#" + param.tableId + "_Msg")
                 }
-                param.tableObj = $("#" + param.tableId);
                 param.data = {
                     tarPageNum: 1,
                     totalNum: 0,
@@ -450,7 +450,7 @@
          *      handle.submitObj    default $("#" + param.formId + '_Submit')
          *      handle.unbindObj    default $("#" + param.formId + '_Unbind')
          */
-        var pageId = $(this).attr("id");
+        param.formId = $(this).attr("id");
         init();
         return {
             getForm: function (dataId) {
@@ -465,7 +465,7 @@
             initValidateEvent();
             initHandleEvent();
             function initParam() {
-                param.reqId = $.ero.navigator.getReqId($.ero.navigator.getNavigation("", pageId));
+                param.reqId = $.ero.reqIdForPlugin;
                 if (param.msgObj == undefined) {
                     param.msgObj = $("#" + param.formId + "_Msg")
                 }
@@ -898,7 +898,7 @@
     $.fn.dynamic_select = function (param) {
         /**
          * @param param
-         * param.reqId          id
+         * param.reqId
          * param.valObj         required
          * param.subObj
          * param.compId         default param.valObj.attr("id")
@@ -918,7 +918,10 @@
          * param.callback       default valObj.trigger('change')
          * param.out
          */
-        var pageId = $(this).attr("id");
+        if (param == undefined) {
+            param = {}
+        }
+        param.subObj = $(this);
         init();
         return {
             reset: function () {
@@ -926,11 +929,9 @@
             }
         };
         function init() {
-            param.reqId = $.ero.navigator.getReqId($.ero.navigator.getNavigation("", pageId));
             initValObj();
             initData();
             function initValObj() {
-                param.subObj = param.valObj;
                 var id = param.subObj.attr("id");
                 param.subObj.attr("id", id + '_Sub');
                 param.subObj.before('<input type="hidden" id="' + id + '"/>');
@@ -941,6 +942,7 @@
             }
             function initData() {
                 if (param.dynamic == undefined || param.dynamic) {
+                    param.reqId = $.ero.reqIdForPlugin;
                     getData();
                 } else {
                     if (param.boxObj == undefined) {
@@ -1231,7 +1233,10 @@
          * param.data           array
          * param.callback       default valObj.trigger('change')
          */
-        var pageId = $(this).attr("id");
+        if (param == undefined) {
+            param = {}
+        }
+        param.valObj = $(this);
         init();
         return {
             reset: function () {
@@ -1239,7 +1244,7 @@
             }
         };
         function init() {
-            param.reqId = $.ero.navigator.getReqId($.ero.navigator.getNavigation("", pageId));
+            param.reqId = $.ero.reqIdForPlugin;
             initData();
             function initData() {
                 if (param.compId == undefined) {

@@ -36,8 +36,7 @@
     
     <script>
         $(function () {
-            var list = $("#InvitationPage").list_table({
-                tableId: 'InvitationList',
+            var list = $("#InvitationList").list_table({
                 header: {
                     names: ["邀请码", "用户姓名", "联系电话", "所在单位"],
                     colWith: ["span20p", "span20p", "span20p", "span40p"]
@@ -46,8 +45,7 @@
                     tdConf: ["", "", "", "nowrap"]
                 }
             });
-            var status = $("#InvitationPage").dynamic_select({
-                valObj: $("#Invitation_Query_status"),
+            var status = $("#Invitation_Query_status").dynamic_select({
                 dynamic: false,
                 writable: false
             });
@@ -55,7 +53,6 @@
                 manually: false,
                 keys: ["status"],
                 callback: function (q) {
-                    console.log(q)
                     list.getList(q)
                 },
                 handle: {

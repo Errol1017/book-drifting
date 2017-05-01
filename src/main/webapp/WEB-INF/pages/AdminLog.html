@@ -35,24 +35,17 @@
 
     <script>
         $(function () {
-            var list = $("#AdminLogPage").list_table({
-                tableId: 'AdminLogList',
+            var list = $("#AdminLogList").list_table({
                 header: {
                     names: ["!_id", "管理员用户名", "操作类型", "操作对象", "!_targetId", "备注", "操作时间"],
                     colWith: ["", "span20p", "span10p", "span20p", "", "span30p", "span20p"]
                 },
                 body: {
                     tdConf: ["", "", "", "", "", "nowrap", ""]
-                },
-//                handle: {
-//                }
+                }
             });
-            var start = $("#AdminLog_Query_start").date_picker({
-                shortDate: false
-            });
-            var end = $("#AdminLog_Query_end").date_picker({
-                writable: false,
-            });
+            var start = $("#AdminLog_Query_start").date_picker();
+            var end = $("#AdminLog_Query_end").date_picker();
             var query = $("#AdminLog_Query").query_manager({
                 manually: false,
                 keys: ["start", "end"],

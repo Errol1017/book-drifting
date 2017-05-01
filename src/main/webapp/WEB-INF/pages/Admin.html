@@ -84,8 +84,7 @@
     <input type="hidden" id="AdminPage_Initialization"/>
     <script>
         $(function () {
-            var list = $("#AdminPage").list_table({
-                tableId: 'AdminList',
+            var list = $("#AdminList").list_table({
                 header: {
                     names: ["!_id", "用户名", "角色/部门", "真实姓名"],
                     colWith: ["", "span30p", "span40p", "span30p"]
@@ -106,8 +105,7 @@
                     }
                 }
             });
-            var form = $("#AdminPage").form_detail({
-                formId: "AdminForm",
+            var form = $("#AdminForm").form_detail({
                 inputIds: ["!_id", "name", "role", "actualName", "contactNumber", "password", "power", "remark"],
                 validator: [
                     function (o) {
@@ -156,9 +154,7 @@
                     }
                 }
             });
-            var power = $("#AdminPage").cascade_checkbox({
-                valObj: $("#AdminForm_power")
-            });
+            var power = $("#AdminForm_power").cascade_checkbox();
             $("#AdminPage").reloadData(function () {
                 list.getList(1);
             })
