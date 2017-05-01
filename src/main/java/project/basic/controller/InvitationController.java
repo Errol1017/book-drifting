@@ -1,6 +1,7 @@
 package project.basic.controller;
 
 import common.CRUD.service.ComService;
+import common.DataFormatter.DataManager;
 import common.DataFormatter.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Errol on 17/4/26.
@@ -32,13 +34,21 @@ public class InvitationController {
 
     @RequestMapping(value = Lists.InvitationList + "/list", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public @ResponseBody Object getInvitationList(HttpServletRequest request) throws Exception {
-//        comService.saveDetail(new Client());
-        System.out.println(request.getParameter("query"));
-
-        long total = comService.getCount(InvitationCode.class);
+        String con = "";
+        Map<String, String> map = DataManager.string2Map(request.getParameter("query"));
+        if (map != null) {
+            String s = map.get("status");
+            if (s.equals("1")) {
+                con += "clientId!=-1";
+            } else if (s.equals("0")) {
+                con += "clientId=-1";
+            }
+        }
+        long total = comService.getCount(InvitationCode.class, con);
         int tarPageNum = Integer.parseInt(request.getParameter("tarPageNum"));
         int perPageNum = Integer.parseInt(request.getParameter("perPageNum"));
-        List<Object[]> os = comService.query("select i.code,c.name,c.mobile,c.agencyId from InvitationCode i left join Client c on i.clientId=c.id", tarPageNum, perPageNum);
+        List<Object[]> os = comService.query("select i.code,c.name,c.mobile,c.agencyId from InvitationCode i left join Client c on i.clientId=c.id"
+                + (con.equals("")?"":" where " + con), tarPageNum, perPageNum);
         List<InvitationList> list = new ArrayList<>();
         for (Object[] o: os) {
             list.add(new InvitationList(o, cacheManager));

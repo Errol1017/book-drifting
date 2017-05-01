@@ -944,9 +944,10 @@
                     getData();
                 } else {
                     if (param.boxObj == undefined) {
-                        param.boxObj = $("#" + param.compId + "_box");
+                        param.boxObj = param.subObj.next();
                     }
                     param.liObjs = param.boxObj.find("li");
+                    setData();
                     getCss();
                     initEvent();
                 }
@@ -993,6 +994,15 @@
                     getCss();
                     initEvent();
                 }
+            }
+            function setData() {
+                param.data = new Array();
+                param.liObjs.each(function () {
+                    param.data.push({
+                        val: $(this).attr("data-val"),
+                        text: $(this).text()
+                    })
+                })
             }
             function getCss() {
                 param.ulObj = param.boxObj.children().first();
@@ -1105,7 +1115,6 @@
                                 select(getIndex());
                                 break;
                             case 13:
-                                console.log("13")
                                 if (param.matchIndex == undefined) {
                                     if (param.subObj.val() == '') {
                                         param.callback();
@@ -2204,266 +2213,6 @@
         }
     });
 
-
-    //dynamic_select
-    $.fn.extend({
-        /**
-         * @param obj
-         * obj.pageId           id
-         * obj.valId            id
-         * obj.textId           id
-         * obj.msgId            id
-         */
-        // dynamic_select_register: function (obj) {
-        //     var textObj = $(this);
-        //     textObj.data("obj", obj).dynamic_select_get_data(obj).click(function () {
-        //         $(this).next().dynamic_select_show();
-        //     }).focus(function () {
-        //         $(this).next().dynamic_select_show();
-        //     })
-        // },
-        // dynamic_select_show: function () {
-        //     $(this).fadeIn();
-        //     return this;
-        // },
-        // dynamic_select_hide: function () {
-        //     $(this).fadeOut().children().first().dynamic_select_pre_deselect();
-        //     return this;
-        // },
-        // dynamic_select_get_data: function (obj) {
-        //     var textObj = $(this);
-        //     $.ajax({
-        //         url: "navigator/validator",
-        //         type: "post",
-        //         data: {
-        //             type: "select",
-        //             reqId: obj.pageId,
-        //             key: obj.key
-        //         },
-        //         datatype: "json",
-        //         success: function (res) {
-        //             if (res.code == 0) {
-        //                 textObj.dynamic_select_draw(obj, res.data);
-        //             } else if (res.code == -1) {
-        //                 $("#" + obj.msgId).show_msg(res.data);
-        //             } else {
-        //                 $.ero.showErrorMessage(res.code, res.data);
-        //             }
-        //         },
-        //         error: function (xhr, msg, obj) {
-        //             $.ero.showErrorMessage(-10);
-        //             $.ero.getAjaxErrorMessage(xhr, msg, obj);
-        //         }
-        //     });
-        //     return this;
-        // },
-        // dynamic_select_draw: function (obj, data) {
-        //     var textObj = $(this);
-        //     var val = data.val;
-        //     var text = data.text == undefined ? val : data.text;
-        //     var lis = "";
-        //     var liLength = val.length;
-        //     for (var i = 0; i < liLength; i++) {
-        //         lis += "<li data-val='" + val[i] + "' class='dynamic_select_li'>" + text[i] + "</li>";
-        //     }
-        //     textObj.after("<div class='dynamic_plugin_box' style='width:" + textObj.css("width") + "'><ul id='ss' class='dynamic_select_ul'>" + lis + "</ul></div>");
-        //     textObj.next().dynamic_select_event(obj, liLength);
-        // },
-        dynamic_select_event: function (obj, liLength) {
-            var divObj = $(this);
-            divObj.dynamic_select_li_click(obj).dynamic_select_blur(obj).mouseleave(function () {
-                $(this).dynamic_select_hide();
-            });
-            var ulObj = divObj.children().first().data("len", liLength).dynamic_select_bind(obj).dynamic_select_search(obj).mouseenter(function () {
-                $(this).dynamic_select_pre_deselect();
-            });
-            ulObj.data("padTop", parseInt(ulObj.css("padding-top").slice(0, -2)));
-            ulObj.data("liHei", parseInt(ulObj.css("line-height").slice(0, -2)) + 1);
-        },
-        // dynamic_select_li_click: function (obj) {
-        //     var divObj = $(this);
-        //     var ulObj = divObj.children().first();
-        //     ulObj.children().each(function () {
-        //         $(this).click(function () {
-        //             if (ulObj.data("index") != undefined) {
-        //                 ulObj.dynamic_select_deselect(ulObj.data("index"));
-        //             }
-        //             $(this).addClass("dynamic_select_li_select");
-        //             ulObj.data("index", $(this).index());
-        //             $("#" + obj.textId).val($(this).text());
-        //             $("#" + obj.valId).val($(this).attr("data-val"));
-        //             divObj.dynamic_select_hide();
-        //         })
-        //     });
-        //     return this;
-        // },
-        // dynamic_select_blur: function (obj) {
-        //     var divObj = $(this);
-        //     $("#" + obj.textId).blur(function () {
-        //         divObj.dynamic_select_hide();
-        //         if (divObj.children().first().data("index") == undefined) {
-        //             divObj.prev().val("");
-        //         }
-        //     });
-        //     return this;
-        // },
-        // dynamic_select_deselect: function (index) {
-        //     $(this).children().eq(index).removeClass("dynamic_select_li_select");
-        // },
-        // dynamic_select_bind: function (obj) {
-        //     var ulObj = $(this);
-        //     var textObj = $("#" + obj.textId);
-        //     $("#" + obj.valId).change(function () {
-        //         if (ulObj.data("index") != undefined) {
-        //             ulObj.dynamic_select_deselect(ulObj.data("index"));
-        //         }
-        //         var curVal = $(this).val();
-        //         if (curVal != "") {
-        //             var isExist = false;
-        //             ulObj.children().each(function () {
-        //                 if ($(this).attr("data-val") == curVal) {
-        //                     $(this).addClass("dynamic_select_li_select");
-        //                     ulObj.data("index", $(this).index());
-        //                     textObj.val($(this).text());
-        //                     isExist = true;
-        //                     return false;
-        //                 }
-        //             });
-        //             if (!isExist) {
-        //                 $(this).val("");
-        //                 textObj.val("");
-        //             }
-        //         } else {
-        //             textObj.val("");
-        //         }
-        //     });
-        //     return this;
-        // },
-        dynamic_select_pre_select: function (pre, match) {
-            $(this).data("pre", pre).children().eq(match == undefined ? pre : match[pre]).addClass("dynamic_select_li_select");
-        },
-        dynamic_select_pre_deselect: function () {
-            var ulObj = $(this);
-            var pre = ulObj.data("pre");
-            if (pre != undefined) {
-                var match = ulObj.data("match");
-                ulObj.dynamic_select_deselect(match == undefined ? pre : match[pre]);
-                ulObj.removeData("pre");
-                var index = ulObj.data("index");
-                if (index != undefined) {
-                    ulObj.children().eq(index).addClass("dynamic_select_li_select");
-                    ulObj.scrollTop(index < 3 ? 0 : ((index - 2) * (ulObj.data("liHei"))) + ulObj.data("padTop"));
-                } else {
-
-                }
-            }
-        },
-        dynamic_select_search: function (obj) {
-            var ulObj = $(this);
-            var valObj = $("#" + obj.valId);
-            var getPreIndex = function (pre, match) {
-                return match == undefined ? pre : match[pre]
-            };
-            $("#" + obj.textId).keyup(function (e) {
-                var eWhich = e.which;
-                if (ulObj.data("len") == 0 || eWhich == 9 || eWhich == 16) {
-                    return false;
-                }
-                if (eWhich == 27) {
-                    ulObj.parent().dynamic_select_hide();
-                    return false;
-                }
-                var match = ulObj.data("match");
-                var pre = ulObj.data("pre");
-                if (eWhich == 38 || eWhich == 40 || eWhich == 13) {
-                    if (match != undefined && match.length == 0) {
-                        return false;
-                    }
-                    var maxIndex = match == undefined ? ulObj.data("len") - 1 : match.length - 1;
-                    var index = ulObj.data("index");
-                    if (index != undefined && pre == undefined) {
-                        pre = index;
-                    } else {
-                        pre = pre == undefined ? -1 : pre;
-                    }
-                    pre = pre == undefined ? -1 : pre;
-                    switch (eWhich) {
-                        case 38:
-                            if (pre != -1) {
-                                ulObj.dynamic_select_deselect(getPreIndex(pre, match));
-                            }
-                            if (--pre > -1) {
-                                ulObj.dynamic_select_pre_select(pre, match);
-                            } else {
-                                pre = maxIndex;
-                                ulObj.dynamic_select_pre_select(pre, match);
-                            }
-                            if ((pre < maxIndex - 3) && ((pre - 1) * ulObj.data("liHei") < ulObj.scrollTop())) {
-                                ulObj.scrollTop(ulObj.scrollTop() - ulObj.data("liHei"));
-                            }
-                            if (pre >= maxIndex - 3) {
-                                ulObj.scrollTop(ulObj.data("liHei") * (maxIndex - 5));
-                            }
-                            break;
-                        case 40:
-                            if (pre != -1) {
-                                ulObj.dynamic_select_deselect(getPreIndex(pre, match));
-                            }
-                            if (++pre <= maxIndex) {
-                                ulObj.dynamic_select_pre_select(pre, match);
-                            } else {
-                                pre = 0;
-                                ulObj.dynamic_select_pre_select(pre, match);
-                            }
-                            if ((pre > 3) && ((pre - 5) * ulObj.data("liHei") > ulObj.scrollTop())) {
-                                ulObj.scrollTop(ulObj.scrollTop() + ulObj.data("liHei"));
-                            }
-                            if (pre <= 3) {
-                                ulObj.scrollTop(0);
-                            }
-                            break;
-                        case 13:
-                            if (pre != -1) {
-                                ulObj.children().eq(getPreIndex(pre, match)).trigger("click");
-                            }
-                            break;
-                        default:
-                            return false;
-                    }
-                } else {
-                    valObj.val("");
-                    ulObj.removeData("index");
-                    var curText = $(this).val();
-                    if (curText == "" && match != undefined) {
-                        ulObj.removeData("match").removeData("pre").children().each(function () {
-                            $(this).removeAttr("style").removeClass("dynamic_select_li_select");
-                        });
-                    }
-                    if (curText != "") {
-                        curText = curText.toUpperCase();
-                        var match = new Array();
-                        ulObj.removeData("pre").children().each(function () {
-                            if ($(this).text().indexOf(curText) != -1 || $(this).attr("data-val").toUpperCase().indexOf(curText) != -1) {
-                                $(this).removeAttr("style").removeClass("dynamic_select_li_select");
-                                match.push($(this).index());
-                            } else {
-                                $(this).css("display", "none").removeClass("dynamic_select_li_select");
-                            }
-                        });
-                        ulObj.data("match", match);
-                    }
-                }
-            });
-            return this;
-        },
-        dynamic_select_update_data: function () {
-            var textObj = $(this);
-            textObj.next().remove();
-            var obj = textObj.data("obj");
-            textObj.dynamic_select_register(obj);
-            textObj.next().children().first().dynamic_select_bind(obj);
-        }
-    });
 
     //file_uploader
     $.fn.extend({

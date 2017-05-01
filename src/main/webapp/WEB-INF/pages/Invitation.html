@@ -7,6 +7,12 @@
             <label for="Invitation_Query_status" class="ls_mw_100">按状态筛选</label>
             <span class="span_box">
                 <input type="text" id="Invitation_Query_status" class="input_text_30 span200">
+                <div class="dynamic_plugin_box span200">
+                    <ul class="dynamic_select_ul">
+                        <li class="dynamic_select_li" data-val="1">已使用的</li>
+                        <li class="dynamic_select_li" data-val="0">未使用的</li>
+                    </ul>
+                </div>
             </span>
             <span class="span_box float_right">
                 <!--<button id="Invitation_Query_Submit" class="button_style_80_30">筛 选</button>-->
@@ -42,7 +48,8 @@
             });
             var status = $("#InvitationPage").dynamic_select({
                 valObj: $("#Invitation_Query_status"),
-//                writable: false
+                dynamic: false,
+                writable: false
             });
             var query = $("#Invitation_Query").query_manager({
                 manually: false,
