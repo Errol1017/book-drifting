@@ -87,14 +87,17 @@ public class AdminController {
             comService.saveDetail(role);
             Admin admin = new Admin(form, role);
             comService.saveDetail(admin);
-            comService.saveDetail(new AdminLog(adminSession, OperationTargets.Admin, OperationTypes.Create, admin.getId(), "用户名： "+admin.getAdminName()));
+            comService.saveDetail(new AdminLog(adminSession, OperationTargets.Admin, OperationTypes.Create, String.valueOf(admin.getId()), "用户名： "+admin.getAdminName()));
             return Result.SUCCESS(admin.getId());
         }else {
+            if (comService.hasExist(Admin.class, "adminName='"+form.getName()+"' and id!="+Integer.parseInt(form.getId()))){
+                return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "用户名已存在");
+            }
             Admin admin = comService.getDetail(Admin.class, Integer.parseInt(form.getId()));
             comService.saveDetail(admin.modify(form));
             AdminRole role = comService.getDetail(AdminRole.class, admin.getRoleId());
             comService.saveDetail(role.modify(form));
-            comService.saveDetail(new AdminLog(adminSession, OperationTargets.Admin, OperationTypes.Update, admin.getId(), "用户名： "+admin.getAdminName()));
+            comService.saveDetail(new AdminLog(adminSession, OperationTargets.Admin, OperationTypes.Update, String.valueOf(admin.getId()), "用户名： "+admin.getAdminName()));
             return Result.SUCCESS();
         }
     }
@@ -106,7 +109,7 @@ public class AdminController {
         AdminRole role = comService.getDetail(AdminRole.class, admin.getRoleId());
         comService.deleteDetail(admin);
         comService.deleteDetail(role);
-        comService.saveDetail(new AdminLog(AdminValidator.getAdminSession(request), OperationTargets.Admin, OperationTypes.Delete, admin.getId(), "用户名： "+admin.getAdminName()));
+        comService.saveDetail(new AdminLog(AdminValidator.getAdminSession(request), OperationTargets.Admin, OperationTypes.Delete, String.valueOf(admin.getId()), "用户名： "+admin.getAdminName()));
         return Result.SUCCESS();
     }
 

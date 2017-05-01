@@ -1,5 +1,7 @@
 package project.basic.entity;
 
+import project.basic.model.AgencyList;
+
 import javax.persistence.*;
 
 /**
@@ -27,6 +29,11 @@ public class Agency {
 //    private String clientIds = "";
 
     public Agency() {
+    }
+    public Agency(AgencyList al) {
+        this.name = al.getName();
+        this.location = al.getLocation();
+        this.openTime = al.getOpenTime();
     }
 
     /**

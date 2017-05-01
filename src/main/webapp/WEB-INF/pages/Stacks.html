@@ -1,3 +1,113 @@
 <div id="StacksPage" class="cc_main">
-    projectCheckPage
+    <div class="list_table_title span35p">
+        固定起漂点（机关单位）列表
+    </div>
+    <div class="msg_box">
+        <div id="AgencyList_Msg" class="msg_style"></div>
+    </div>
+    <table id="AgencyList" class="list_table">
+    </table>
+    <div id="AgencyList_HandleBox" class="list_table_handle_box span80">
+        <ul class="list_table_handle_box_ul">
+            <li class="m_m_s" id="AgencyList_Edit">编 辑</li>
+            <li class="m_m_s" id="AgencyList_Delete">删 除</li>
+            <li class="m_m_s" id="AgencyList_Reload">刷 新</li>
+        </ul>
+    </div>
+    <div class="list_table_bottom">
+        -&nbsp;单击表格行可执行操作<br>
+        -&nbsp;开放时间建议统一格式，如： 上午 9：00-11：00，下午 13：00-16：00
+    </div>
+
+    <div class="form_detail_title span30p" style="margin-top: 30px">
+        固定起漂点详情
+    </div>
+    <div class="msg_box">
+        <div id="AgencyForm_Msg" class="msg_style"></div>
+    </div>
+    <div id="AgencyForm" class="form_detail">
+        <input type="hidden" id="AgencyForm_id">
+        <div>
+            <label for="AgencyForm_name" class="ls_mw_100 span20p">单位名称</label>
+            <span class="span_box span70p">
+                <input type="text" id="AgencyForm_name" class="input_text_35 span100p" placeholder="不能为空">
+            </span>
+        </div>
+        <div>
+            <label for="AgencyForm_location" class="ls_mw_100 span20p">起漂点详细地址</label>
+            <span class="span_box span70p">
+                <input type="text" id="AgencyForm_location" class="input_text_35 span100p" placeholder="不能为空">
+            </span>
+        </div>
+        <div>
+            <label for="AgencyForm_openTime" class="ls_mw_100 span20p">开放时间</label>
+            <span class="span_box span70p">
+                <input type="text" id="AgencyForm_openTime" class="input_text_35 span100p" placeholder="可以为空">
+            </span>
+        </div>
+    </div>
+    <div class="form_detail_bottom">
+        <span class="ls_mw_100 span20p"></span>
+        <span class="form_detail_bottom_handle_box span70p">
+                <button class="button_style_80_30" id="AgencyForm_Submit">新 增</button>
+                <button class="button_style_80_30" id="AgencyForm_Unbind">清 空</button>
+            </span>
+        <span class="form_detail_bottom_lines span30p"></span>
+    </div>
+    
+    <script>
+        $(function () {
+            var list = $("#AgencyList").list_table({
+                header: {
+                    names: ["!_id", "单位名称", "起漂点详细地址", "开放时间"],
+                    colWith: ["", "span30p", "span40p", "span30p"]
+                },
+                body: {
+                    tdConf: ["", "nowrap", "nowrap", "nowrap"]
+                },
+                handle: {
+                    edit: {
+                        callback: function (data) {
+                            form.getForm(data.id)
+                        }
+                    },
+                    delete: {
+                        before: function () {
+                            return confirm("确认删除数据？")
+                        },
+                        success: function (data) {
+                            form.unbind(data.id)
+                        }
+                    }
+                }
+            });
+            var form = $("#AgencyForm").form_detail({
+                inputIds: ["!_id", "name", "location", "openTime"],
+                validator: [
+                    function (o) {
+                        return o.required().check_simple_length(1, 15).show_check_msg();
+                    },
+                    function (o) {
+                        return o.required().check_simple_length(1, 50).show_check_msg();
+                    },
+                    function (o) {
+                        return o.required().check_simple_length(1, 30).show_check_msg();
+                    }
+                ],
+                unbind: {
+                    after: function () {
+                        list.deselect();
+                    }
+                },
+                submit: {
+                    success: function (data) {
+                        if (data != undefined) {
+                            $("#AgencyForm_id").val(data);
+                        }
+                        list.getList();
+                    }
+                }
+            });
+        })
+    </script>
 </div>

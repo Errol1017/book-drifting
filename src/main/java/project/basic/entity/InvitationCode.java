@@ -14,7 +14,7 @@ public class InvitationCode {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String code;
     @Column(nullable = false)
     private long clientId = -1;

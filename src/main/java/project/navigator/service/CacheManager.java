@@ -98,17 +98,17 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
          */
         Agency ag = comService.getFirst(Agency.class, "id asc");
         if (ag == null) {
-            comService.saveDetail(new Agency("国土局","海虞北路","8:30-11:00 am , 13:00-16:30 pm"));
-            comService.saveDetail(new Agency("常熟海关","枫林路","9:00-11:00 am , 13:00-16:00 pm"));
-            comService.saveDetail(new Agency("地税","长江路","8:00-11:00 am , 12:30-16:30 pm"));
+            comService.saveDetail(new Agency("国土局","海虞北路","上午 8:30-11:00 ,下午 13:00-16:30"));
+            comService.saveDetail(new Agency("常熟海关","枫林路","上午 9:00-11:00 ,下午 13:00-16:00"));
+            comService.saveDetail(new Agency("地税","长江路","上午 8:00-11:00 ,下午 12:30-16:30"));
         }
     }
 
     private void initCache() {
         //加载图书分类缓存
-        resetBookClassificationList();
+        resetBookClassificationCache();
         //加载单位信息
-        resetAgencyList();
+        resetAgencyCache();
     }
 
 
@@ -132,7 +132,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
         }
     }
     //修改图书分类后重置缓存
-    public void resetBookClassificationList() {
+    public void resetBookClassificationCache() {
         bookClassificationSelect = new ArrayList<>();
         bookClassificationCache = new HashMap<>();
         List<BookClassification> list = comService.getList(BookClassification.class);
@@ -158,7 +158,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     }
     //检查单位id是否存在
     //修改单位信息后重置缓存
-    public void resetAgencyList() {
+    public void resetAgencyCache() {
         agencySelect = new ArrayList<>();
         agencyCache = new HashMap<>();
         List<Agency> list = comService.getList(Agency.class);
@@ -170,7 +170,6 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
             agencyCache.put(ag.getId(), ag);
         }
     }
-
 
     private void test() {
 //        comService.test();

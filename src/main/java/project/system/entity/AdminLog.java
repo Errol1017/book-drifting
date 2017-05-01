@@ -33,7 +33,7 @@ public class AdminLog {
     private OperationTypes type;
     //操作数据id
     @Column(nullable = false)
-    private long targetId;
+    private String targetId;
     //备注
     @Column(nullable = false)
     private String remark;
@@ -45,7 +45,7 @@ public class AdminLog {
     public AdminLog() {
     }
 
-    public AdminLog(AdminSession adminSession, OperationTargets target, OperationTypes type, long targetId) {
+    public AdminLog(AdminSession adminSession, OperationTargets target, OperationTypes type, String targetId) {
         this.adminId = adminSession.getId();
         this.adminName = adminSession.getName();
         this.target = target;
@@ -54,7 +54,7 @@ public class AdminLog {
         this.remark = "";
     }
 
-    public AdminLog(AdminSession adminSession, OperationTargets target, OperationTypes type, long targetId, String remark) {
+    public AdminLog(AdminSession adminSession, OperationTargets target, OperationTypes type, String targetId, String remark) {
         this.adminId = adminSession.getId();
         this.adminName = adminSession.getName();
         this.target = target;
@@ -104,11 +104,11 @@ public class AdminLog {
         this.type = type;
     }
 
-    public long getTargetId() {
+    public String getTargetId() {
         return targetId;
     }
 
-    public void setTargetId(long targetId) {
+    public void setTargetId(String targetId) {
         this.targetId = targetId;
     }
 

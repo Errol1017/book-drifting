@@ -1,5 +1,7 @@
 package project.basic.entity;
 
+import project.basic.model.ClassList;
+
 import javax.persistence.*;
 
 /**
@@ -14,14 +16,21 @@ public class BookClassification {
     @Column(columnDefinition = "smallint unsigned")
     private int id;
     //分类名称
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     public BookClassification() {
     }
 
+    /**
+     * 测试环境下初始化数据用
+     */
     public BookClassification(String name) {
         this.name = name;
+    }
+
+    public BookClassification(ClassList form) {
+        this.name = form.getName();
     }
 
     public int getId() {

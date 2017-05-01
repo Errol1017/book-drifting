@@ -6,7 +6,8 @@ package project.system.pojo;
 public enum OperationTargets {
 
     Admin("系统管理员"),
-
+    Agency("固定起漂点"),
+    BookClassification("图书分类"),
     ;
 
     private String name;

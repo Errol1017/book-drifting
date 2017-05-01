@@ -1,3 +1,93 @@
 <div id="ClassPage" class="cc_main">
-    projectCheckPage
+    <div class="div_box box5">
+        <div class="list_table_title span35p">
+            管理员列表
+        </div>
+        <div class="msg_box">
+            <div id="ClassList_Msg" class="msg_style"></div>
+        </div>
+        <table id="ClassList" class="list_table">
+        </table>
+        <div id="ClassList_HandleBox" class="list_table_handle_box span80">
+            <ul class="list_table_handle_box_ul">
+                <li class="m_m_s" id="ClassList_Edit">编 辑</li>
+                <li class="m_m_s" id="ClassList_Delete">删 除</li>
+                <li class="m_m_s" id="ClassList_Reload">刷 新</li>
+            </ul>
+        </div>
+        <div class="list_table_bottom">
+            -&nbsp;单击表格行可执行操作
+        </div>
+    </div>
+    <div class="div_box box_m_l box5">
+        <div class="form_detail_title span30p">
+            管理员详情
+        </div>
+        <div class="msg_box">
+            <div id="ClassForm_Msg" class="msg_style"></div>
+        </div>
+        <div id="ClassForm" class="form_detail">
+            <input type="hidden" id="ClassForm_id">
+            <div>
+                <label for="ClassForm_name" class="ls_mw_100 span20p">图书分类名</label>
+                <span class="span_box span70p">
+                    <input type="text" id="ClassForm_name" class="input_text_35 span100p" placeholder="不能为空">
+                </span>
+            </div>
+        </div>
+        <div class="form_detail_bottom">
+            <span class="ls_mw_100 span20p"></span>
+            <span class="form_detail_bottom_handle_box span70p">
+                <button class="button_style_80_30" id="ClassForm_Submit">新 增</button>
+                <button class="button_style_80_30" id="ClassForm_Unbind">清 空</button>
+            </span>
+            <span class="form_detail_bottom_lines span30p"></span>
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            var list = $("#ClassList").list_table({
+                header: {
+                    names: ["!_id", "图书分类名"],
+                },
+                handle: {
+                    edit: {
+                        callback: function (data) {
+                            form.getForm(data.id)
+                        }
+                    },
+                    delete: {
+                        before: function () {
+                            return confirm("确认删除数据？")
+                        },
+                        success: function (data) {
+                            form.unbind(data.id)
+                        }
+                    }
+                }
+            });
+            var form = $("#ClassForm").form_detail({
+                inputIds: ["!_id", "name"],
+                validator: [
+                    function (o) {
+                        return o.required().check_simple_length(1, 15).show_check_msg();
+                    }
+                ],
+                unbind: {
+                    after: function () {
+                        list.deselect();
+                    }
+                },
+                submit: {
+                    success: function (data) {
+                        if (data != undefined) {
+                            $("#ClassForm_id").val(data);
+                        }
+                        list.getList();
+                    }
+                }
+            });
+        })
+    </script>
 </div>
