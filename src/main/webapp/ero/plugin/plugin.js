@@ -77,7 +77,9 @@
             initHandleEvent();
             registerBodyEvent();
             function initParam() {
-                param.reqId = $.ero.reqIdForPlugin;
+                if (param.reqId == undefined) {
+                    param.reqId = $.ero.reqIdForPlugin;
+                }
                 param.tableId = param.tableObj.attr("id");
                 if (param.msgObj == undefined) {
                     param.msgObj = $("#" + param.tableId + "_Msg")
@@ -465,7 +467,9 @@
             initValidateEvent();
             initHandleEvent();
             function initParam() {
-                param.reqId = $.ero.reqIdForPlugin;
+                if (param.reqId == undefined) {
+                    param.reqId = $.ero.reqIdForPlugin;
+                }
                 if (param.msgObj == undefined) {
                     param.msgObj = $("#" + param.formId + "_Msg")
                 }
@@ -942,7 +946,9 @@
             }
             function initData() {
                 if (param.dynamic == undefined || param.dynamic) {
-                    param.reqId = $.ero.reqIdForPlugin;
+                    if (param.reqId == undefined) {
+                        param.reqId = $.ero.reqIdForPlugin;
+                    }
                     getData();
                 } else {
                     if (param.boxObj == undefined) {
@@ -1248,7 +1254,9 @@
             }
         };
         function init() {
-            param.reqId = $.ero.reqIdForPlugin;
+            if (param.reqId == undefined) {
+                param.reqId = $.ero.reqIdForPlugin;
+            }
             initData();
             function initData() {
                 if (param.compId == undefined) {

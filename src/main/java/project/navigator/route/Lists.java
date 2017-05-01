@@ -10,6 +10,7 @@ public class Lists {
     public static final String InvitationList = "/Jane Eyre";
     public static final String AgencyList = "/The Way of All Flesh";
     public static final String ClassList = "/Alice's Adventures in Wonderland";
+    public static final String ClientList = "/A Tale of Two Cities";
 
     public static String getList(String list) {
         switch (list) {
@@ -18,6 +19,7 @@ public class Lists {
             case "InvitationList": return Lists.InvitationList;
             case "AgencyList": return Lists.AgencyList;
             case "ClassList": return Lists.ClassList;
+            case "ClientList": return Lists.ClientList;
             default: return null;
         }
     }

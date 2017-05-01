@@ -70,7 +70,7 @@ public class InvitationController {
     }
 
     @RequestMapping(value = Components.Invitation_Query_agency + "/data", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
-    public @ResponseBody Object getStatusData() {
+    public @ResponseBody Object getAgencyData() {
         return Result.SUCCESS(cacheManager.getAgencySelect());
     }
 

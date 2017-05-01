@@ -1,3 +1,143 @@
 <div id="ClientPage" class="cc_main">
-    projectCheckPage
+    <div>
+        <div>
+            <div class="list_table_title span35p">
+                用户列表
+            </div>
+            <div class="msg_box">
+                <div id="ClientList_Msg" class="msg_style"></div>
+            </div>
+            <table id="ClientList" class="list_table">
+            </table>
+            <div id="ClientList_HandleBox" class="list_table_handle_box span80">
+                <ul class="list_table_handle_box_ul">
+                    <li class="m_m_s" id="ClientList_Edit">编 辑</li>
+                    <li class="m_m_s" id="ClientList_Delete">删 除</li>
+                    <li class="m_m_s" id="ClientList_Reload">刷 新</li>
+                </ul>
+            </div>
+            <div class="list_table_bottom">
+                -&nbsp;单击表格行可执行操作
+            </div>
+        </div>
+        <div>
+            <div class="form_detail_title span30p">
+                用户详情
+            </div>
+            <div class="msg_box">
+                <div id="ClientForm_Msg" class="msg_style"></div>
+            </div>
+            <div id="ClientForm" class="form_detail">
+                <input type="hidden" id="ClientForm_id">
+                <div>
+                    <label for="ClientForm_name" class="ls_mw_100 span20p">用户姓名</label>
+                    <span class="span_box span70p">
+                        <input type="text" id="ClientForm_name" class="input_text_35 span100p" placeholder="不能为空">
+                    </span>
+                </div>
+                <div>
+                    <label for="ClientForm_mobile" class="ls_mw_100 span20p">联系电话</label>
+                    <span class="span_box span70p">
+                        <input type="text" id="ClientForm_mobile" class="input_text_35 span100p" placeholder="不能为空">
+                    </span>
+                </div>
+                <div>
+                    <label for="ClientForm_identityNumber" class="ls_mw_100 span20p">身份证号</label>
+                    <span class="span_box span70p">
+                        <input type="text" id="ClientForm_identityNumber" class="input_text_35 span100p" placeholder="不能为空">
+                    </span>
+                </div>
+                <div>
+                    <label for="ClientForm_agencyId" class="ls_mw_100 span20p">所属单位</label>
+                    <span class="span_box span70p">
+                        <input type="text" id="ClientForm_agencyId" class="input_text_35 span100p" placeholder="可以为空">
+                    </span>
+                </div>
+                <div>
+                    <label for="ClientForm_individualIds" class="ls_mw_100 span20p">个人起漂点</label>
+                    <span class="span_box span70p">
+                        <input type="text" id="ClientForm_individualIds" class="input_text_35 span100p" placeholder="可以为空">
+                    </span>
+                </div>
+            </div>
+            <div class="form_detail_bottom">
+                <span class="ls_mw_100 span20p"></span>
+                <span class="form_detail_bottom_handle_box span70p">
+                    <button class="button_style_80_30" id="ClientForm_Submit">新 增</button>
+                    <button class="button_style_80_30" id="ClientForm_Unbind">清 空</button>
+                </span>
+                <span class="form_detail_bottom_lines span30p"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            var list = $("#ClientList").list_table({
+                header: {
+                    names: ["!_id", "用户姓名", "联系电话", "所属单位"],
+                    colWith: ["", "span30p", "span30p", "span40p"]
+                },
+                handle: {
+                    edit: {
+                        callback: function (data) {
+                            form.getForm(data.id)
+                        }
+                    },
+                    delete: {
+                        before: function () {
+                            return confirm("确认删除该用户？")
+                        },
+                        success: function (data) {
+                            form.unbind(data.id)
+                        }
+                    }
+                }
+            });
+            var agencyId = $("#ClientForm_agencyId").dynamic_select();
+            var form = $("#ClientForm").form_detail({
+                inputIds: ["!_id", "name", "mobile", "identityNumber", "agencyId", "individualIds"],
+                validator: [
+                    function (o) {
+                        return o.required().check_simple_length(1, 15).show_check_msg();
+                    },
+                    function (o) {
+                        return o.required().require_strict_phone_number().show_check_msg();
+                    },
+                    function (o) {
+                        return o.required().require_strict_ID_number().show_check_msg();
+                    },
+                    function (o) {
+                        return o.require_number('>', 0).show_check_msg();
+                    },
+                    function (o) {
+                        return o.check_simple_length(0, 100).show_check_msg();
+                    }
+                ],
+                bind: {
+                    after: function () {
+                        agencyId.reset();
+                    }
+                },
+                unbind: {
+                    after: function () {
+                        agencyId.reset();
+                        list.deselect();
+                    }
+                },
+                submit: {
+                    success: function (data) {
+                        if (data != undefined) {
+                            $("#ClientForm_id").val(data);
+                        }
+                        list.getList();
+                    }
+                }
+            });
+            $("#ClientPage").reloadData(function () {
+                list.getList(1);
+            })
+        })
+    </script>
+
 </div>

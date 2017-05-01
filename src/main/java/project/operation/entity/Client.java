@@ -1,5 +1,7 @@
 package project.operation.entity;
 
+import project.operation.model.ClientForm;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -45,6 +47,13 @@ public class Client {
     private int borrowingSum;
 
     public Client() {
+    }
+    public Client(ClientForm form) {
+        this.name = form.getName();
+        this.mobile = form.getMobile();
+        this.identityNumber = form.getIdentityNumber();
+        this.agencyId = Integer.parseInt(form.getId());
+        this.individualIds = form.getIndividualIds();
     }
 
     public long getId() {
