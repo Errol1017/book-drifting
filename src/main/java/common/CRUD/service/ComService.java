@@ -57,6 +57,9 @@ public interface ComService {
 
     <T> boolean hasExist(Class<T> typeValue, String condition);
 
+    long count(String hql);
+    long sum(String hql);
+    List<Object[]> query(String hql);
     List<Object[]> query(String hql, int page, int size);
 
 

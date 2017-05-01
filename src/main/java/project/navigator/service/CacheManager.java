@@ -149,6 +149,9 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
      * 单位信息相关方法
      */
     //获取单位下拉列表
+    public List<Map<String, String>> getAgencySelect() {
+        return agencySelect;
+    }
     //获取单位信息
     public Agency getAgency(int id) {
         return agencyCache.get(id);

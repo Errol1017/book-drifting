@@ -177,6 +177,18 @@ public class ComServiceImpl implements ComService {
     }
 
     @Override
+    public long count(String hql) {
+        return comDao.count(hql);
+    }
+    @Override
+    public long sum(String hql) {
+        return comDao.sum(hql);
+    }
+    @Override
+    public List<Object[]> query(String hql) {
+        return comDao.query(hql);
+    }
+    @Override
     public List<Object[]> query(String hql, int page, int size) {
         return comDao.query(hql, page, size);
     }

@@ -924,8 +924,8 @@
         param.subObj = $(this);
         init();
         return {
-            reset: function () {
-                reset();
+            reset: function (valStr) {
+                reset(valStr);
             }
         };
         function init() {
@@ -1204,9 +1204,13 @@
                 param.index = undefined;
             }
         }
-        function reset() {
+        function reset(valStr) {
             clearIndex();
-            var valStr = param.valObj.val();
+            if (valStr == undefined) {
+                valStr = param.valObj.val();
+            } else {
+                param.valObj.val(valStr);
+            }
             if (valStr == '') {
                 param.subObj.val('');
             } else {
@@ -1239,8 +1243,8 @@
         param.valObj = $(this);
         init();
         return {
-            reset: function () {
-                reset();
+            reset: function (valStr) {
+                reset(valStr);
             }
         };
         function init() {
@@ -1384,8 +1388,13 @@
         function uncheck(liObj) {
             liObj.removeData("type").children().first().prop("checked", false);
         }
-        function reset() {
-            var valArr = param.valObj.val().split(",");
+        function reset(valStr) {
+            if (valStr == undefined) {
+                var valArr = param.valObj.val().split(",");
+            } else {
+                param.valObj.val(valStr);
+                var valArr = valStr.split(",");
+            }
             var i = 0;
             param.boxObj.children().each(function () {
                 resetData($(this))
@@ -1444,8 +1453,8 @@
         param.subObj = $(this);
         init();
         return {
-            reset: function () {
-                reset();
+            reset: function (valStr) {
+                reset(valStr);
             }
         };
         function init() {
@@ -1907,16 +1916,20 @@
                     + param.tarDate.getHours() + param.arr[4] + param.tarDate.getMinutes() + param.arr[5] + param.tarDate.getSeconds() + param.arr[6]);
             }
         }
-        function reset() {
-            var s = param.valObj.val();
-            if (s == '') {
+        function reset(valStr) {
+            if (valStr == undefined) {
+                valStr = param.valObj.val();
+            } else {
+                param.valObj.val(valStr);
+            }
+            if (valStr == '') {
                 param.subObj.val('');
             } else {
-                if (new Date(parseInt(s)) == "Invalid Date") {
+                if (new Date(parseInt(valStr)) == "Invalid Date") {
                     param.valObj.val('');
                     param.subObj.val('');
                 } else {
-                    param.tarDate = new Date(parseInt(s));
+                    param.tarDate = new Date(parseInt(valStr));
                     setSub();
                 }
             }
@@ -1943,6 +1956,9 @@
         param.prefix = $(this).attr("id") + '_';
         init();
         return {
+            reset: function (obj) {
+                reset(obj);
+            }
         };
         function init() {
             initData();
@@ -2010,6 +2026,18 @@
                             param.handle.resetCall();
                         }
                     })
+                }
+            }
+        }
+        function reset(obj) {
+            if (obj == undefined) {
+                for (var i = 0; i < param.keys.length; i++) {
+                    param.queryData[param.keys[i]] = param.keyObjs[i].val();
+                }
+            } else {
+                for (var key in obj) {
+                    param.queryData[key] = obj[key];
+                    param.keyObjs[$.indexOf(param.keys, key)].val(obj[key]);
                 }
             }
         }

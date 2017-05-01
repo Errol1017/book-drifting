@@ -36,15 +36,25 @@ public class InvitationController {
     public @ResponseBody Object getInvitationList(HttpServletRequest request) throws Exception {
         String con = "";
         Map<String, String> map = DataManager.string2Map(request.getParameter("query"));
+        long total;
         if (map != null) {
-            String s = map.get("status");
-            if (s.equals("1")) {
-                con += "clientId!=-1";
-            } else if (s.equals("0")) {
-                con += "clientId=-1";
+            String agency = map.get("agency");
+            if (!agency.equals("")) {
+                con = "clientId!=-1 and c.agencyId=" + Integer.parseInt(agency);
+                total = comService.count("select count(*) from InvitationCode i left join Client c on i.clientId=c.id"
+                        + (con.equals("")?"":" where " + con));
+            } else {
+                String s = map.get("status");
+                if (s.equals("1")) {
+                    con += "clientId!=-1";
+                } else if (s.equals("0")) {
+                    con += "clientId=-1";
+                }
+                total = comService.getCount(InvitationCode.class, con);
             }
+        } else {
+            total = comService.getCount(InvitationCode.class, con);
         }
-        long total = comService.getCount(InvitationCode.class, con);
         int tarPageNum = Integer.parseInt(request.getParameter("tarPageNum"));
         int perPageNum = Integer.parseInt(request.getParameter("perPageNum"));
         List<Object[]> os = comService.query("select i.code,c.name,c.mobile,c.agencyId from InvitationCode i left join Client c on i.clientId=c.id"
@@ -59,9 +69,9 @@ public class InvitationController {
         return Result.SUCCESS(result);
     }
 
-    @RequestMapping(value = Components.Invitation_Query_status + "/data", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    @RequestMapping(value = Components.Invitation_Query_agency + "/data", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public @ResponseBody Object getStatusData() {
-        return Result.SUCCESS(cacheManager.getBookClassificationSelect());
+        return Result.SUCCESS(cacheManager.getAgencySelect());
     }
 
 }

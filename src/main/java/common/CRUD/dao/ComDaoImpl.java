@@ -309,6 +309,20 @@ public class ComDaoImpl extends BaseDao {
         }
     }
 
+    public long count(String hql) {
+        Query query = getSessionFactory().getCurrentSession().createQuery(hql);
+        Object res = query.uniqueResult();
+        return res == null ? 0 : ((Long) res).longValue();
+    }
+    public long sum(String hql) {
+        Query query = getSessionFactory().getCurrentSession().createQuery(hql);
+        Object res = query.uniqueResult();
+        return res == null ? 0 : ((Long) res).longValue();
+    }
+    public List<Object[]> query(String hql) {
+        Query query = getSessionFactory().getCurrentSession().createQuery(hql);
+        return query.list();
+    }
     public List<Object[]> query(String hql, int page, int size) {
         int min = Math.max(page * size - size, 0);
         Query query = getSessionFactory().getCurrentSession().createQuery(hql);
