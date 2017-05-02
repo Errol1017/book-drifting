@@ -1,6 +1,8 @@
 package project.operation.entity;
 
-import project.basic.pojo.OwnerType;
+import common.Util.SecretKeyCoder;
+import project.operation.model.BookForm;
+import project.operation.pojo.OwnerType;
 import project.operation.pojo.BookStatus;
 
 import javax.persistence.*;
@@ -41,17 +43,20 @@ public class Book {
     @Column(nullable = false)
     private long reservationId = -1;
     /** 起漂点 */
-    //所有者类型
+    //所有者类型，机构或个人
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private OwnerType ownerType;
     //所有者id ， 根据 ownerType ，链接到 agencyId 或 clientId
     @Column(nullable = false)
-    private int ownerId;
+    private long ownerId;
+    //起漂点
+    @Column(nullable = false)
+    private String stackIds = "";
     /** 二维码 */
     //二维码盐值
     @Column(nullable = false)
-    private String salt;
+    private String salt = "";
     //二维码标记
     @Column(nullable = false)
     private String qrCode;
@@ -60,6 +65,21 @@ public class Book {
     private Date createTime = new Date();
 
     public Book() {
+    }
+
+    public Book(BookForm form) {
+        this.name = form.getName();
+        this.author = form.getAuthor();
+        this.classificationId = Integer.parseInt(form.getBookClass());
+        this.introduction = form.getIntroduction();
+        this.pictures = form.getPictures();
+        this.status = BookStatus.valueOf(form.getStatus());
+        this.ownerType = OwnerType.valueOf(form.getOwnerType());
+        this.ownerId = Long.parseLong(form.getOwnerId());
+        this.stackIds = form.getStackIds();
+//        this.salt = SecretKeyCoder.getSalt(20);
+//        this.qrCode = qrCode;
+//        this.createTime = createTime;
     }
 
     public long getId() {
@@ -134,12 +154,20 @@ public class Book {
         this.ownerType = ownerType;
     }
 
-    public int getOwnerId() {
+    public long getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(int ownerId) {
+    public void setOwnerId(long ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public String getStackIds() {
+        return stackIds;
+    }
+
+    public void setStackIds(String stackIds) {
+        this.stackIds = stackIds;
     }
 
     public String getSalt() {

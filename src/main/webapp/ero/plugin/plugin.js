@@ -1,5 +1,6 @@
 /**
  * Created by Errol on 2016/6/10.
+ * contact 894957298
  */
 
 ;(function ($) {
@@ -151,7 +152,8 @@
                     thirdButtonObj: i3,
                     inputObj: i,
                     lastPageObj: b2
-                }
+                };
+                param.footer.rightObj.hide();
             }
             function registerFooterEvent() {
                 var i = 0;
@@ -324,16 +326,17 @@
                 param.handle.handleObj.fadeOut();
                 redrawBody();
                 redrawFooter();
+                toggleHandleElement();
                 function redrawBody() {
                     var trs = "";
                     var len = param.data.list.length;
+                    var arr = new Array();
                     if (len == 0) {
                         trs = '<tr class="lt_tbody_tr lt_tr_no_data"><td colspan="' + param.header.colsNum + '">暂无相关数据</td></tr>'
                     } else {
                         var tdConf = param.body.tdConf;
                         var names = param.header.names;
                         var list = param.data.list;
-                        var arr = new Array();
                         for (var i = 0; i < len; i++) {
                             var tds = "";
                             var j = 0;
@@ -352,8 +355,8 @@
                             }
                             trs += '<tr class="lt_tbody_tr">' + tds + '</tr>';
                         }
-                        param.body.data = arr;
                     }
+                    param.body.data = arr;
                     param.body.bodyObj.empty().append(trs);
                 }
                 function redrawFooter() {
@@ -413,6 +416,13 @@
                             footer.secondButtonObj.val(curPageNum).addClass('lt_page_slct');
                             footer.thirdButtonObj.val(curPageNum + 1).removeClass('lt_page_slct');
                         }
+                    }
+                }
+                function toggleHandleElement() {
+                    if (param.data.list.length == 0) {
+                        param.handle.reloadObj.siblings().hide();
+                    } else {
+                        param.handle.reloadObj.siblings().show();
                     }
                 }
             }
@@ -693,7 +703,7 @@
                 if (content != "") {
                     if (isNaN(content)) {
                         this.err_msg = this.tab_name() + "必须是数字 ";
-                    } else {
+                    } else if (min_num != undefined){
                         if (typeof min_num == "string") {
                             if (min_num == ">" && content <= max_num) {
                                 this.err_msg = this.tab_name() + "数值不合法  请输入 大于 " + max_num + "的数字 ";

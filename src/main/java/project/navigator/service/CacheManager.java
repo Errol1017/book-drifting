@@ -11,6 +11,7 @@ import project.basic.entity.Agency;
 import project.basic.entity.BookClassification;
 import project.basic.entity.InvitationCode;
 import project.navigator.model.Navigation;
+import project.operation.entity.Stacks;
 import project.system.entity.Admin;
 import project.system.entity.AdminRole;
 
@@ -98,9 +99,15 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
          */
         Agency ag = comService.getFirst(Agency.class, "id asc");
         if (ag == null) {
-            comService.saveDetail(new Agency("国土局","海虞北路","上午 8:30-11:00 ,下午 13:00-16:30"));
-            comService.saveDetail(new Agency("常熟海关","枫林路","上午 9:00-11:00 ,下午 13:00-16:00"));
-            comService.saveDetail(new Agency("地税","长江路","上午 8:00-11:00 ,下午 12:30-16:30"));
+            Stacks s1 = new Stacks("海虞北路","上午 8:30-11:00 ,下午 13:00-16:30");
+            comService.saveDetail(s1);
+            comService.saveDetail(new Agency("国土局", s1.getId()));
+            Stacks s2 = new Stacks("枫林路","上午 9:00-11:00 ,下午 13:00-16:00");
+            comService.saveDetail(s2);
+            comService.saveDetail(new Agency("常熟海关", s2.getId()));
+            Stacks s3 = new Stacks("长江路","上午 8:00-11:00 ,下午 12:30-16:30");
+            comService.saveDetail(s3);
+            comService.saveDetail(new Agency("地税", s3.getId()));
         }
     }
 

@@ -18,31 +18,26 @@ public class Agency {
     //机构名称
     @Column(nullable = false)
     private String name;
-    //机构地址
+    //固定起漂点ID
     @Column(nullable = false)
-    private String location;
-    //开放时间
-    @Column(nullable = false)
-    private String openTime;
+    private long stackId = -1;
     /** 是否加 联系人 列表 */
 //    @Column(nullable = false)
 //    private String clientIds = "";
 
     public Agency() {
     }
-    public Agency(AgencyList al) {
+    public Agency(AgencyList al, long stackId) {
         this.name = al.getName();
-        this.location = al.getLocation();
-        this.openTime = al.getOpenTime();
+        this.stackId = stackId;
     }
 
     /**
      * 开发阶段初始化单位信息
      */
-    public Agency(String name, String location, String openTime) {
+    public Agency(String name, long stackId) {
         this.name = name;
-        this.location = location;
-        this.openTime = openTime;
+        this.stackId = stackId;
     }
 
     public int getId() {
@@ -61,19 +56,11 @@ public class Agency {
         this.name = name;
     }
 
-    public String getLocation() {
-        return location;
+    public long getStackId() {
+        return stackId;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getOpenTime() {
-        return openTime;
-    }
-
-    public void setOpenTime(String openTime) {
-        this.openTime = openTime;
+    public void setStackId(long stackId) {
+        this.stackId = stackId;
     }
 }

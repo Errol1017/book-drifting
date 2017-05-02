@@ -1,7 +1,7 @@
 package project.system.entity;
 
 import project.system.model.AdminForm;
-import project.system.util.PasswordCoder;
+import common.Util.SecretKeyCoder;
 
 import javax.persistence.*;
 
@@ -43,8 +43,8 @@ public class Admin {
 
     public Admin(AdminForm form, AdminRole role) {
         this.adminName = form.getName();
-        this.salt = PasswordCoder.getSalt(20);
-        this.password = PasswordCoder.codingPassword(form.getPassword(), this.salt);
+        this.salt = SecretKeyCoder.getSalt(20);
+        this.password = SecretKeyCoder.codingPassword(form.getPassword(), this.salt);
         this.roleId = role.getId();
         this.actualName = form.getActualName();
         this.contactNumber = form.getContactNumber();
@@ -54,7 +54,7 @@ public class Admin {
     public Admin modify(AdminForm form) {
         this.adminName = form.getName();
         if (form.getPassword() != "") {
-            this.password = PasswordCoder.codingPassword(form.getPassword(), this.salt);
+            this.password = SecretKeyCoder.codingPassword(form.getPassword(), this.salt);
         }
         this.actualName = form.getActualName();
         this.contactNumber = form.getContactNumber();
@@ -63,7 +63,7 @@ public class Admin {
     }
 
     public boolean checkPassword(String password) {
-        if (this.getPassword().equals(PasswordCoder.codingPassword(password, this.getSalt()))) {
+        if (this.getPassword().equals(SecretKeyCoder.codingPassword(password, this.getSalt()))) {
             return true;
         }else {
             return false;
@@ -77,8 +77,8 @@ public class Admin {
      */
     public Admin addRootAdmin() {
         this.adminName = "admin";
-        this.salt = PasswordCoder.getSalt(20);
-        this.password = PasswordCoder.codingPassword("admin", this.salt);
+        this.salt = SecretKeyCoder.getSalt(20);
+        this.password = SecretKeyCoder.codingPassword("admin", this.salt);
         this.roleId = 1;
         return this;
     }

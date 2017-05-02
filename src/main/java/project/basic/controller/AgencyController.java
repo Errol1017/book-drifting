@@ -14,6 +14,7 @@ import project.basic.model.AgencyList;
 import project.navigator.route.Forms;
 import project.navigator.route.Lists;
 import project.navigator.service.CacheManager;
+import project.operation.entity.Stacks;
 import project.system.entity.AdminLog;
 import project.system.model.AdminSession;
 import project.system.pojo.OperationTargets;
@@ -43,10 +44,10 @@ public class AgencyController {
         long total = comService.getCount(Agency.class);
         int tarPageNum = Integer.parseInt(request.getParameter("tarPageNum"));
         int perPageNum = Integer.parseInt(request.getParameter("perPageNum"));
-        List<Agency> agencies = comService.getList(Agency.class, tarPageNum, perPageNum);
+        List<Object[]> os = comService.query("select a.id,a.name,s.location,s.openTime from Agency a left join Stacks s on a.stackId=s.id", tarPageNum, perPageNum);
         List<AgencyList> list = new ArrayList<>();
-        for (Agency agency: agencies) {
-            list.add(new AgencyList(agency));
+        for (Object[] o: os) {
+            list.add(new AgencyList(o));
         }
         Map<String, Object> result = new HashMap<>();
         result.put("list", list);
@@ -58,7 +59,8 @@ public class AgencyController {
     public @ResponseBody Object getAgencyForm(HttpServletRequest request) throws Exception {
         String dataId = request.getParameter("dataId");
         Agency agency = comService.getDetail(Agency.class, Integer.parseInt(dataId));
-        return Result.SUCCESS(new AgencyList(agency));
+        Stacks stacks = comService.getDetail(Stacks.class, agency.getStackId());
+        return Result.SUCCESS(new AgencyList(agency, stacks));
     }
 
     @RequestMapping(value = Forms.AgencyForm + "/submit", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
@@ -73,7 +75,9 @@ public class AgencyController {
             if (comService.hasExist(Agency.class, "name='" + form.getName() + "'")) {
                 return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "单位名已存在");
             }
-            Agency agency = new Agency(form);
+            Stacks stack = new Stacks(form);
+            comService.saveDetail(stack);
+            Agency agency = new Agency(form, stack.getId());
             comService.saveDetail(agency);
             cacheManager.resetAgencyCache();
             comService.saveDetail(new AdminLog(adminSession, OperationTargets.Agency, OperationTypes.Create, String.valueOf(agency.getId()), "单位名称： "+agency.getName()));
@@ -82,9 +86,12 @@ public class AgencyController {
             if (comService.hasExist(Agency.class, "name='" + form.getName() + "' and id!="+Integer.parseInt(form.getId()))) {
                 return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "单位名已存在");
             }
-            Agency agency = new Agency(form);
-            agency.setId(Integer.parseInt(form.getId()));
+            Agency agency = comService.getDetail(Agency.class, Integer.parseInt(form.getId()));
+            agency.setName(form.getName());
             comService.saveDetail(agency);
+            Stacks stack = new Stacks(form);
+            stack.setId(agency.getStackId());
+            comService.saveDetail(stack);
             cacheManager.resetAgencyCache();
             comService.saveDetail(new AdminLog(adminSession, OperationTargets.Agency, OperationTypes.Update, String.valueOf(agency.getId()), "单位名称： "+agency.getName()));
             return Result.SUCCESS();
@@ -95,6 +102,10 @@ public class AgencyController {
     public @ResponseBody Object deleteAgency(HttpServletRequest request) throws Exception {
         String dataId = request.getParameter("dataId");
         Agency agency = comService.getDetail(Agency.class, Integer.parseInt(dataId));
+        /**
+         * 机构管理的相关图书尚未做处理
+         */
+        comService.deleteDetail(Stacks.class, "id=" + agency.getStackId());
         comService.deleteDetail(agency);
         cacheManager.resetAgencyCache();
         AdminSession adminSession = AdminValidator.getAdminSession(request);

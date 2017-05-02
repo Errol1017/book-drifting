@@ -47,7 +47,6 @@
         </div>
     </div>
     <div class="form_detail_bottom">
-        <span class="ls_mw_100 span20p"></span>
         <span class="form_detail_bottom_handle_box span70p">
                 <button class="button_style_80_30" id="AgencyForm_Submit">新 增</button>
                 <button class="button_style_80_30" id="AgencyForm_Unbind">清 空</button>
@@ -88,10 +87,10 @@
                         return o.required().check_simple_length(1, 15).show_check_msg();
                     },
                     function (o) {
-                        return o.required().check_simple_length(1, 50).show_check_msg();
+                        return o.required().check_simple_length(1, 100).show_check_msg();
                     },
                     function (o) {
-                        return o.required().check_simple_length(1, 30).show_check_msg();
+                        return o.required().check_simple_length(1, 100).show_check_msg();
                     }
                 ],
                 unbind: {

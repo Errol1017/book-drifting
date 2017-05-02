@@ -54,14 +54,13 @@
                     </span>
                 </div>
                 <div>
-                    <label for="ClientForm_individualIds" class="ls_mw_100 span20p">个人起漂点</label>
+                    <label for="ClientForm_stackIds" class="ls_mw_100 span20p">个人起漂点</label>
                     <span class="span_box span70p">
-                        <input type="text" id="ClientForm_individualIds" class="input_text_35 span100p" placeholder="可以为空">
+                        <input type="text" id="ClientForm_stackIds" class="input_text_35 span100p" placeholder="可以为空">
                     </span>
                 </div>
             </div>
             <div class="form_detail_bottom">
-                <span class="ls_mw_100 span20p"></span>
                 <span class="form_detail_bottom_handle_box span70p">
                     <button class="button_style_80_30" id="ClientForm_Submit">新 增</button>
                     <button class="button_style_80_30" id="ClientForm_Unbind">清 空</button>
@@ -86,7 +85,7 @@
                     },
                     delete: {
                         before: function () {
-                            return confirm("确认删除该用户？")
+                            return confirm("确认删除数据？")
                         },
                         success: function (data) {
                             form.unbind(data.id)
@@ -96,10 +95,10 @@
             });
             var agencyId = $("#ClientForm_agencyId").dynamic_select();
             var form = $("#ClientForm").form_detail({
-                inputIds: ["!_id", "name", "mobile", "identityNumber", "agencyId", "individualIds"],
+                inputIds: ["!_id", "name", "mobile", "identityNumber", "agencyId", "stackIds"],
                 validator: [
                     function (o) {
-                        return o.required().check_simple_length(1, 15).show_check_msg();
+                        return o.required().check_simple_length(1, 100).show_check_msg();
                     },
                     function (o) {
                         return o.required().require_strict_phone_number().show_check_msg();

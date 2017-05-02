@@ -1,14 +1,11 @@
-package project.system.util;
-
-import common.Util.EncryptUtil;
-import common.Util.RandomUtil;
+package common.Util;
 
 import java.math.BigInteger;
 
 /**
  * Created by Errol on 16/10/13.
  */
-public class PasswordCoder {
+public class SecretKeyCoder {
 
     public static String getSalt(int length){
         return RandomUtil.getRandomString(length, RandomUtil.PATTEN_ALL_CHARS);

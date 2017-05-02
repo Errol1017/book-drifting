@@ -26,10 +26,10 @@ public class Client {
     private String identityNumber;
     //单位
     @Column(nullable = false, columnDefinition = "smallint unsigned")
-    private int agencyId;
+    private int agencyId = -1;
     /** 个人起漂点 */
     @Column(nullable = false)
-    private String individualIds = "";
+    private String stackIds = "";
 
     //微信id
     //昵称
@@ -52,8 +52,10 @@ public class Client {
         this.name = form.getName();
         this.mobile = form.getMobile();
         this.identityNumber = form.getIdentityNumber();
-        this.agencyId = Integer.parseInt(form.getId());
-        this.individualIds = form.getIndividualIds();
+        if (!form.getAgencyId().equals("")) {
+            this.agencyId = Integer.parseInt(form.getAgencyId());
+        }
+        this.stackIds = form.getStackIds();
     }
 
     public long getId() {
@@ -96,12 +98,12 @@ public class Client {
         this.agencyId = agencyId;
     }
 
-    public String getIndividualIds() {
-        return individualIds;
+    public String getStackIds() {
+        return stackIds;
     }
 
-    public void setIndividualIds(String individualIds) {
-        this.individualIds = individualIds;
+    public void setStackIds(String stackIds) {
+        this.stackIds = stackIds;
     }
 
     public Date getCreateTime() {

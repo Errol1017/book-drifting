@@ -1,6 +1,6 @@
 package project.operation.entity;
 
-import project.basic.pojo.OwnerType;
+import project.operation.pojo.OwnerType;
 import project.operation.pojo.BookStatus;
 
 import javax.persistence.*;
@@ -22,10 +22,10 @@ public class Reservation {
     //所有人类型
     @Column(nullable = false)
     private OwnerType ownerType;
-    //当前持有人id
+    //当前持有人id（借出方）
     @Column(nullable = false)
     private long ownerId;
-    //借书用户id
+    //借书用户id（借入方）
     @Column(nullable = false)
     private long clientId;
     //预约状态（图书状态）

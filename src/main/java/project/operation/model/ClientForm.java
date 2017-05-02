@@ -12,7 +12,7 @@ public class ClientForm {
     private String mobile;
     private String identityNumber;
     private String agencyId;
-    private String individualIds;
+    private String stackIds;
 
     public ClientForm() {
     }
@@ -23,7 +23,7 @@ public class ClientForm {
         this.mobile = client.getMobile();
         this.identityNumber = client.getIdentityNumber();
         this.agencyId = String.valueOf(client.getAgencyId());
-        this.individualIds = client.getIndividualIds();
+        this.stackIds = client.getStackIds();
     }
 
     public String getId() {
@@ -46,7 +46,7 @@ public class ClientForm {
         return agencyId;
     }
 
-    public String getIndividualIds() {
-        return individualIds;
+    public String getStackIds() {
+        return stackIds;
     }
 }

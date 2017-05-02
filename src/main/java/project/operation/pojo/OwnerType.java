@@ -3,18 +3,16 @@ package project.operation.pojo;
 /**
  * Created by Errol on 17/4/16.
  */
-public enum  BookStatus {
+public enum OwnerType {
 
-    IN_STOCK("在架"),
+    AGENCY("机构"),
 
-    BORROWED("外借"),
-
-    EXPIRED("到期未还")
+    INDIVIDUAL("个人")
     ;
 
     private String name;
 
-    BookStatus(String name) {
+    OwnerType(String name) {
         this.name = name;
     }
 

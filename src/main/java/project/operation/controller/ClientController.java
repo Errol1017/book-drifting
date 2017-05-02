@@ -102,7 +102,7 @@ public class ClientController {
     }
 
     @RequestMapping(value = Components.ClientForm_agencyId + "/data", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
-    public @ResponseBody Object getStatusData() {
+    public @ResponseBody Object getAgencyData() {
         return Result.SUCCESS(cacheManager.getAgencySelect());
     }
 }
