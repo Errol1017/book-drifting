@@ -93,7 +93,7 @@
                         return o.required().check_simple_length(1, 15).show_check_msg();
                     },
                     function (o) {
-                        return o.required().require_chart().check_simple_length(1, 5).show_check_msg();
+                        return o.required().require_chart(true).check_simple_length(1, 5).show_check_msg();
                     },
                     function (o) {
                         return o.required().check_simple_length(1, 100).show_check_msg();

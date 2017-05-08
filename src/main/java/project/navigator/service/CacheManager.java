@@ -193,6 +193,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
         for (Agency ag: list) {
             map = new HashMap<>();
             map.put("val", String.valueOf(ag.getId()));
+            map.put("code", ag.getCode());
             map.put("text", ag.getName());
             agencySelect.add(map);
             map = new HashMap<>();

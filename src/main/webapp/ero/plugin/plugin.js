@@ -944,6 +944,7 @@
          * param.writable       boolean default true
          * param.lines          number  default 7
          * param.data           array
+         * param.withCode
          * param.index
          * param.match
          * param.matchIndex
@@ -976,6 +977,7 @@
                 }
             }
             function initData() {
+                param.withCode = false;
                 if (param.dynamic == undefined || param.dynamic) {
                     if (param.reqId == undefined) {
                         param.reqId = $.ero.reqIdForPlugin;
@@ -1012,6 +1014,9 @@
                     success: function (res) {
                         if (res.code == 0) {
                             param.data = res.data;
+                            if (param.data.length > 0 && param.data[0]['code'] != undefined) {
+                                param.withCode = true;
+                            }
                             draw();
                         } else {
                             $.ero.showErrorMessage(res.code, res.data);
@@ -1036,10 +1041,16 @@
             }
             function setData() {
                 param.data = new Array();
+                if (param.liObjs.first().attr("data-code") != undefined) {
+                    param.withCode = true;
+                }
+                console.log("ok")
                 param.liObjs.each(function () {
+                    var o = $(this);
                     param.data.push({
-                        val: $(this).attr("data-val"),
-                        text: $(this).text()
+                        val: o.attr("data-val"),
+                        code: param.withCode?o.attr("data-code"):'',
+                        text: o.text()
                     })
                 })
             }
@@ -1182,8 +1193,10 @@
                             curText = curText;
                             var i = 0;
                             param.match = new Array();
+                            var withCode =
                             param.liObjs.each(function () {
-                                if (param.data[i]['val'].toUpperCase().indexOf(curText.toUpperCase()) != -1 || param.data[i]['text'].indexOf(curText) != -1) {
+                                if (param.data[i]['val'].toUpperCase().indexOf(curText.toUpperCase()) != -1 || param.data[i]['text'].indexOf(curText) != -1
+                                || param.withCode?(param.data[i]['code'].toUpperCase().indexOf(curText.toUpperCase()) != -1):false) {
                                     $(this).show();
                                     param.match.push($(this).index());
                                 } else {
