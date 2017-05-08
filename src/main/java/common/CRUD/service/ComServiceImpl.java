@@ -18,9 +18,16 @@ public class ComServiceImpl implements ComService {
 
     @Value("${project.file.path}")
     private String fileBasePath;
+    @Value("${remote.client.id}")
+    private String remoteClientId;
+
     @Override
     public String getFileBathPath() {
         return fileBasePath;
+    }
+    @Override
+    public String getRemoteClientId() {
+        return remoteClientId;
     }
 
     @Override

@@ -44,7 +44,7 @@ public class AgencyController {
         long total = comService.getCount(Agency.class);
         int tarPageNum = Integer.parseInt(request.getParameter("tarPageNum"));
         int perPageNum = Integer.parseInt(request.getParameter("perPageNum"));
-        List<Object[]> os = comService.query("select a.id,a.name,s.location,s.openTime from Agency a left join Stacks s on a.stackId=s.id", tarPageNum, perPageNum);
+        List<Object[]> os = comService.query("select a.id,a.name,a.code,s.location,s.openTime from Agency a left join Stacks s on a.stackId=s.id", tarPageNum, perPageNum);
         List<AgencyList> list = new ArrayList<>();
         for (Object[] o: os) {
             list.add(new AgencyList(o));

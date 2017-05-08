@@ -26,9 +26,7 @@ public class LoginController {
     private ComService comService;
 
     @RequestMapping(value = "/admin/login", produces = "application/json;charset=UTF-8")
-    public
-    @ResponseBody
-    Object login(HttpServletRequest request) throws Exception {
+    public @ResponseBody Object login(HttpServletRequest request) throws Exception {
         String adminName = request.getParameter("adminName");
         String password = request.getParameter("password");
         Admin admin = comService.getFirst(Admin.class, "adminName='" + adminName + "'");
@@ -49,9 +47,7 @@ public class LoginController {
     }
 
     @RequestMapping(value = "/admin/initialization", produces = "application/json;charset=UTF-8")
-    public
-    @ResponseBody
-    Object initialization(HttpServletRequest request) throws Exception {
+    public @ResponseBody Object initialization(HttpServletRequest request) throws Exception {
         AdminSession adminSession = (AdminSession) request.getSession().getAttribute("admin");
         if (adminSession == null) {
             return Result.ERROR(ErrorCode.LOGIN_TIMEOUT);

@@ -11,6 +11,7 @@ import java.util.List;
 public interface ComService {
 
     String getFileBathPath();
+    String getRemoteClientId();
 
     <T> long getCount(Class<T> typeValue);
     <T> long getCount(Class<T> typeValue, String condition);

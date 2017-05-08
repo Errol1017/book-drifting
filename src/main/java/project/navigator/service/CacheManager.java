@@ -1,7 +1,6 @@
 package project.navigator.service;
 
 import common.CRUD.service.ComService;
-import common.Util.DateUtil;
 import common.Util.InvitationCodeGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -11,7 +10,9 @@ import project.basic.entity.Agency;
 import project.basic.entity.BookClassification;
 import project.basic.entity.InvitationCode;
 import project.navigator.model.Navigation;
+import project.operation.entity.Client;
 import project.operation.entity.Stacks;
+import project.operation.model.ClientCache;
 import project.system.entity.Admin;
 import project.system.entity.AdminRole;
 
@@ -26,13 +27,17 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     @Autowired
     private ComService comService;
 
-    //cache
+    //admin cache
     private Map<Integer, String> bookClassificationCache;
     private Map<Integer, Agency> agencyCache;
-
     //dynamic select
     private List<Map<String, String>> bookClassificationSelect;
     private List<Map<String, String>> agencySelect;
+
+    //public cache
+    private List<Map<String, String>> publicBookClassificationSelect;
+    private List<Map<String, String>> publicAgencySelect;
+    private Map<String, ClientCache> clientCacheMap;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
@@ -101,13 +106,13 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
         if (ag == null) {
             Stacks s1 = new Stacks("海虞北路","上午 8:30-11:00 ,下午 13:00-16:30");
             comService.saveDetail(s1);
-            comService.saveDetail(new Agency("国土局", s1.getId()));
+            comService.saveDetail(new Agency("国土局", "GTJ", s1.getId()));
             Stacks s2 = new Stacks("枫林路","上午 9:00-11:00 ,下午 13:00-16:00");
             comService.saveDetail(s2);
-            comService.saveDetail(new Agency("常熟海关", s2.getId()));
+            comService.saveDetail(new Agency("常熟海关", "CSHG", s2.getId()));
             Stacks s3 = new Stacks("长江路","上午 8:00-11:00 ,下午 12:30-16:30");
             comService.saveDetail(s3);
-            comService.saveDetail(new Agency("地税", s3.getId()));
+            comService.saveDetail(new Agency("地税", "DS", s3.getId()));
         }
     }
 
@@ -116,15 +121,20 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
         resetBookClassificationCache();
         //加载单位信息
         resetAgencyCache();
+        //加载用户登录信息
+        resetClientCache();
     }
 
 
     /**
-     * 图书分类相关方法
+     * 图书分类缓存相关方法
      */
     //获取图书分类下拉列表
     public List<Map<String, String>> getBookClassificationSelect() {
         return bookClassificationSelect;
+    }
+    public List<Map<String, String>> getPublicBookClassificationSelect() {
+        return publicBookClassificationSelect;
     }
     //获取图书分类名称
     public String getBookClassificationName(int id) {
@@ -142,22 +152,31 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     public void resetBookClassificationCache() {
         bookClassificationSelect = new ArrayList<>();
         bookClassificationCache = new HashMap<>();
+        publicBookClassificationSelect = new ArrayList<>();
+        Map<String, String> map;
         List<BookClassification> list = comService.getList(BookClassification.class);
         for (BookClassification bc: list) {
-            Map<String, String> map = new HashMap<>();
+            map = new HashMap<>();
             map.put("val", String.valueOf(bc.getId()));
             map.put("text", bc.getName());
             bookClassificationSelect.add(map);
+            map = new HashMap<>();
+            map.put("value", String.valueOf(bc.getId()));
+            map.put("name", bc.getName());
+            publicBookClassificationSelect.add(map);
             bookClassificationCache.put(bc.getId(), bc.getName());
         }
     }
 
     /**
-     * 单位信息相关方法
+     * 单位信息缓存相关方法
      */
     //获取单位下拉列表
     public List<Map<String, String>> getAgencySelect() {
         return agencySelect;
+    }
+    public List<Map<String, String>> getPublicAgencySelect() {
+        return publicAgencySelect;
     }
     //获取单位信息
     public Agency getAgency(int id) {
@@ -168,25 +187,49 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     public void resetAgencyCache() {
         agencySelect = new ArrayList<>();
         agencyCache = new HashMap<>();
+        publicAgencySelect = new ArrayList<>();
         List<Agency> list = comService.getList(Agency.class);
+        Map<String, String> map;
         for (Agency ag: list) {
-            Map<String, String> map = new HashMap<>();
+            map = new HashMap<>();
             map.put("val", String.valueOf(ag.getId()));
             map.put("text", ag.getName());
             agencySelect.add(map);
+            map = new HashMap<>();
+            map.put("value", String.valueOf(ag.getId()));
+            map.put("name", ag.getName());
+            publicAgencySelect.add(map);
             agencyCache.put(ag.getId(), ag);
         }
     }
+
+    /**
+     * 用户信息缓存相关方法
+     */
+    //获取用户缓存
+    public ClientCache getClientCache(String openId) {
+        return clientCacheMap.get(openId);
+    }
+    //添加用户缓存
+    public void addClientCache(ClientCache clientCache) {
+        clientCacheMap.put(clientCache.getOpenId(), clientCache);
+    }
+    //重置用户缓存
+    public void resetClientCache() {
+        clientCacheMap = new HashMap<>();
+        List<Client> list = comService.getList(Client.class);
+        for (Client client: list) {
+            clientCacheMap.put(client.getOpenId(), new ClientCache(client));
+        }
+    }
+
 
     private void test() {
 //        comService.test();
     }
 
     public static void main(String[] args) {
-        System.out.println(DateUtil.string2Date("201607", DateUtil.PATTERN_H));
-        System.out.println(new Date(Long.parseLong("1493183327995")));
-        System.out.println(new Date().getTime());
-        System.out.println(DateUtil.date2String(new Date(), DateUtil.PATTERN_J));
+        System.out.println(String.format("qwe%s123%sasd","-----------","=========="));
     }
 
 }

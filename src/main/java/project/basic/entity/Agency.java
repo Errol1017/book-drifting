@@ -18,6 +18,8 @@ public class Agency {
     //机构名称
     @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
+    private String code;
     //固定起漂点ID
     @Column(nullable = false)
     private long stackId = -1;
@@ -29,14 +31,16 @@ public class Agency {
     }
     public Agency(AgencyList al, long stackId) {
         this.name = al.getName();
+        this.code = al.getCode();
         this.stackId = stackId;
     }
 
     /**
      * 开发阶段初始化单位信息
      */
-    public Agency(String name, long stackId) {
+    public Agency(String name, String code, long stackId) {
         this.name = name;
+        this.code = code;
         this.stackId = stackId;
     }
 
@@ -54,6 +58,14 @@ public class Agency {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public long getStackId() {

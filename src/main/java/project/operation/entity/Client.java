@@ -1,5 +1,7 @@
 package project.operation.entity;
 
+import common.pojo.Gender;
+import project.open.model.UserVerifyForm;
 import project.operation.model.ClientForm;
 
 import javax.persistence.*;
@@ -30,11 +32,20 @@ public class Client {
     /** 个人起漂点 */
     @Column(nullable = false)
     private String stackIds = "";
-
-    //微信id
+    /** 微信身份相关 */
+    //微信openId
+    @Column(nullable = false, unique = true)
+    private String openId = "";
     //昵称
+    @Column(nullable = false)
+    private String nickName = "";
     //头像
+    @Column(nullable = false)
+    private String avatar = "avatar/avatar.png";
     //性别
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
+    private Gender gender = Gender.UNKNOWN;
 
     @Column(nullable = false)
     private Date createTime = new Date();
@@ -56,6 +67,14 @@ public class Client {
             this.agencyId = Integer.parseInt(form.getAgencyId());
         }
         this.stackIds = form.getStackIds();
+        this.nickName = form.getName();
+    }
+    public Client(UserVerifyForm form) {
+        this.name = form.getName();
+        this.mobile = form.getMobile();
+        this.identityNumber = form.getIdNum();
+        this.agencyId = form.getAgencyId();
+        this.nickName = form.getName();
     }
 
     public long getId() {
@@ -104,6 +123,38 @@ public class Client {
 
     public void setStackIds(String stackIds) {
         this.stackIds = stackIds;
+    }
+
+    public String getOpenId() {
+        return openId;
+    }
+
+    public void setOpenId(String openId) {
+        this.openId = openId;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
     }
 
     public Date getCreateTime() {

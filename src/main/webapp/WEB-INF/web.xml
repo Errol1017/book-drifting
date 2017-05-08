@@ -30,6 +30,15 @@
     <filter-name>setcharacter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+  
+  <filter>
+    <filter-name>cors</filter-name>
+    <filter-class>project.open.service.CORSFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>cors</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
 
   <context-param>
     <param-name>webAppRootKey</param-name>

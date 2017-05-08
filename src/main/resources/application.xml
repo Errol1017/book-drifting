@@ -34,7 +34,7 @@
  	<context:component-scan base-package="project.*.dao" />
 	<context:component-scan base-package="project.*.service" />
 	<context:component-scan base-package="project.*.controller" />
-	
+
 	<!-- springmvc配置 -->
 	<mvc:annotation-driven>
 		<!-- 返回json数据，使用@response -->
@@ -172,9 +172,17 @@
     </bean>
 
 	<mvc:interceptors>
+		<!--<mvc:interceptor>-->
+			<!--<mvc:mapping path="/**"/>-->
+			<!--<bean class="project.navigator.service.Interceptor"/>-->
+		<!--</mvc:interceptor>-->
 		<mvc:interceptor>
-			<mvc:mapping path="/**"/>
-			<bean class="project.navigator.service.Interceptor" />
+			<mvc:mapping path="/public/**"/>
+			<mvc:exclude-mapping path="/public/common/**"/>
+			<mvc:exclude-mapping path="/public/user/check"/>
+			<mvc:exclude-mapping path="/public/user/check/result"/>
+			<mvc:exclude-mapping path="/public/user/verify"/>
+			<bean class="project.open.service.PublicInterceptor"/>
 		</mvc:interceptor>
 	</mvc:interceptors>
  

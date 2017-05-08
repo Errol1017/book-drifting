@@ -728,6 +728,27 @@
             }
             return this;
         },
+        require_chart: function (only_upper_case) {
+            if (this.err_msg == "") {
+                var content = $(this).val();
+                if (content != "") {
+                    if (only_upper_case == undefined) {
+                        var reg = new RegExp("\^[a-zA-Z]+$");
+                        var s = "大写或小写字母"
+                    } else if (only_upper_case) {
+                        var reg = new RegExp("\^[A-Z]+$");
+                        var s = "大写字母"
+                    } else if (!only_upper_case) {
+                        var reg = new RegExp("\^[a-z]+$");
+                        var s = "小写字母"
+                    }
+                    if (!content.match(reg)) {
+                        this.err_msg = this.tab_name() + "格式不合法  请输入 " + s;
+                    }
+                }
+            }
+            return this;
+        },
         require_img: function (default_src) {
             if (this.err_msg == "") {
                 var src = $(this).attr("src");
