@@ -13,14 +13,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import project.basic.entity.InvitationCode;
 import project.navigator.service.CacheManager;
 import project.open.model.UserInfo;
+import project.open.model.UserInfoData;
 import project.open.model.UserVerifyForm;
+import project.operation.entity.Book;
 import project.operation.entity.Client;
 import project.open.util.ClientValidator;
 import project.operation.model.ClientCache;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
+import java.util.Random;
 
 /**
  * Created by Errol on 17/5/4.
@@ -41,7 +43,15 @@ public class UserCenterController {
         if (result.getCode() == -2) {
             //无openId session，需静默授权
             //模拟授权获得openId
-            request.getSession().setAttribute("openId", RandomUtil.getRandomString(12, RandomUtil.PATTEN_ALL_CHARS));
+//            if (new Random().nextInt(10) >4) {
+                System.out.println("随机>4  获取已有client");
+                long max = comService.getCount(Client.class);
+                Client client = comService.getList(Client.class, (new Random().nextInt((int)max)), 1).get(0);
+                request.getSession().setAttribute("openId", client.getOpenId());
+//            } else {
+//                System.out.println("随机<5  新增openid");
+//                request.getSession().setAttribute("openId", RandomUtil.getRandomString(12, RandomUtil.PATTEN_ALL_CHARS));
+//            }
             return "redirect:/public/user/check";
         } else if (result.getCode() == -1) {
             //有openId session，但clientCache中无对应记录，也即静默授权后未核验身份
@@ -93,7 +103,19 @@ public class UserCenterController {
         ClientCache cc = ClientValidator.getClientCache(request, cacheManager);
         Client client = comService.getFirst(Client.class, "openId='" + cc.getOpenId() + "'");
         UserInfo info = new UserInfo(client, comService);
+//        long nb = comService.getCount(Book.class, "createTime>'"+cc.getLoginTime()+"'");
+        Book b =  comService.getFirst(Book.class, "createTime>'"+cc.getLoginTime()+"'");
+        info.setNewBook(String.valueOf(b==null?"0":"1"));
+        info.setNewMsg(String.valueOf(cc.getNews().size()));
         return Result.SUCCESS(info);
+    }
+
+    @RequestMapping(value = "/info/data", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public @ResponseBody Object getUserInfoData(HttpServletRequest request) throws Exception {
+        ClientCache cc = ClientValidator.getClientCache(request, cacheManager);
+        Client client = comService.getFirst(Client.class, "openId='" + cc.getOpenId() + "'");
+        UserInfoData data = new UserInfoData(client, comService, cacheManager);
+        return Result.SUCCESS(data);
     }
 
 }

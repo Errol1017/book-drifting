@@ -1,8 +1,11 @@
 package project.operation.model;
 
+import common.Util.DateUtil;
 import project.operation.entity.Client;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Errol on 17/5/5.
@@ -10,12 +13,13 @@ import java.util.Date;
 public class ClientCache {
 
     private String openId;
-    private Date loginTime;
+    private String loginTime;
     private int borrowingSum;
+    private List<Long> news = new ArrayList<>();
 
     public ClientCache(Client client) {
         this.openId = client.getOpenId();
-        this.loginTime = client.getLoginTime();
+        this.loginTime = DateUtil.date2String(client.getLoginTime(), DateUtil.PATTERN_A);
         this.borrowingSum = client.getBorrowingSum();
     }
 
@@ -27,11 +31,11 @@ public class ClientCache {
         this.openId = openId;
     }
 
-    public Date getLoginTime() {
+    public String getLoginTime() {
         return loginTime;
     }
 
-    public void setLoginTime(Date loginTime) {
+    public void setLoginTime(String loginTime) {
         this.loginTime = loginTime;
     }
 
@@ -41,5 +45,13 @@ public class ClientCache {
 
     public void setBorrowingSum(int borrowingSum) {
         this.borrowingSum = borrowingSum;
+    }
+
+    public List<Long> getNews() {
+        return news;
+    }
+
+    public void setNews(List<Long> news) {
+        this.news = news;
     }
 }

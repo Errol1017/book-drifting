@@ -2,6 +2,7 @@ package project.navigator.service;
 
 import common.CRUD.service.ComService;
 import common.Util.InvitationCodeGenerator;
+import common.Util.RandomUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -10,6 +11,7 @@ import project.basic.entity.Agency;
 import project.basic.entity.BookClassification;
 import project.basic.entity.InvitationCode;
 import project.navigator.model.Navigation;
+import project.operation.entity.Book;
 import project.operation.entity.Client;
 import project.operation.entity.Stacks;
 import project.operation.model.ClientCache;
@@ -38,6 +40,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     private List<Map<String, String>> publicBookClassificationSelect;
     private List<Map<String, String>> publicAgencySelect;
     private Map<String, ClientCache> clientCacheMap;
+    private Set<String[]> bookCacheSet;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
@@ -114,6 +117,18 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
             comService.saveDetail(s3);
             comService.saveDetail(new Agency("地税", "DS", s3.getId()));
         }
+
+        /**
+         * 初始化图书
+         */
+        Book book = comService.getFirst(Book.class, "id asc");
+        if (book ==null) {
+            List<Book> list = new ArrayList<>();
+            for (int i=0;i<24;i++){
+                list.add(new Book(i));
+            }
+            comService.saveDetail(list);
+        }
     }
 
     private void initCache() {
@@ -123,6 +138,8 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
         resetAgencyCache();
         //加载用户登录信息
         resetClientCache();
+        //加载书名与作者
+        resetBookCache();
     }
 
 
@@ -216,11 +233,37 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
         clientCacheMap.put(clientCache.getOpenId(), clientCache);
     }
     //重置用户缓存
-    public void resetClientCache() {
+    private void resetClientCache() {
         clientCacheMap = new HashMap<>();
         List<Client> list = comService.getList(Client.class);
         for (Client client: list) {
             clientCacheMap.put(client.getOpenId(), new ClientCache(client));
+        }
+    }
+
+    /**
+     * 图书缓存，用于前端快速匹配作者和书名
+     */
+    //获取匹配图书缓存
+    public List<Map<String, String>> getBookMatch(String m) {
+        List<Map<String, String>> list = new ArrayList<>();
+        Iterator<String[]> i = bookCacheSet.iterator();
+        while (i.hasNext() && list.size()<8) {
+            String[] s = i.next();
+            if (s[0].indexOf(m)!=-1 || s[1].indexOf(m)!=-1) {
+                Map<String, String> map = new HashMap<>();
+                map.put("title", "《"+s[0]+"》 "+s[1]);
+                list.add(map);
+            }
+        }
+        return list;
+    }
+    //重置图书缓存
+    private void resetBookCache() {
+        bookCacheSet = new HashSet<>();
+        List<Object[]> res = comService.getFields(Book.class,"name,author");
+        for (Object[] o: res){
+            bookCacheSet.add(new String[]{String.valueOf(o[0]),String.valueOf(o[1])});
         }
     }
 
@@ -230,7 +273,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     public static void main(String[] args) {
-        System.out.println(String.format("qwe%s123%sasd","-----------","=========="));
+
     }
 
 }

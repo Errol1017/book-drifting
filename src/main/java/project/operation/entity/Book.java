@@ -42,7 +42,10 @@ public class Book {
     //借出时的 预约记录id
     @Column(nullable = false)
     private long reservationId = -1;
-    /** 起漂点 */
+    /** 所有人和起漂点
+     * 图书所有权属于上传图书的 个人 或 机构
+     * 个人可以选择自己管理图书的流转（个人起漂点）或者委托机构进行管理（机构起漂点）
+     * 机构则只能选择 机构起漂点*/
     //所有者类型，机构或个人
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -81,6 +84,25 @@ public class Book {
 //        this.qrCode = qrCode;
 //        this.createTime = createTime;
     }
+
+
+    /**
+     * 开发阶段初始化数据
+     * @return
+     */
+    public Book(int s) {
+        this.name = "毛泽东选集  "+s;
+        this.author = "毛泽东  "+s;
+        this.classificationId = 1;
+        this.introduction = "《毛泽东选集》是毛泽东思想的重要载体，《毛泽东选集》是毛泽东思想的集中展现，是对20世纪中国影响最大的书籍之一。";
+        this.pictures = "img/bookface.png";
+        this.ownerType = OwnerType.INDIVIDUAL;
+        this.ownerId = 1;
+        this.stackIds = "";
+        this.salt = "qazwsx";
+        this.qrCode = "zaqxsw";
+    }
+
 
     public long getId() {
         return id;

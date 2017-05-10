@@ -11,6 +11,8 @@ public class UserInfo {
 
     private String nickname;
     private String avatar;
+    private String newBook = "0";
+    private String newMsg = "0";
 
     public UserInfo(Client client, ComService comService) {
         this.nickname = client.getNickName();
@@ -31,5 +33,21 @@ public class UserInfo {
 
     public void setAvatar(String avatar) {
         this.avatar = avatar;
+    }
+
+    public String getNewBook() {
+        return newBook;
+    }
+
+    public void setNewBook(String newBook) {
+        this.newBook = newBook;
+    }
+
+    public String getNewMsg() {
+        return newMsg;
+    }
+
+    public void setNewMsg(String newMsg) {
+        this.newMsg = newMsg;
     }
 }
