@@ -37,4 +37,8 @@ public class ClientValidator {
         return String.valueOf(request.getSession().getAttribute("openId"));
     }
 
+    public static long getClientId(HttpServletRequest request, CacheManager cacheManager) {
+        return cacheManager.getClientCache(String.valueOf(request.getSession().getAttribute("openId"))).getId();
+    }
+
 }

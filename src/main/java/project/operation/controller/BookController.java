@@ -39,14 +39,14 @@ public class BookController {
     @Autowired
     private CacheManager cacheManager;
 
+    @ResponseBody
     @RequestMapping(value = Lists.BookList + "/list", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public @ResponseBody
-    Object getBookList(HttpServletRequest request) throws Exception {
+    public Object getBookList(HttpServletRequest request) throws Exception {
         int tarPageNum = Integer.parseInt(request.getParameter("tarPageNum"));
         int perPageNum = Integer.parseInt(request.getParameter("perPageNum"));
         List<Book> books = comService.getList(Book.class, tarPageNum, perPageNum);
         List<BookList> list = new ArrayList<>();
-        for (Book book: books){
+        for (Book book : books) {
             list.add(new BookList(book, cacheManager));
         }
         long total = comService.getCount(Book.class);
@@ -56,48 +56,51 @@ public class BookController {
         return Result.SUCCESS(result);
     }
 
+    @ResponseBody
     @RequestMapping(value = Forms.BookForm + "/form", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public @ResponseBody Object getBookForm(HttpServletRequest request) throws Exception {
+    public Object getBookForm(HttpServletRequest request) throws Exception {
         String dataId = request.getParameter("dataId");
         Book book = comService.getDetail(Book.class, Long.parseLong(dataId));
         BookForm form = new BookForm(book);
         return Result.SUCCESS(form);
     }
 
+    @ResponseBody
     @RequestMapping(value = Forms.BookForm + "/submit", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public @ResponseBody Object submitBookForm(HttpServletRequest request) throws Exception {
+    public Object submitBookForm(HttpServletRequest request) throws Exception {
         String data = request.getParameter("data");
         BookForm form = DataManager.string2Object(data, BookForm.class);
         if (form == null) {
             return Result.ERROR(ErrorCode.ILLEGAL_OPERATION);
         }
         AdminSession adminSession = AdminValidator.getAdminSession(request);
-        if (form.getId().equals("")){
+        if (form.getId().equals("")) {
 //            if (comService.hasExist(Book.class, "identityNumber='"+form.getIdentityNumber()+"'")){
 //                return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "用户身份证号已存在");
 //            }
             Book book = new Book(form);
             comService.saveDetail(book);
-            comService.saveDetail(new AdminLog(adminSession, OperationTargets.Book, OperationTypes.Create, String.valueOf(book.getId()), "书名： "+book.getName()));
+            comService.saveDetail(new AdminLog(adminSession, OperationTargets.Book, OperationTypes.Create, String.valueOf(book.getId()), "书名： " + book.getName()));
             return Result.SUCCESS(book.getId());
-        }else {
+        } else {
 //            if (comService.hasExist(Book.class, "identityNumber='"+form.getIdentityNumber()+"' and id!="+Long.parseLong(form.getId()))){
 //                return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "用户身份证号已存在");
 //            }
             Book book = new Book(form);
             book.setId(Long.parseLong(form.getId()));
             comService.saveDetail(book);
-            comService.saveDetail(new AdminLog(adminSession, OperationTargets.Book, OperationTypes.Update, String.valueOf(book.getId()), "书名： "+book.getName()));
+            comService.saveDetail(new AdminLog(adminSession, OperationTargets.Book, OperationTypes.Update, String.valueOf(book.getId()), "书名： " + book.getName()));
             return Result.SUCCESS();
         }
     }
 
+    @ResponseBody
     @RequestMapping(value = Lists.BookList + "/delete", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public @ResponseBody Object deleteBookList(HttpServletRequest request) throws Exception {
+    public Object deleteBookList(HttpServletRequest request) throws Exception {
         String dataId = request.getParameter("dataId");
         Book book = comService.getDetail(Book.class, Long.parseLong(dataId));
         comService.deleteDetail(book);
-        comService.saveDetail(new AdminLog(AdminValidator.getAdminSession(request), OperationTargets.Book, OperationTypes.Delete, String.valueOf(book.getId()), "书名： "+book.getName()));
+        comService.saveDetail(new AdminLog(AdminValidator.getAdminSession(request), OperationTargets.Book, OperationTypes.Delete, String.valueOf(book.getId()), "书名： " + book.getName()));
         return Result.SUCCESS();
     }
 

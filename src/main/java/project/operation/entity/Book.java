@@ -1,6 +1,5 @@
 package project.operation.entity;
 
-import common.Util.SecretKeyCoder;
 import project.operation.model.BookForm;
 import project.operation.pojo.OwnerType;
 import project.operation.pojo.BookStatus;
@@ -53,9 +52,11 @@ public class Book {
     //所有者id ， 根据 ownerType ，链接到 agencyId 或 clientId
     @Column(nullable = false)
     private long ownerId;
-    //起漂点
+    //起漂点 --只允许一个起漂点，还是可以允许多个，主要在个人管理的情况
+//    @Column(nullable = false)
+//    private String stackIds = "";
     @Column(nullable = false)
-    private String stackIds = "";
+    private long stackId = -1;
     /** 二维码 */
     //二维码盐值
     @Column(nullable = false)
@@ -79,7 +80,8 @@ public class Book {
         this.status = BookStatus.valueOf(form.getStatus());
         this.ownerType = OwnerType.valueOf(form.getOwnerType());
         this.ownerId = Long.parseLong(form.getOwnerId());
-        this.stackIds = form.getStackIds();
+//        this.stackIds = form.getStackId();
+        this.stackId = Long.parseLong(form.getStackId());
 //        this.salt = SecretKeyCoder.getSalt(20);
 //        this.qrCode = qrCode;
 //        this.createTime = createTime;
@@ -98,7 +100,8 @@ public class Book {
         this.pictures = "img/bookface.png";
         this.ownerType = OwnerType.INDIVIDUAL;
         this.ownerId = 1;
-        this.stackIds = "";
+//        this.stackIds = "";
+        this.stackId = -1;
         this.salt = "qazwsx";
         this.qrCode = "zaqxsw";
     }
@@ -184,12 +187,20 @@ public class Book {
         this.ownerId = ownerId;
     }
 
-    public String getStackIds() {
-        return stackIds;
+//    public String getStackId() {
+//        return stackIds;
+//    }
+//
+//    public void setStackIds(String stackIds) {
+//        this.stackIds = stackIds;
+//    }
+
+    public long getStackId() {
+        return stackId;
     }
 
-    public void setStackIds(String stackIds) {
-        this.stackIds = stackIds;
+    public void setStackId(long stackId) {
+        this.stackId = stackId;
     }
 
     public String getSalt() {

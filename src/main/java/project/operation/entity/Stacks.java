@@ -28,9 +28,7 @@ public class Stacks {
         this.openTime = al.getOpenTime();
     }
 
-    /**
-     * 开发阶段初始化固定起漂点
-     */
+    //不止初始化用到了
     public Stacks(String location, String openTime) {
         this.location = location;
         this.openTime = openTime;

@@ -52,6 +52,10 @@
     <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
   </listener>
 
+  <session-config>
+    <session-timeout>60</session-timeout>
+  </session-config>
+
   <welcome-file-list>
     <welcome-file>login.html</welcome-file>
   </welcome-file-list>

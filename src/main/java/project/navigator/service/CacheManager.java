@@ -38,6 +38,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
 
     //public cache
     private List<Map<String, String>> publicBookClassificationSelect;
+    private List<Map<String, String>> publicBookClassificationSelectMultiple;
     private List<Map<String, String>> publicAgencySelect;
     private Map<String, ClientCache> clientCacheMap;
     private Set<String[]> bookCacheSet;
@@ -85,6 +86,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
             List<BookClassification> list = new ArrayList<>();
             for (int i = 0; i < arr.length; i++) {
                 list.add(new BookClassification(arr[i]));
+//                comService.saveDetail(new BookClassification(arr[i]));
             }
             comService.saveDetail(list);
         }
@@ -153,6 +155,9 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     public List<Map<String, String>> getPublicBookClassificationSelect() {
         return publicBookClassificationSelect;
     }
+    public List<Map<String, String>> getPublicBookClassificationSelectMultiple() {
+        return publicBookClassificationSelectMultiple;
+    }
     //获取图书分类名称
     public String getBookClassificationName(int id) {
         return bookClassificationCache.get(id);
@@ -170,7 +175,12 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
         bookClassificationSelect = new ArrayList<>();
         bookClassificationCache = new HashMap<>();
         publicBookClassificationSelect = new ArrayList<>();
+        publicBookClassificationSelectMultiple = new ArrayList<>();
         Map<String, String> map;
+//        map = new HashMap<>();
+//        map.put("key", "0");
+//        map.put("value", "全类别");
+//        publicBookClassificationSelectMultiple.add(map);
         List<BookClassification> list = comService.getList(BookClassification.class);
         for (BookClassification bc: list) {
             map = new HashMap<>();
@@ -181,6 +191,10 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
             map.put("value", String.valueOf(bc.getId()));
             map.put("name", bc.getName());
             publicBookClassificationSelect.add(map);
+            map = new HashMap<>();
+            map.put("key", String.valueOf(bc.getId()));
+            map.put("value", bc.getName());
+            publicBookClassificationSelectMultiple.add(map);
             bookClassificationCache.put(bc.getId(), bc.getName());
         }
     }
@@ -273,7 +287,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     public static void main(String[] args) {
-
+        System.out.println(new Date().getTime());
     }
 
 }

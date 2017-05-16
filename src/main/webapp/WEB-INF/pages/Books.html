@@ -72,9 +72,9 @@
                     </span>
                 </div>
                 <div>
-                    <label for="BookForm_stackIds" class="ls_mw_100 span20p">图书起漂点</label>
+                    <label for="BookForm_stackId" class="ls_mw_100 span20p">图书起漂点</label>
                     <span class="span_box span70p">
-                        <input type="text" id="BookForm_stackIds" class="input_text_35 span100p" placeholder="可以为空">
+                        <input type="text" id="BookForm_stackId" class="input_text_35 span100p" placeholder="可以为空">
                     </span>
                 </div>
                 <div>
@@ -121,7 +121,7 @@
                 }
             });
             var form = $("#BookForm").form_detail({
-                inputIds: ["!_id", "name", "author", "bookClass", "introduction", "pictures", "ownerType", "ownerId", "stackIds", "status"],
+                inputIds: ["!_id", "name", "author", "bookClass", "introduction", "pictures", "ownerType", "ownerId", "stackId", "status"],
                 validator: [
                     function (o) {
                         return o.required().check_simple_length(1, 100).show_check_msg();

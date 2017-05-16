@@ -12,15 +12,25 @@ import java.util.List;
  */
 public class ClientCache {
 
+    private long id;
     private String openId;
     private String loginTime;
     private int borrowingSum;
     private List<Long> news = new ArrayList<>();
 
     public ClientCache(Client client) {
+        this.id = client.getId();
         this.openId = client.getOpenId();
         this.loginTime = DateUtil.date2String(client.getLoginTime(), DateUtil.PATTERN_A);
         this.borrowingSum = client.getBorrowingSum();
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getOpenId() {

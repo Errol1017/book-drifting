@@ -5,6 +5,8 @@ package project.operation.pojo;
  */
 public enum  BookStatus {
 
+    UNPREPARED("未入库"),
+
     IN_STOCK("在架"),
 
     BORROWED("外借"),

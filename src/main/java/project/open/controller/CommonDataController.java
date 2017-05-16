@@ -19,8 +19,19 @@ public class CommonDataController {
     private CacheManager cacheManager;
 
     @RequestMapping(value = "/agency/list", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
-    public @ResponseBody Object getAgencyList() throws Exception {
+    public @ResponseBody Object getAgencySelect() throws Exception {
         return Result.SUCCESS(cacheManager.getPublicAgencySelect());
     }
+
+    @RequestMapping(value = "/book/list", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public @ResponseBody Object getBookSelect() throws Exception {
+        return Result.SUCCESS(cacheManager.getPublicBookClassificationSelect());
+    }
+
+    @RequestMapping(value = "/book/class", method = RequestMethod.POST, produces = "application/json;cahrset=utf-8")
+    public @ResponseBody Object getBookSelectMultiple() throws Exception{
+        return Result.SUCCESS(cacheManager.getPublicBookClassificationSelectMultiple());
+    }
+
 
 }

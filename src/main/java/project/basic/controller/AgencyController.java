@@ -14,6 +14,7 @@ import project.basic.model.AgencyList;
 import project.navigator.route.Forms;
 import project.navigator.route.Lists;
 import project.navigator.service.CacheManager;
+import project.operation.entity.Book;
 import project.operation.entity.Stacks;
 import project.system.entity.AdminLog;
 import project.system.model.AdminSession;
@@ -102,9 +103,10 @@ public class AgencyController {
     public @ResponseBody Object deleteAgency(HttpServletRequest request) throws Exception {
         String dataId = request.getParameter("dataId");
         Agency agency = comService.getDetail(Agency.class, Integer.parseInt(dataId));
-        /**
-         * 机构管理的相关图书尚未做处理
-         */
+        Book book = comService.getFirst(Book.class, "stackId=" + agency.getStackId());
+        if (book != null) {
+            return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "该机构尚有委托管理的图书未处理，请先转移这批图书！");
+        }
         comService.deleteDetail(Stacks.class, "id=" + agency.getStackId());
         comService.deleteDetail(agency);
         cacheManager.resetAgencyCache();

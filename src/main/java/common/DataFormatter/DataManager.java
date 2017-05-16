@@ -10,41 +10,41 @@ import java.util.Map;
  */
 public class DataManager {
 
-    public static <T> T string2Object(String jsonStr, Class<T> valueType){
-        if (jsonStr.equals("")) {
+    public static <T> T string2Object(String jsonStr, Class<T> valueType) {
+        if (jsonStr == null || jsonStr.equals("")) {
             return null;
         }
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
-        try{
+        try {
             return objectMapper.readValue(jsonStr, valueType);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            return  null;
+            return null;
         }
     }
 
-    public static Map string2Map(String jsonStr){
-        if (jsonStr.equals("")) {
+    public static Map string2Map(String jsonStr) {
+        if (jsonStr == null || jsonStr.equals("")) {
             return null;
         }
         ObjectMapper objectMapper = new ObjectMapper();
-        try{
+        try {
             return objectMapper.readValue(jsonStr, Map.class);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public static String object2String (Object object){
+    public static String object2String(Object object) {
         if (object == null) {
             return null;
         }
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             return objectMapper.writeValueAsString(object);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }

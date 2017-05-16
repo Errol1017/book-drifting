@@ -15,7 +15,7 @@ public class BookForm {
     private String pictures;
     private String ownerType;
     private String ownerId;
-    private String stackIds;
+    private String stackId;
     private String status;
 
     public BookForm(Book book) {
@@ -27,7 +27,7 @@ public class BookForm {
         this.pictures = book.getPictures();
         this.ownerType = book.getOwnerType().getName();
         this.ownerId = "";
-        this.stackIds = "";
+        this.stackId = "";
         this.status = book.getStatus().getName();
     }
 
@@ -63,8 +63,8 @@ public class BookForm {
         return ownerId;
     }
 
-    public String getStackIds() {
-        return stackIds;
+    public String getStackId() {
+        return stackId;
     }
 
     public String getStatus() {
