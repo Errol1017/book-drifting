@@ -13,6 +13,7 @@ import java.util.List;
 public class ClientCache {
 
     private long id;
+    private String nickName;
     private String openId;
     private String loginTime;
     private int borrowingSum;
@@ -20,6 +21,7 @@ public class ClientCache {
 
     public ClientCache(Client client) {
         this.id = client.getId();
+        this.nickName = client.getNickName();
         this.openId = client.getOpenId();
         this.loginTime = DateUtil.date2String(client.getLoginTime(), DateUtil.PATTERN_A);
         this.borrowingSum = client.getBorrowingSum();
@@ -31,6 +33,14 @@ public class ClientCache {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 
     public String getOpenId() {

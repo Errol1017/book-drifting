@@ -1,6 +1,5 @@
 package project.basic.model;
 
-import project.basic.entity.InvitationCode;
 import project.navigator.service.CacheManager;
 
 /**
@@ -18,7 +17,7 @@ public class InvitationList {
         if (o[1] != null) {
             this.name = String.valueOf(o[1]);
             this.mobile = String.valueOf(o[2]);
-            this.agency = cacheManager.getAgency(Integer.parseInt(String.valueOf(o[3]))).getName();
+            this.agency = cacheManager.getAgencyCache(Integer.parseInt(String.valueOf(o[3]))).getName();
         }
     }
 

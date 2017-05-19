@@ -17,7 +17,7 @@ public class ClientList {
         this.id = String.valueOf(client.getId());
         this.name = client.getName();
         this.mobile = client.getMobile();
-        this.agency = cacheManager.getAgency(client.getAgencyId()).getName();
+        this.agency = cacheManager.getAgencyCache(client.getAgencyId()).getName();
     }
 
     public String getId() {

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import project.basic.entity.Agency;
 import project.basic.entity.BookClassification;
 import project.basic.entity.InvitationCode;
+import project.basic.model.AgencyCache;
 import project.navigator.model.Navigation;
 import project.operation.entity.Book;
 import project.operation.entity.Client;
@@ -31,7 +32,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
 
     //admin cache
     private Map<Integer, String> bookClassificationCache;
-    private Map<Integer, Agency> agencyCache;
+    private Map<Integer, AgencyCache> agencyCache;
     //dynamic select
     private List<Map<String, String>> bookClassificationSelect;
     private List<Map<String, String>> agencySelect;
@@ -41,6 +42,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     private List<Map<String, String>> publicBookClassificationSelectMultiple;
     private List<Map<String, String>> publicAgencySelect;
     private Map<String, ClientCache> clientCacheMap;
+    private Map<Long, String> clientIdAndOpenIdMap;
     private Set<String[]> bookCacheSet;
 
     @Override
@@ -177,10 +179,6 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
         publicBookClassificationSelect = new ArrayList<>();
         publicBookClassificationSelectMultiple = new ArrayList<>();
         Map<String, String> map;
-//        map = new HashMap<>();
-//        map.put("key", "0");
-//        map.put("value", "全类别");
-//        publicBookClassificationSelectMultiple.add(map);
         List<BookClassification> list = comService.getList(BookClassification.class);
         for (BookClassification bc: list) {
             map = new HashMap<>();
@@ -210,7 +208,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
         return publicAgencySelect;
     }
     //获取单位信息
-    public Agency getAgency(int id) {
+    public AgencyCache getAgencyCache(int id) {
         return agencyCache.get(id);
     }
     //检查单位id是否存在
@@ -219,20 +217,22 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
         agencySelect = new ArrayList<>();
         agencyCache = new HashMap<>();
         publicAgencySelect = new ArrayList<>();
-        List<Agency> list = comService.getList(Agency.class);
+        List<Object[]> list = comService.query("from Agency a left join Stacks s on a.stackId=s.id");
         Map<String, String> map;
-        for (Agency ag: list) {
+        for (Object[] o: list) {
+            AgencyCache ac = new AgencyCache(o);
+            agencyCache.put(ac.getId(), ac);
             map = new HashMap<>();
-            map.put("val", String.valueOf(ag.getId()));
-            map.put("code", ag.getCode());
-            map.put("text", ag.getName());
+            map.put("val", String.valueOf(ac.getId()));
+            map.put("code", ac.getCode());
+            map.put("text", ac.getName());
             agencySelect.add(map);
             map = new HashMap<>();
-            map.put("value", String.valueOf(ag.getId()));
-            map.put("name", ag.getName());
+            map.put("value", String.valueOf(ac.getId()));
+            map.put("name", ac.getName());
             publicAgencySelect.add(map);
-            agencyCache.put(ag.getId(), ag);
         }
+        System.out.println();
     }
 
     /**
@@ -242,16 +242,22 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     public ClientCache getClientCache(String openId) {
         return clientCacheMap.get(openId);
     }
+    public ClientCache getClientCache(long id) {
+        return clientCacheMap.get(clientIdAndOpenIdMap.get(id));
+    }
     //添加用户缓存
     public void addClientCache(ClientCache clientCache) {
         clientCacheMap.put(clientCache.getOpenId(), clientCache);
+        clientIdAndOpenIdMap.put(clientCache.getId(), clientCache.getOpenId());
     }
     //重置用户缓存
     private void resetClientCache() {
         clientCacheMap = new HashMap<>();
+        clientIdAndOpenIdMap = new HashMap<>();
         List<Client> list = comService.getList(Client.class);
         for (Client client: list) {
             clientCacheMap.put(client.getOpenId(), new ClientCache(client));
+            clientIdAndOpenIdMap.put(client.getId(), client.getOpenId());
         }
     }
 

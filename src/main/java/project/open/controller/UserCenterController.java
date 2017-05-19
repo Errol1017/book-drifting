@@ -154,6 +154,7 @@ public class UserCenterController {
 //            sb.deleteCharAt(sb.length() - 1);
 //        }
         client.setStackIds(sb.toString());
+        comService.saveDetail(client);
         return Result.SUCCESS();
     }
 

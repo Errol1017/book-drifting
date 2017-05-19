@@ -30,6 +30,7 @@ public class Client {
     @Column(nullable = false, columnDefinition = "smallint unsigned")
     private int agencyId = -1;
     /** 个人起漂点 */
+    //是否建立默认起漂点？申请图书流转时可以显示持有用户的默认起漂点
     @Column(nullable = false)
     private String stackIds = "";
     /** 微信身份相关 */
@@ -53,7 +54,7 @@ public class Client {
     //最近登录时间
     @Column(nullable = false)
     private Date loginTime = new Date();
-    //当前借阅的书数量
+    //当前借阅的书数量 ？ 是否添加预约数量
     @Column(nullable = false)
     private int borrowingSum;
 

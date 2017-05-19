@@ -5,11 +5,13 @@ package project.operation.pojo;
  */
 public enum  BookStatus {
 
-    UNPREPARED("未入库"),
+    //委托机构管理而尚未交给机构
+    UNPREPARED("尚未入库"),
 
-    IN_STOCK("在架"),
+    //在机构或在所有人手里
+    IN_STOCK("在架/闲置"),
 
-    BORROWED("外借"),
+    BORROWED("外借/流转"),
 
     EXPIRED("到期未还")
     ;

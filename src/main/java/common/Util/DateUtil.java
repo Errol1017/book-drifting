@@ -1,6 +1,5 @@
 package common.Util;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,6 +19,7 @@ public class DateUtil {
     public static final String PATTERN_H = "yyyyMM";
     public static final String PATTERN_I = "yyMM";
     public static final String PATTERN_J = "yyM";
+    public static final String PATTERN_K = "yy/MM/dd";
 
     public static String date2String(Date date, String pattern) {
         if (date == null) {

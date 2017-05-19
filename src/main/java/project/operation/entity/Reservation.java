@@ -1,7 +1,7 @@
 package project.operation.entity;
 
 import project.operation.pojo.OwnerType;
-import project.operation.pojo.BookStatus;
+import project.operation.pojo.ReservationStatus;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -19,29 +19,39 @@ public class Reservation {
     //图书id
     @Column(nullable = false)
     private long bookId;
-    //所有人类型
+    //当前持有图书的人类型，机构或个人，预约状态中默认 AGENCY
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private OwnerType ownerType;
+    private OwnerType ownerType = OwnerType.AGENCY;
     //当前持有人id（借出方）
     @Column(nullable = false)
-    private long ownerId;
+    private long ownerId = -1;
     //借书用户id（借入方）
     @Column(nullable = false)
     private long clientId;
     //预约状态（图书状态）
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BookStatus status = BookStatus.IN_STOCK;
+    private ReservationStatus status = ReservationStatus.RESERVE;
     //预约时间
     @Column(nullable = false)
     private Date createTime = new Date();
     //借书时间
     @Column(nullable = false)
-    private Date BorrowedTime = new Date();
+    private Date borrowedTime = new Date();
+    //归还时间
+    @Column(nullable = false)
+    private Date recedeTime = new Date();
     //到期时间
     @Column(nullable = false)
     private Date expireTime = new Date();
 
     public Reservation() {
+    }
+
+    public Reservation(long bookId, long clientId) {
+        this.bookId = bookId;
+        this.clientId = clientId;
     }
 
     public long getId() {
@@ -84,11 +94,11 @@ public class Reservation {
         this.clientId = clientId;
     }
 
-    public BookStatus getStatus() {
+    public ReservationStatus getStatus() {
         return status;
     }
 
-    public void setStatus(BookStatus status) {
+    public void setStatus(ReservationStatus status) {
         this.status = status;
     }
 
@@ -101,11 +111,19 @@ public class Reservation {
     }
 
     public Date getBorrowedTime() {
-        return BorrowedTime;
+        return borrowedTime;
     }
 
     public void setBorrowedTime(Date borrowedTime) {
-        BorrowedTime = borrowedTime;
+        this.borrowedTime = borrowedTime;
+    }
+
+    public Date getRecedeTime() {
+        return recedeTime;
+    }
+
+    public void setRecedeTime(Date recedeTime) {
+        this.recedeTime = recedeTime;
     }
 
     public Date getExpireTime() {

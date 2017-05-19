@@ -23,7 +23,7 @@ public class BookList {
         this.author = book.getAuthor();
         this.bookClass = cacheManager.getBookClassificationName(book.getClassificationId());
         this.ownerType = book.getOwnerType().getName();
-        this.owner = book.getOwnerType().equals(OwnerType.AGENCY)?cacheManager.getAgency((int)book.getOwnerId()).getName():"";
+        this.owner = book.getOwnerType().equals(OwnerType.AGENCY)?cacheManager.getAgencyCache((int)book.getOwnerId()).getName():"";
         this.status = book.getStatus().getName();
     }
 

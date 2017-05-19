@@ -26,7 +26,7 @@ public class UserInfoData {
         this.gender = client.getGender().getName();
         this.mobile = client.getMobile();
         this.idNum = client.getIdentityNumber();
-        this.agency = cacheManager.getAgency(client.getAgencyId()).getName();
+        this.agency = cacheManager.getAgencyCache(client.getAgencyId()).getName();
         this.stacks = "";
     }
 

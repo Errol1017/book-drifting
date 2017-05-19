@@ -33,14 +33,6 @@ public class Book {
     //图片（第一张做封面）
     @Column(nullable = false)
     private String pictures;
-    /** 图书状态 及 对应预约记录 */
-    //图书状态
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private BookStatus status = BookStatus.IN_STOCK;
-    //借出时的 预约记录id
-    @Column(nullable = false)
-    private long reservationId = -1;
     /** 所有人和起漂点
      * 图书所有权属于上传图书的 个人 或 机构
      * 个人可以选择自己管理图书的流转（个人起漂点）或者委托机构进行管理（机构起漂点）
@@ -55,6 +47,10 @@ public class Book {
     //起漂点 --只允许一个起漂点，还是可以允许多个，主要在个人管理的情况
 //    @Column(nullable = false)
 //    private String stackIds = "";
+    //管理者类型，如果是个人类型则 stackId 就是 stacks 表 id，机构类型则 stackId 为 agency 表 id
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private OwnerType stackType;
     @Column(nullable = false)
     private long stackId = -1;
     /** 二维码 */
@@ -67,6 +63,16 @@ public class Book {
 
     @Column(nullable = false)
     private Date createTime = new Date();
+
+    /** 频分变动项 */
+    /** 图书状态 及 对应预约记录 */
+    //图书状态
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private BookStatus status = BookStatus.IN_STOCK;
+    //借出时的 预约记录id
+    @Column(nullable = false)
+    private long reservationId = -1;
 
     public Book() {
     }
@@ -81,6 +87,7 @@ public class Book {
         this.ownerType = OwnerType.valueOf(form.getOwnerType());
         this.ownerId = Long.parseLong(form.getOwnerId());
 //        this.stackIds = form.getStackId();
+        this.stackType = OwnerType.AGENCY;
         this.stackId = Long.parseLong(form.getStackId());
 //        this.salt = SecretKeyCoder.getSalt(20);
 //        this.qrCode = qrCode;
@@ -101,6 +108,7 @@ public class Book {
         this.ownerType = OwnerType.INDIVIDUAL;
         this.ownerId = 1;
 //        this.stackIds = "";
+        this.stackType = OwnerType.AGENCY;
         this.stackId = -1;
         this.salt = "qazwsx";
         this.qrCode = "zaqxsw";
@@ -194,6 +202,14 @@ public class Book {
 //    public void setStackIds(String stackIds) {
 //        this.stackIds = stackIds;
 //    }
+
+    public OwnerType getStackType() {
+        return stackType;
+    }
+
+    public void setStackType(OwnerType stackType) {
+        this.stackType = stackType;
+    }
 
     public long getStackId() {
         return stackId;
