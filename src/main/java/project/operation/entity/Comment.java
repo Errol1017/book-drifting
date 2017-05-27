@@ -29,6 +29,12 @@ public class Comment {
     public Comment() {
     }
 
+    public Comment(long bookId, long clientId, String content) {
+        this.bookId = bookId;
+        this.clientId = clientId;
+        this.content = content;
+    }
+
     public long getId() {
         return id;
     }

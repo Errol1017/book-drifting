@@ -40,13 +40,14 @@ public class ClientController {
     @Autowired
     private CacheManager cacheManager;
 
+    @ResponseBody
     @RequestMapping(value = Lists.ClientList + "/list", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public @ResponseBody Object getClientList(HttpServletRequest request) throws Exception {
+    public Object getClientList(HttpServletRequest request) throws Exception {
         int tarPageNum = Integer.parseInt(request.getParameter("tarPageNum"));
         int perPageNum = Integer.parseInt(request.getParameter("perPageNum"));
-        List<Client> clients = comService.getList(Client.class, tarPageNum, perPageNum);
+        List<Client> clients = comService.getList(Client.class, tarPageNum, perPageNum, "id desc");
         List<ClientList> list = new ArrayList<>();
-        for (Client client: clients){
+        for (Client client : clients) {
             list.add(new ClientList(client, cacheManager));
         }
         long total = comService.getCount(Client.class);
@@ -56,53 +57,58 @@ public class ClientController {
         return Result.SUCCESS(result);
     }
 
+    @ResponseBody
     @RequestMapping(value = Forms.ClientForm + "/form", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public @ResponseBody Object getClientForm(HttpServletRequest request) throws Exception {
+    public Object getClientForm(HttpServletRequest request) throws Exception {
         String dataId = request.getParameter("dataId");
         Client client = comService.getDetail(Client.class, Long.parseLong(dataId));
         ClientForm form = new ClientForm(client);
         return Result.SUCCESS(form);
     }
 
+    @ResponseBody
     @RequestMapping(value = Forms.ClientForm + "/submit", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public @ResponseBody Object submitClientForm(HttpServletRequest request) throws Exception {
+    public Object submitClientForm(HttpServletRequest request) throws Exception {
         String data = request.getParameter("data");
         ClientForm form = DataManager.string2Object(data, ClientForm.class);
         if (form == null || form.getIdentityNumber().isEmpty() || form.getMobile().isEmpty()) {
             return Result.ERROR(ErrorCode.ILLEGAL_OPERATION);
         }
         AdminSession adminSession = AdminValidator.getAdminSession(request);
-        if (form.getId().equals("")){
-            if (comService.hasExist(Client.class, "identityNumber='"+form.getIdentityNumber()+"'")){
-                return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "用户身份证号已存在");
-            }
-            Client client = new Client(form);
-            comService.saveDetail(client);
-            comService.saveDetail(new AdminLog(adminSession, OperationTargets.Client, OperationTypes.Create, String.valueOf(client.getId()), "用户姓名： "+client.getName()));
-            return Result.SUCCESS(client.getId());
-        }else {
-            if (comService.hasExist(Client.class, "identityNumber='"+form.getIdentityNumber()+"' and id!="+Long.parseLong(form.getId()))){
+        if (form.getId().equals("")) {
+//            if (comService.hasExist(Client.class, "identityNumber='" + form.getIdentityNumber() + "'")) {
+//                return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "用户身份证号已存在");
+//            }
+//            Client client = new Client(form);
+//            comService.saveDetail(client);
+//            comService.saveDetail(new AdminLog(adminSession, OperationTargets.Client, OperationTypes.Create, String.valueOf(client.getId()), "用户姓名： " + client.getName()));
+//            return Result.SUCCESS(client.getId());
+            return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "为避免脏数据，管理系统不允许添加用户");
+        } else {
+            if (comService.hasExist(Client.class, "identityNumber='" + form.getIdentityNumber() + "' and id!=" + Long.parseLong(form.getId()))) {
                 return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "用户身份证号已存在");
             }
             Client client = new Client(form);
             client.setId(Long.parseLong(form.getId()));
             comService.saveDetail(client);
-            comService.saveDetail(new AdminLog(adminSession, OperationTargets.Client, OperationTypes.Update, String.valueOf(client.getId()), "用户姓名： "+client.getName()));
+            comService.saveDetail(new AdminLog(adminSession, OperationTargets.Client, OperationTypes.Update, String.valueOf(client.getId()), "用户姓名： " + client.getName()));
             return Result.SUCCESS();
         }
     }
 
+    @ResponseBody
     @RequestMapping(value = Lists.ClientList + "/delete", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public @ResponseBody Object deleteClientList(HttpServletRequest request) throws Exception {
+    public Object deleteClientList(HttpServletRequest request) throws Exception {
         String dataId = request.getParameter("dataId");
         Client client = comService.getDetail(Client.class, Long.parseLong(dataId));
         comService.deleteDetail(client);
-        comService.saveDetail(new AdminLog(AdminValidator.getAdminSession(request), OperationTargets.Client, OperationTypes.Delete, String.valueOf(client.getId()), "用户姓名： "+client.getName()));
+        comService.saveDetail(new AdminLog(AdminValidator.getAdminSession(request), OperationTargets.Client, OperationTypes.Delete, String.valueOf(client.getId()), "用户姓名： " + client.getName()));
         return Result.SUCCESS();
     }
 
+    @ResponseBody
     @RequestMapping(value = Components.ClientForm_agencyId + "/data", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
-    public @ResponseBody Object getAgencyData() {
+    public Object getAgencyData() {
         return Result.SUCCESS(cacheManager.getAgencySelect());
     }
 }

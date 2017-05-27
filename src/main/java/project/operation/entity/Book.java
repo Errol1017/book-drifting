@@ -1,5 +1,7 @@
 package project.operation.entity;
 
+import common.Util.SecretKeyCoder;
+import project.open.model.BookAddForm;
 import project.operation.model.BookForm;
 import project.operation.pojo.OwnerType;
 import project.operation.pojo.BookStatus;
@@ -17,7 +19,9 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    /** 基本信息 */
+    /**
+     * 基本信息
+     */
     //书名
     @Column(nullable = false)
     private String name;
@@ -33,10 +37,12 @@ public class Book {
     //图片（第一张做封面）
     @Column(nullable = false)
     private String pictures;
-    /** 所有人和起漂点
+    /**
+     * 所有人和起漂点
      * 图书所有权属于上传图书的 个人 或 机构
      * 个人可以选择自己管理图书的流转（个人起漂点）或者委托机构进行管理（机构起漂点）
-     * 机构则只能选择 机构起漂点*/
+     * 机构则只能选择 机构起漂点
+     */
     //所有者类型，机构或个人
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -44,7 +50,7 @@ public class Book {
     //所有者id ， 根据 ownerType ，链接到 agencyId 或 clientId
     @Column(nullable = false)
     private long ownerId;
-    //起漂点 --只允许一个起漂点，还是可以允许多个，主要在个人管理的情况
+    //起漂点 -- 只允许一个起漂点，还是可以允许多个，主要在个人管理的情况
 //    @Column(nullable = false)
 //    private String stackIds = "";
     //管理者类型，如果是个人类型则 stackId 就是 stacks 表 id，机构类型则 stackId 为 agency 表 id
@@ -53,7 +59,9 @@ public class Book {
     private OwnerType stackType;
     @Column(nullable = false)
     private long stackId = -1;
-    /** 二维码 */
+    /**
+     * 二维码
+     */
     //二维码盐值
     @Column(nullable = false)
     private String salt = "";
@@ -65,11 +73,13 @@ public class Book {
     private Date createTime = new Date();
 
     /** 频分变动项 */
-    /** 图书状态 及 对应预约记录 */
+    /**
+     * 图书状态 及 对应预约记录
+     */
     //图书状态
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private BookStatus status = BookStatus.IN_STOCK;
+    private BookStatus status = BookStatus.UNPREPARED;
     //借出时的 预约记录id
     @Column(nullable = false)
     private long reservationId = -1;
@@ -94,14 +104,30 @@ public class Book {
 //        this.createTime = createTime;
     }
 
+    public Book(BookAddForm form, long ownerId) {
+        this.name = form.getName();
+        this.author = form.getAuthor();
+        this.classificationId = Integer.parseInt(form.getClassId());
+        this.introduction = form.getIntro();
+        this.pictures = form.getPictures();
+        this.ownerType = OwnerType.INDIVIDUAL; //目前图书所有人只有个人
+        this.ownerId = ownerId;
+        this.stackType = form.getStackType().equals("a") ? OwnerType.AGENCY : OwnerType.INDIVIDUAL;
+        this.stackId = Long.parseLong(form.getStackId());
+//        this.salt = SecretKeyCoder.getSalt(10);
+        this.salt = "";
+        this.qrCode = form.getQrCode();
+        if (!form.getStackType().equals("a")) {
+            this.status = BookStatus.IN_STOCK;
+        }
+    }
 
     /**
      * 开发阶段初始化数据
-     * @return
      */
     public Book(int s) {
-        this.name = "毛泽东选集  "+s;
-        this.author = "毛泽东  "+s;
+        this.name = "毛泽东选集  " + s;
+        this.author = "毛泽东  " + s;
         this.classificationId = 1;
         this.introduction = "《毛泽东选集》是毛泽东思想的重要载体，《毛泽东选集》是毛泽东思想的集中展现，是对20世纪中国影响最大的书籍之一。";
         this.pictures = "img/bookface.png";

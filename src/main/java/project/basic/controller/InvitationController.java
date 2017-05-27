@@ -55,10 +55,13 @@ public class InvitationController {
         } else {
             total = comService.getCount(InvitationCode.class, con);
         }
+        if (con.equals("")){
+            con = "1=1";
+        }
         int tarPageNum = Integer.parseInt(request.getParameter("tarPageNum"));
         int perPageNum = Integer.parseInt(request.getParameter("perPageNum"));
         List<Object[]> os = comService.query("select i.code,c.name,c.mobile,c.agencyId from InvitationCode i left join Client c on i.clientId=c.id"
-                + (con.equals("")?"":" where " + con), tarPageNum, perPageNum);
+                + (con.equals("")?"":" where " + con + " order by i.id desc"), tarPageNum, perPageNum);
         List<InvitationList> list = new ArrayList<>();
         for (Object[] o: os) {
             list.add(new InvitationList(o, cacheManager));

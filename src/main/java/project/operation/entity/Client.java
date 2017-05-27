@@ -29,6 +29,9 @@ public class Client {
     //单位
     @Column(nullable = false, columnDefinition = "smallint unsigned")
     private int agencyId = -1;
+    //是否为所在单位图书管理员
+    @Column(nullable = false)
+    private boolean isAdmin = false;
     /** 个人起漂点 */
     //是否建立默认起漂点？申请图书流转时可以显示持有用户的默认起漂点
     @Column(nullable = false)
@@ -116,6 +119,14 @@ public class Client {
 
     public void setAgencyId(int agencyId) {
         this.agencyId = agencyId;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
     }
 
     public String getStackIds() {

@@ -13,7 +13,11 @@ public enum  BookStatus {
 
     BORROWED("外借/流转"),
 
-    EXPIRED("到期未还")
+    EXPIRED("到期未还"),
+
+    RELEASED("等待出库"),
+
+    FROZEN("已出库")
     ;
 
     private String name;

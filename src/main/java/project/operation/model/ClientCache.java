@@ -1,5 +1,7 @@
 package project.operation.model;
 
+import common.CRUD.service.ComService;
+import common.Util.Base64Util;
 import common.Util.DateUtil;
 import project.operation.entity.Client;
 
@@ -13,18 +15,25 @@ import java.util.List;
 public class ClientCache {
 
     private long id;
+    private String avatar;
     private String nickName;
     private String openId;
     private String loginTime;
     private int borrowingSum;
+    //所在机构的图书管理员，如果是管理员则为相关机构id，否则为-1
+    private int agencyId;
     private List<Long> news = new ArrayList<>();
+    //用以保证扫码过程中的连续的两次请求中的第二次请求合法
+    private String random = "";
 
-    public ClientCache(Client client) {
+    public ClientCache(Client client, ComService comService) {
         this.id = client.getId();
+        this.avatar = Base64Util.img2String(comService.getFileBathPath(), client.getAvatar());
         this.nickName = client.getNickName();
         this.openId = client.getOpenId();
         this.loginTime = DateUtil.date2String(client.getLoginTime(), DateUtil.PATTERN_A);
         this.borrowingSum = client.getBorrowingSum();
+        this.agencyId = client.isAdmin()?client.getAgencyId():-1;
     }
 
     public long getId() {
@@ -33,6 +42,14 @@ public class ClientCache {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     public String getNickName() {
@@ -67,11 +84,27 @@ public class ClientCache {
         this.borrowingSum = borrowingSum;
     }
 
+    public int getAgencyId() {
+        return agencyId;
+    }
+
+    public void setAgencyId(int agencyId) {
+        this.agencyId = agencyId;
+    }
+
     public List<Long> getNews() {
         return news;
     }
 
     public void setNews(List<Long> news) {
         this.news = news;
+    }
+
+    public String getRandom() {
+        return random;
+    }
+
+    public void setRandom(String random) {
+        this.random = random;
     }
 }

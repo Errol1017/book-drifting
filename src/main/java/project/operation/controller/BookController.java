@@ -44,7 +44,7 @@ public class BookController {
     public Object getBookList(HttpServletRequest request) throws Exception {
         int tarPageNum = Integer.parseInt(request.getParameter("tarPageNum"));
         int perPageNum = Integer.parseInt(request.getParameter("perPageNum"));
-        List<Book> books = comService.getList(Book.class, tarPageNum, perPageNum);
+        List<Book> books = comService.getList(Book.class, tarPageNum, perPageNum, "id desc");
         List<BookList> list = new ArrayList<>();
         for (Book book : books) {
             list.add(new BookList(book, cacheManager));

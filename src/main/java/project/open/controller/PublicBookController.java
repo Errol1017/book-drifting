@@ -1,6 +1,7 @@
 package project.open.controller;
 
 import common.CRUD.service.ComService;
+import common.DataFormatter.DataManager;
 import common.DataFormatter.ErrorCode;
 import common.DataFormatter.Result;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,25 +9,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import project.basic.entity.Agency;
 import project.basic.model.AgencyCache;
 import project.navigator.service.CacheManager;
-import project.open.model.BookInfoForm;
-import project.open.model.BookList;
-import project.open.model.CommentForm;
-import project.open.model.DataFormerLabelValue;
+import project.open.model.*;
 import project.open.util.ClientValidator;
+import project.open.util.ScanUtil;
 import project.operation.entity.*;
+import project.operation.model.BookCache;
 import project.operation.model.ClientCache;
 import project.operation.pojo.BookStatus;
 import project.operation.pojo.OwnerType;
 import project.operation.pojo.ReservationStatus;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Errol on 17/5/9.
@@ -49,15 +45,17 @@ public class PublicBookController {
         String q3 = request.getParameter("q3");
         String s = request.getParameter("search");
         StringBuffer sb = new StringBuffer();
+        if (q2 != null && (q2.equals("1") || q2.equals("2"))) {
+            sb.append("status='" + (q2.equals("1") ? BookStatus.IN_STOCK : BookStatus.BORROWED) + "'");
+        } else {
+            sb.append("status='" + BookStatus.UNPREPARED + "' or status='" + BookStatus.IN_STOCK + "' or status='" + BookStatus.BORROWED + "'");
+        }
         if (q1 != null && q1.equals("1")) {
             ClientCache cc = ClientValidator.getClientCache(request, cacheManager);
-            sb.append("createTime>'" + cc.getLoginTime() + "'");
-        }
-        if (q2 != null && (q2.equals("1") || q2.equals("2"))) {
-            sb.append((sb.length() == 0 ? "" : " and ") + ("status='" + (q2.equals("1") ? BookStatus.IN_STOCK : BookStatus.BORROWED) + "'"));
+            sb.append(" and createTime>'" + cc.getLoginTime() + "'");
         }
         if (q3 != null && !q3.equals("0")) {
-            sb.append((sb.length() == 0 ? "" : " and ") + ("classificationId in (" + q3 + ")"));
+            sb.append(" and classificationId in (" + q3 + ")");
         }
         if (s != null && !s.equals("")) {
             s = s.replace("《", "");
@@ -67,6 +65,7 @@ public class PublicBookController {
             } else {
                 sb = new StringBuffer("name like '%" + a[0] + "%' or author like '%" + a[1] + "%'");
             }
+            sb.append(" and status='" + BookStatus.UNPREPARED + "' or status='" + BookStatus.IN_STOCK + "' or status='" + BookStatus.BORROWED + "'");
         }
         List<Book> books = comService.getList(Book.class, p == null ? 1 : Integer.parseInt(p), 10, sb.toString(), "id desc");
         List<BookList> list = new ArrayList<>();
@@ -96,6 +95,18 @@ public class PublicBookController {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/add/submit", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object submitBookAdd(HttpServletRequest request) throws Exception {
+        BookAddForm form = DataManager.string2Object(request.getParameter("data"), BookAddForm.class);
+        if (form != null) {
+            Book book = new Book(form, ClientValidator.getClientId(request, cacheManager));
+            comService.saveDetail(book);
+            return Result.SUCCESS();
+        }
+        return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "数据有误");
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/add/st/list", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object getIndividualStacksList(HttpServletRequest request) throws Exception {
         ClientCache cc = ClientValidator.getClientCache(request, cacheManager);
@@ -111,7 +122,7 @@ public class PublicBookController {
     @RequestMapping(value = "/info", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object getBookInfo(HttpServletRequest request) throws Exception {
         Book book = comService.getDetail(Book.class, Long.parseLong(request.getParameter("id")));
-        BookInfoForm form = new BookInfoForm(book, comService);
+        BookInfoForm form = new BookInfoForm(book, comService, cacheManager);
         return Result.SUCCESS(form);
     }
 
@@ -122,23 +133,23 @@ public class PublicBookController {
         Map<String, Object> map = new HashMap<>();
         if (id != null && !id.equals("")) {
             List<Comment> comments = comService.getList(Comment.class, 1, 2, "bookId=" + id, "id desc");
-            List<CommentForm> list0 = new ArrayList<>();
+            List<BookInfoCommentForm> list0 = new ArrayList<>();
             for (Comment c : comments) {
-                list0.add(new CommentForm(c, cacheManager));
+                list0.add(new BookInfoCommentForm(c, cacheManager));
             }
             map.put("list0", list0);
             List<Reservation> readers = comService.getList(Reservation.class, 1, 5,
                     "bookId=" + id + " and (status='" + ReservationStatus.BORROW + "' or status='" + ReservationStatus.RECEDE + "')", "borrowedTime desc");
-            List<CommentForm> list1 = new ArrayList<>();
+            List<BookInfoCommentForm> list1 = new ArrayList<>();
             for (Reservation r : readers) {
-                list1.add(new CommentForm(r, cacheManager));
+                list1.add(new BookInfoCommentForm(r, cacheManager));
             }
             map.put("list1", list1);
             List<Reservation> reservations = comService.getList(Reservation.class, 1, 5,
                     "bookId=" + id + " and status='" + ReservationStatus.RESERVE + "'", "createTime asc");
-            List<CommentForm> list2 = new ArrayList<>();
+            List<BookInfoCommentForm> list2 = new ArrayList<>();
             for (Reservation r : reservations) {
-                list2.add(new CommentForm(r, cacheManager));
+                list2.add(new BookInfoCommentForm(r, cacheManager));
             }
             map.put("list2", list2);
         }
@@ -155,14 +166,14 @@ public class PublicBookController {
             Book book = comService.getDetail(Book.class, Long.parseLong(id));
             res.add(new DataFormerLabelValue("书名", book.getName()));
             res.add(new DataFormerLabelValue("图书状态", book.getStatus().getName()));
-            if (book.getStatus().equals(BookStatus.IN_STOCK)){
+            if (book.getStatus().equals(BookStatus.IN_STOCK)) {
                 if (book.getStackType().equals(OwnerType.AGENCY)) {
-                    AgencyCache ac = cacheManager.getAgencyCache((int)book.getStackId());
+                    AgencyCache ac = cacheManager.getAgencyCache((int) book.getStackId());
                     res.add(new DataFormerLabelValue("管理机构", ac.getName()));
                     res.add(new DataFormerLabelValue("所在地", ac.getStack().getLocation()));
                     res.add(new DataFormerLabelValue("开放时间", ac.getStack().getOpenTime()));
 //                    res.add(new DataFormerLabelValue("注意", "当前在架，请您自行前往相关机构借阅"));
-                }else {
+                } else {
                     Client c = comService.getDetail(Client.class, book.getOwnerId());
                     Stacks s = comService.getDetail(Stacks.class, book.getStackId());
                     res.add(new DataFormerLabelValue("管理者", c.getName()));
@@ -170,7 +181,7 @@ public class PublicBookController {
                     res.add(new DataFormerLabelValue("建议地点", s.getLocation()));
                     res.add(new DataFormerLabelValue("建议时间", s.getOpenTime()));
                 }
-            }else if (book.getStatus().equals(BookStatus.UNPREPARED)){
+            } else if (book.getStatus().equals(BookStatus.UNPREPARED)) {
                 Client c = comService.getDetail(Client.class, book.getOwnerId());
                 res.add(new DataFormerLabelValue("管理者", c.getName()));
                 res.add(new DataFormerLabelValue("联系电话", c.getMobile()));
@@ -186,16 +197,126 @@ public class PublicBookController {
 
     @ResponseBody
     @RequestMapping(value = "/order/submit", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
-    public Object submitOrder(HttpServletRequest request) throws Exception{
+    public Object submitOrder(HttpServletRequest request) throws Exception {
         String id = request.getParameter("id");
         long cid = ClientValidator.getClientId(request, cacheManager);
-        if (comService.hasExist(Reservation.class, "bookId="+id+" and clientId="+cid+" and status!='"+ReservationStatus.RECEDE+"'")){
+        if (comService.hasExist(Reservation.class, "bookId=" + id + " and clientId=" + cid + " and status!='" + ReservationStatus.RECEDE + "'")) {
             return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "您已预约");
         }
         Reservation r = new Reservation(Long.parseLong(id), cid);
         comService.saveDetail(r);
         return Result.SUCCESS();
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/scan/info", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object getScanBookInfo(HttpServletRequest request) throws Exception {
+        String code = request.getParameter("code");
+        BookCache bookCache = cacheManager.getBookCache(code);
+        System.out.println(bookCache);
+        if (bookCache != null) {
+            Result result;
+            ClientCache clientCache = ClientValidator.getClientCache(request, cacheManager);
+            if (ScanUtil.isFirstScan(bookCache)) {  //第一次扫描
+                result =  ScanUtil.getFirstScanDirection(bookCache, clientCache);
+            } else { //第二次扫描
+                result =  ScanUtil.getSecondScanDirection(bookCache, clientCache);
+            }
+            if (result.getCode()==0){
+                Random random = new Random();
+                String key = String.valueOf(random.nextInt(1000));
+                clientCache.setRandom(key);
+                Map<String, Object> map = new HashMap<>();
+                map.put("key", key);
+                map.put("data", result.getData());
+                return Result.SUCCESS(map);
+            }else {
+                return result;
+            }
+        } else {
+            return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "无效操作。");
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/scan/confirm", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object submitScanConfirm(HttpServletRequest request) throws Exception {
+        String code = request.getParameter("code");
+        String key = request.getParameter("key");
+        ClientCache clientCache = ClientValidator.getClientCache(request, cacheManager);
+        if (key.equals(clientCache.getRandom())) {
+            clientCache.setRandom("");
+            BookCache bookCache = cacheManager.getBookCache(code);
+            if (bookCache != null) {
+                if (ScanUtil.isFirstScan(bookCache)) {  //第一次扫描
+                    return ScanUtil.setFirstScanConfirm(bookCache, clientCache, comService);
+                } else { //第二次扫描
+                    return ScanUtil.setSecondScanConfirm(bookCache, clientCache, comService);
+                }
+            }
+        }
+        return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "无效操作。");
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/comment/list", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object getBookCommentList(HttpServletRequest request) throws Exception {
+        String bookId = request.getParameter("bookId");
+        List<Comment> res = comService.getList(Comment.class, "bookId="+bookId, "id desc");
+        List<BookCommentList> list = new ArrayList<>();
+        for (Comment c: res){
+            list.add(new BookCommentList(c, cacheManager));
+        }
+        return Result.SUCCESS(list);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/comment/save", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object submitBookComment(HttpServletRequest request) throws Exception {
+        String bookId = request.getParameter("bookId");
+        String comment = request.getParameter("comment");
+        if (bookId!=null && !bookId.equals("") && comment!=null && !comment.equals("")){
+            Comment c = new Comment(Long.parseLong(bookId), ClientValidator.getClientId(request, cacheManager), comment);
+            comService.saveDetail(c);
+            return Result.SUCCESS();
+        }
+        return Result.ERROR(ErrorCode.LOGIN_TIMEOUT);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/borrow/list", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object getBookBorrowList(HttpServletRequest request) throws Exception {
+        String bookId = request.getParameter("bookId");
+        List<Reservation> res = comService.getList(Reservation.class, "bookId=" + bookId +
+                " and status='" + ReservationStatus.RECEDE + "'", "borrowedTime desc");
+        List<BookInfoCommentForm> list = new ArrayList<>();
+        for (Reservation r: res) {
+            list.add(new BookInfoCommentForm(r, cacheManager));
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("list", list);
+        Reservation reservation = comService.getFirst(Reservation.class, "bookId=" + bookId + " and status='" + ReservationStatus.BORROW + "'");
+        if (reservation!=null) {
+            Client client = comService.getDetail(Client.class, reservation.getClientId());
+        map.put("one", new ReservationListWithMobile(reservation, client, cacheManager));
+        }
+        return Result.SUCCESS(map);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/reserve/list", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object getBookReserveList(HttpServletRequest request) throws Exception {
+        String bookId = request.getParameter("bookId");
+//        List<Reservation> res = comService.getList(Reservation.class, "bookId=" + bookId + " and status='" + ReservationStatus.RESERVE + "'", "createTime asc");
+        List<Object[]> res = comService.query("select r,c from Reservation r,Client c where r.clientId=c.id and r.bookId="+bookId+" and r.status='"+ReservationStatus.RESERVE+"'");
+        List<ReservationListWithMobile> list = new ArrayList<>();
+        for (Object[] o: res) {
+            list.add(new ReservationListWithMobile((Reservation)o[0], (Client)o[1], cacheManager));
+        }
+        return Result.SUCCESS(list);
+    }
+
+
 
 
 

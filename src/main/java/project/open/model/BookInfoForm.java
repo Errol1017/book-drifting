@@ -2,7 +2,10 @@ package project.open.model;
 
 import common.CRUD.service.ComService;
 import common.Util.Base64Util;
+import project.navigator.service.CacheManager;
 import project.operation.entity.Book;
+import project.operation.pojo.BookStatus;
+import project.operation.pojo.OwnerType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +20,11 @@ public class BookInfoForm {
     private String author;
 //    private String sort;
     private String intro;
+    private String agency = "";
     private List<String> pics = new ArrayList<>();
     private String status;
 
-    public BookInfoForm(Book book, ComService comService) {
+    public BookInfoForm(Book book, ComService comService, CacheManager cacheManager) {
         this.id = String.valueOf(book.getId());
         this.name = book.getName();
         this.author = book.getAuthor();
@@ -30,6 +34,9 @@ public class BookInfoForm {
             this.pics.add(Base64Util.img2String(comService.getFileBathPath(), s));
         }
         this.status = book.getStatus().getName();
+        if (book.getStatus().equals(BookStatus.IN_STOCK) && book.getStackType().equals(OwnerType.AGENCY)) {
+            this.agency = cacheManager.getAgencyCache((int)book.getStackId()).getName();
+        }
     }
 
     public String getId() {
@@ -46,6 +53,10 @@ public class BookInfoForm {
 
     public String getIntro() {
         return intro;
+    }
+
+    public String getAgency() {
+        return agency;
     }
 
     public List<String> getPics() {

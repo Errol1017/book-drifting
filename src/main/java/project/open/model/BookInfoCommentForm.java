@@ -9,20 +9,19 @@ import project.operation.pojo.ReservationStatus;
 /**
  * Created by Errol on 17/5/17.
  */
-public class CommentForm {
+public class BookInfoCommentForm extends ClientListParent {
 
-    private String nickname;
     private String content;
     private String time;
 
-    public CommentForm(Comment comment, CacheManager cacheManager) {
-        this.nickname = cacheManager.getClientCache(comment.getClientId()).getNickName();
+    public BookInfoCommentForm(Comment comment, CacheManager cacheManager) {
+        super(cacheManager.getClientCache(comment.getClientId()));
         this.content = comment.getContent();
         this.time = DateUtil.date2String(comment.getCreateTime(), DateUtil.PATTERN_K);
     }
 
-    public CommentForm(Reservation r, CacheManager cacheManager) {
-        this.nickname = cacheManager.getClientCache(r.getClientId()).getNickName();
+    public BookInfoCommentForm(Reservation r, CacheManager cacheManager) {
+        super(cacheManager.getClientCache(r.getClientId()));
         this.content = "";
         if (r.getStatus().equals(ReservationStatus.RESERVE)){
 //            this.content = "";
@@ -36,10 +35,6 @@ public class CommentForm {
                 this.time = DateUtil.date2String(r.getBorrowedTime(), DateUtil.PATTERN_K) +" - "+DateUtil.date2String(r.getExpireTime(), DateUtil.PATTERN_K);
             }
         }
-    }
-
-    public String getNickname() {
-        return nickname;
     }
 
     public String getContent() {

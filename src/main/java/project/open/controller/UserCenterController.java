@@ -13,18 +13,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import project.basic.entity.InvitationCode;
 import project.navigator.service.CacheManager;
-import project.open.model.UserInfo;
-import project.open.model.UserInfoData;
-import project.open.model.UserVerifyForm;
-import project.operation.entity.Book;
-import project.operation.entity.Client;
+import project.open.model.*;
+import project.operation.entity.*;
 import project.open.util.ClientValidator;
-import project.operation.entity.Stacks;
 import project.operation.model.ClientCache;
+import project.operation.pojo.BookStatus;
+import project.operation.pojo.OwnerType;
+import project.operation.pojo.ReservationStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -41,13 +42,31 @@ public class UserCenterController {
 
     @RequestMapping(value = "/check", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
     public String checkOpenId(HttpServletRequest request) throws Exception {
-        System.out.println(request.getSession().getId());
+        String k = request.getParameter("k");
+        if (k!=null){
+            if (k.equals("1")){
+                request.getSession().setAttribute("openId", "hiU47jOZQpCx");
+            }else if (k.equals("2")){
+                request.getSession().setAttribute("openId", "8PCdldvgp7ok");
+            }else if (k.equals("3")){
+                request.getSession().setAttribute("openId", "Z8RnFPafBI5U");
+            }else {
+                long max = comService.getCount(Client.class);
+                Client client = comService.getList(Client.class, (new Random().nextInt((int) max)), 1).get(0);
+                request.getSession().setMaxInactiveInterval(60 * 60 * 24 * 7);
+                request.getSession().setAttribute("openId", client.getOpenId());
+            }
+            return "redirect:/public/user/check";
+        }
+
+
+
         Result result = ClientValidator.ClientValidate(request, cacheManager);
         if (result.getCode() == -2) {
             //无openId session，需静默授权
             //模拟授权获得openId
 //            if (new Random().nextInt(10) >4) {
-            System.out.println("随机>4  获取已有client");
+//            System.out.println("随机>4  获取已有client");
             long max = comService.getCount(Client.class);
             Client client = comService.getList(Client.class, (new Random().nextInt((int) max)), 1).get(0);
             request.getSession().setMaxInactiveInterval(60 * 60 * 24 * 7);
@@ -59,12 +78,12 @@ public class UserCenterController {
             return "redirect:/public/user/check";
         } else if (result.getCode() == -1) {
             //有openId session，但clientCache中无对应记录，也即静默授权后未核验身份
-//            return "redirect:/index.html#/page/user/verify";
-            return "redirect:" + comService.getRemoteClientId() + "/index.html#/page/user/verify";
+            return "redirect:/index.html#/page/user/verify";
+//            return "redirect:" + comService.getRemoteClientId() + "/index.html#/page/user/verify";
         } else {
             //有openId session，且已核验身份
-//            return "redirect:/index.html#/page/user/center";
-            return "redirect:" + comService.getRemoteClientId() + "/index.html#/page/user/center";
+            return "redirect:/index.html#/page/user/center";
+//            return "redirect:" + comService.getRemoteClientId() + "/index.html#/page/user/center";
         }
     }
 
@@ -95,7 +114,7 @@ public class UserCenterController {
                 comService.saveDetail(client);
                 ic.setClientId(client.getId());
                 comService.saveDetail(ic);
-                cacheManager.addClientCache(new ClientCache(client));
+                cacheManager.addClientCache(new ClientCache(client, comService));
                 return Result.SUCCESS();
             }
             return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "邀请码错误或已被使用");
@@ -147,7 +166,7 @@ public class UserCenterController {
                 comService.deleteDetail(Stacks.class, "id=" + s);
             } else {
 //                sb.append(s + ",");
-                sb.append((sb.length()>0?",":"") + s);
+                sb.append((sb.length() > 0 ? "," : "") + s);
             }
         }
 //        if (sb.length() > 0) {
@@ -181,5 +200,102 @@ public class UserCenterController {
         }
         return Result.ERROR(-1);
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/reservation/borrow", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object getUserReBorrow(HttpServletRequest request) throws Exception {
+        ClientCache cc = ClientValidator.getClientCache(request, cacheManager);
+        List<BookListBorrowing> list = new ArrayList<>();
+        if (cc.getBorrowingSum() != 0) {
+            List<Object[]> res = comService.query("select r,b from Reservation r,Book b where r.bookId=b.id" +
+                    " and r.clientId=" + cc.getId() + " and r.status='" + ReservationStatus.BORROW + "'");
+            for (Object[] o : res) {
+                list.add(new BookListBorrowing((Book) o[1], comService, (Reservation) o[0]));
+            }
+        }
+        return Result.SUCCESS(list);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/reservation/recede", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object getUserReRecede(HttpServletRequest request) throws Exception {
+        ClientCache cc = ClientValidator.getClientCache(request, cacheManager);
+        List<BookListRecede> list = new ArrayList<>();
+        List<Object[]> res = comService.query("select r,b from Reservation r,Book b where r.bookId=b.id and r.clientId=" + cc.getId() +
+                " and r.status='" + ReservationStatus.RECEDE + "' order by r.recedeTime desc", 1, 5);
+        for (Object[] o : res) {
+            list.add(new BookListRecede((Book) o[1], comService, (Reservation) o[0]));
+        }
+        return Result.SUCCESS(list);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/reservation/reserve", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object getUserReReserve(HttpServletRequest request) throws Exception {
+        ClientCache cc = ClientValidator.getClientCache(request, cacheManager);
+        List<BookListReserve> list = new ArrayList<>();
+        List<Object[]> res = comService.query("select b,r.id from Reservation r,Book b where r.bookId=b.id and r.clientId=" + cc.getId() +
+                " and r.status='" + ReservationStatus.RESERVE + "'", 1, 5);
+        for (Object[] o : res) {
+            Book book = (Book) o[0];
+            BookListReserve br = new BookListReserve(book, comService);
+            if (book.getStatus().equals(BookStatus.IN_STOCK)) {
+                if (book.getStackType().equals(OwnerType.AGENCY)) {
+                    br.setOwner(cacheManager.getAgencyCache((int) book.getStackId()).getName());
+                } else {
+                    br.setOwner(cacheManager.getClientCache(book.getOwnerId()).getNickName());
+                }
+            } else if (book.getStatus().equals(BookStatus.UNPREPARED)) {
+                br.setOwner(cacheManager.getClientCache(book.getOwnerId()).getNickName());
+            } else if (book.getStatus().equals(BookStatus.FROZEN)) {
+                br.setOwner("");
+            } else {
+                Reservation r = comService.getDetail(Reservation.class, book.getReservationId());
+                br.setOwner(cacheManager.getClientCache(r.getClientId()).getNickName());
+            }
+            list.add(br);
+        }
+        return Result.SUCCESS(list);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/books", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object getUserBooks(HttpServletRequest request) throws Exception {
+        List<Book> res = comService.getList(Book.class, "ownerId=" + ClientValidator.getClientId(request, cacheManager));
+        List<BookListReserve> list = new ArrayList<>();
+        for (Book book : res) {
+            BookListReserve br = new BookListReserve(book, comService);
+            if (book.getStatus().equals(BookStatus.IN_STOCK)) {
+                if (book.getStackType().equals(OwnerType.AGENCY)) {
+                    br.setOwner("委托 " + cacheManager.getAgencyCache((int) book.getStackId()).getName() + " 进行管理");
+                } else {
+                    br.setOwner("由您亲自管理");
+                }
+            } else if (book.getStatus().equals(BookStatus.UNPREPARED)) {
+                br.setOwner("尚未移交 " + cacheManager.getAgencyCache((int) book.getStackId()).getName() + " 入库管理");
+            } else if (book.getStatus().equals(BookStatus.FROZEN)) {
+                br.setOwner("已出库");
+            } else {
+                Reservation r = comService.getDetail(Reservation.class, book.getReservationId());
+                br.setOwner("目前用户 " + cacheManager.getClientCache(r.getClientId()).getNickName() + " 正在借阅");
+            }
+            list.add(br);
+        }
+        return Result.SUCCESS(list);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/comment", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object getUserComment(HttpServletRequest request) throws Exception {
+        String page = request.getParameter("p");
+        List<Object[]> objects = comService.query("select c,b from Comment c, Book b where c.clientId=" +
+                ClientValidator.getClientId(request, cacheManager) + " and c.bookId=b.id", Integer.parseInt(page), 10);
+        List<UserCommentList> list = new ArrayList<>();
+        for (Object[] o: objects){
+            list.add(new UserCommentList((Comment)o[0], (Book)o[1], comService));
+        }
+        return Result.SUCCESS(list);
+    }
+
 
 }
