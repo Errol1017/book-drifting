@@ -1,9 +1,9 @@
 package project.open.model;
 
-import common.CRUD.service.ComService;
 import common.Util.Base64Util;
 import project.navigator.service.CacheManager;
 import project.operation.entity.Client;
+import project.resource.properties.ServerProperties;
 
 /**
  * Created by Errol on 17/5/8.
@@ -19,8 +19,8 @@ public class UserInfoData {
     private String agency;
     private String stacks;
 
-    public UserInfoData(Client client, ComService comService, CacheManager cacheManager) {
-        this.avatar = Base64Util.img2String(comService.getFileBathPath(), client.getAvatar());
+    public UserInfoData(Client client, CacheManager cacheManager) {
+        this.avatar = Base64Util.img2String(ServerProperties.getInstance().getFileBasePath(), client.getAvatar());
         this.nickname = client.getNickName();
         this.name = client.getName();
         this.gender = client.getGender().getName();

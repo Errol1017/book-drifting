@@ -1,6 +1,5 @@
 package project.open.model;
 
-import common.CRUD.service.ComService;
 import common.Util.DateUtil;
 import project.operation.entity.Book;
 import project.operation.entity.Reservation;
@@ -12,8 +11,8 @@ public class BookListBorrowing extends BookListParent {
 
     private String expire;
 
-    public BookListBorrowing(Book book, ComService comService, Reservation reservation) {
-        super(book, comService);
+    public BookListBorrowing(Book book, Reservation reservation) {
+        super(book);
         this.expire = DateUtil.date2String(reservation.getExpireTime(), DateUtil.PATTERN_D);
     }
 

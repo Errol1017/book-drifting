@@ -1,12 +1,11 @@
 package project.operation.model;
 
-import common.CRUD.service.ComService;
 import common.Util.Base64Util;
 import common.Util.DateUtil;
 import project.operation.entity.Client;
+import project.resource.properties.ServerProperties;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -26,9 +25,9 @@ public class ClientCache {
     //用以保证扫码过程中的连续的两次请求中的第二次请求合法
     private String random = "";
 
-    public ClientCache(Client client, ComService comService) {
+    public ClientCache(Client client) {
         this.id = client.getId();
-        this.avatar = Base64Util.img2String(comService.getFileBathPath(), client.getAvatar());
+        this.avatar = Base64Util.img2String(ServerProperties.getInstance().getFileBasePath(), client.getAvatar());
         this.nickName = client.getNickName();
         this.openId = client.getOpenId();
         this.loginTime = DateUtil.date2String(client.getLoginTime(), DateUtil.PATTERN_A);

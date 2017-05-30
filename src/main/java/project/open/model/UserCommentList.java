@@ -1,6 +1,5 @@
 package project.open.model;
 
-import common.CRUD.service.ComService;
 import common.Util.DateUtil;
 import project.operation.entity.Book;
 import project.operation.entity.Comment;
@@ -13,8 +12,8 @@ public class UserCommentList extends BookListParent {
     private String content;
     private String time;
 
-    public UserCommentList(Comment comment, Book book, ComService comService) {
-        super(book, comService);
+    public UserCommentList(Comment comment, Book book) {
+        super(book);
         this.content = comment.getContent();
         this.time = DateUtil.date2String(comment.getCreateTime(), DateUtil.PATTERN_D);
     }

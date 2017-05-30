@@ -70,7 +70,7 @@ public class PublicBookController {
         List<Book> books = comService.getList(Book.class, p == null ? 1 : Integer.parseInt(p), 10, sb.toString(), "id desc");
         List<BookList> list = new ArrayList<>();
         for (Book book : books) {
-            list.add(new BookList(book, comService));
+            list.add(new BookList(book));
         }
         return Result.SUCCESS(list);
     }
@@ -122,7 +122,7 @@ public class PublicBookController {
     @RequestMapping(value = "/info", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object getBookInfo(HttpServletRequest request) throws Exception {
         Book book = comService.getDetail(Book.class, Long.parseLong(request.getParameter("id")));
-        BookInfoForm form = new BookInfoForm(book, comService, cacheManager);
+        BookInfoForm form = new BookInfoForm(book, cacheManager);
         return Result.SUCCESS(form);
     }
 

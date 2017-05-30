@@ -32,10 +32,9 @@ public class NavController {
     @Value("${project.file.path}")
     private String fileBasePath;
 
-    @RequestMapping(value = "/validator", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public
     @ResponseBody
-    Object validate(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @RequestMapping(value = "/validator", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    public Object validate(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Result result = AdminValidator.AdminValidator(request);
         if (result.getCode() == 0) {
             request.getRequestDispatcher("/navigator/" + result.getData()).forward(request, response);
@@ -45,10 +44,9 @@ public class NavController {
         }
     }
 
-    @RequestMapping(value = Types.page, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public
     @ResponseBody
-    Object getPage(HttpServletRequest request) throws Exception {
+    @RequestMapping(value = Types.page, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    public Object getPage(HttpServletRequest request) throws Exception {
         String reqId = request.getParameter("reqId");
         try {
             String[] pageNameAndPageId = Navigation.getInstance().getPageNameAndPageId(reqId);
@@ -67,10 +65,9 @@ public class NavController {
         }
     }
 
-    @RequestMapping(value = Types.list, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public
     @ResponseBody
-    Object getList(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @RequestMapping(value = Types.list, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    public Object getList(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String reqId = request.getParameter("reqId");
         String listId = Lists.getList(request.getParameter("listId"));
         if (listId != null
@@ -83,10 +80,9 @@ public class NavController {
         }
     }
 
-    @RequestMapping(value = Types.form, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public
     @ResponseBody
-    Object getForm(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @RequestMapping(value = Types.form, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    public Object getForm(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String reqId = request.getParameter("reqId");
         String formId = Forms.getForm(request.getParameter("formId"));
         if (formId != null
@@ -98,10 +94,9 @@ public class NavController {
         }
     }
 
-    @RequestMapping(value = Types.submit, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public
     @ResponseBody
-    Object submitForm(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @RequestMapping(value = Types.submit, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    public Object submitForm(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String reqId = request.getParameter("reqId");
         String formId = Forms.getForm(request.getParameter("formId"));
         if (formId != null) {
@@ -112,10 +107,9 @@ public class NavController {
         }
     }
 
-    @RequestMapping(value = Types.delete, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public
     @ResponseBody
-    Object deleteData(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    @RequestMapping(value = Types.delete, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
+    public Object deleteData(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String reqId = request.getParameter("reqId");
         String listId = Lists.getList(request.getParameter("listId"));
         if (listId != null
@@ -127,8 +121,9 @@ public class NavController {
         }
     }
 
+    @ResponseBody
     @RequestMapping(value = Types.data, method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
-    public @ResponseBody Object getData(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public Object getData(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String reqId = request.getParameter("reqId");
         String componentId = Components.getComponent(request.getParameter("compId"));
         if (componentId != null) {
@@ -177,5 +172,19 @@ public class NavController {
 //        }
 //        request.getRequestDispatcher("/com-res/uploader/uploader.jsp").forward(request, response);
 //    }
+
+    @ResponseBody
+    @RequestMapping(value = Types.handle, method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object doHandle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String reqId = request.getParameter("reqId");
+        String handle = request.getParameter("handle");
+        String componentId = Components.getComponent(request.getParameter("compId"));
+        if (componentId != null) {
+            request.getRequestDispatcher("/" + reqId.toLowerCase() + "/" + componentId + "/" + handle).forward(request, response);
+            return "";
+        } else {
+            return Result.ERROR(ErrorCode.ILLEGAL_OPERATION);
+        }
+    }
 
 }

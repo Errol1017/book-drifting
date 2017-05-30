@@ -261,7 +261,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
         clientIdAndOpenIdMap = new HashMap<>();
         List<Client> list = comService.getList(Client.class);
         for (Client client: list) {
-            clientCacheMap.put(client.getOpenId(), new ClientCache(client, comService));
+            clientCacheMap.put(client.getOpenId(), new ClientCache(client));
             clientIdAndOpenIdMap.put(client.getId(), client.getOpenId());
         }
     }
@@ -331,9 +331,6 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     public static void main(String[] args) {
-        String s = "wqedq-asda";
-        s=s.replace("-","");
-        System.out.println(s);
     }
 
 }

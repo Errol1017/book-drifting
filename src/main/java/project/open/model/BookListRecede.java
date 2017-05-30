@@ -1,6 +1,5 @@
 package project.open.model;
 
-import common.CRUD.service.ComService;
 import common.Util.DateUtil;
 import project.operation.entity.Book;
 import project.operation.entity.Reservation;
@@ -12,8 +11,8 @@ public class BookListRecede extends BookListParent {
 
     private String period;
 
-    public BookListRecede(Book book, ComService comService, Reservation reservation) {
-        super(book, comService);
+    public BookListRecede(Book book, Reservation reservation) {
+        super(book);
         this.period = DateUtil.date2String(reservation.getBorrowedTime(), DateUtil.PATTERN_K)+" - "+DateUtil.date2String(reservation.getExpireTime(), DateUtil.PATTERN_K);
     }
 

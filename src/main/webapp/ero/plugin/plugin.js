@@ -56,6 +56,7 @@
          *              delete.key      default 'id'
          *              delete.success
          *              delete.error
+         *      handle.addition     array
          * param.queryData          jsonStr
          */
         param.tableObj = $(this);
@@ -192,15 +193,23 @@
                 if (param.handle.handleObj == undefined) {
                     param.handle.handleObj = $("#" + param.tableId + "_HandleBox");
                 }
-                if (param.handle.editObj == undefined) {
-                    param.handle.editObj = $("#" + param.tableId + "_Edit");
-                }
-                if (param.handle.deleteObj == undefined) {
-                    param.handle.deleteObj = $("#" + param.tableId + "_Delete");
-                }
-                if (param.handle.reloadObj == undefined) {
-                    param.handle.reloadObj = $("#" + param.tableId + "_Reload");
-                }
+                param.handle.addition = new Object()
+                param.handle.handleObj.find("li").each(function () {
+                    var liObj = $(this);
+                    if (liObj.attr("id") == param.tableId + "_Edit") {
+                        param.handle.editObj = liObj
+                    } else if (liObj.attr("id") == param.tableId + "_Delete") {
+                        param.handle.deleteObj = liObj
+                    } else if (liObj.attr("id") == param.tableId + "_Reload") {
+                        param.handle.reloadObj = liObj
+                    } else {
+                        var key = (liObj.attr("id")).slice(param.tableId.length+1)
+                        param.handle.addition[liObj.index()] = {
+                            obj: liObj,
+                            fun: param.handle[key]
+                        }
+                    }
+                })
             }
             function initHandleEvent() {
                 if (param.handle.handleObj.length > 0) {
@@ -208,13 +217,13 @@
                         $(this).fadeOut();
                     });
                 }
-                if (param.handle.editObj.length > 0) {
+                if (param.handle.editObj != undefined) {
                     param.handle.editObj.click(function () {
                         param.handle.edit.callback(param.handle.data);
                         param.handle.handleObj.fadeOut();
                     });
                 }
-                if (param.handle.deleteObj.length > 0) {
+                if (param.handle.deleteObj != undefined) {
                     param.handle.deleteObj.click(function () {
                         if (param.handle.delete.before != undefined) {
                             if (!param.handle.delete.before()) {
@@ -229,10 +238,27 @@
                         })
                     });
                 }
-                if (param.handle.reloadObj.length > 0) {
+                if (param.handle.reloadObj != undefined) {
                     param.handle.reloadObj.click(function () {
                         getList(1);
                     });
+                }
+                for (var key in param.handle.addition){
+                    param.handle.addition[key]['obj'].click(function () {
+                        var k = $(this).index()
+                        if (param.handle.addition[k]['fun']['before'] != undefined) {
+                            if (!param.handle.addition[k]['fun']['before']()) {
+                                return false;
+                            }
+                        }
+                        if (param.handle.addition[k]['fun']['callback'] != undefined) {
+                            param.handle.addition[k]['fun']['callback'](param.handle.data)
+                        }
+                        if (param.handle.addition[k]['fun']['after'] != undefined) {
+                            param.handle.addition[k]['fun']['after']()
+                        }
+                        param.handle.handleObj.fadeOut();
+                    })
                 }
                 function deleteData(success) {
                     $.ajax({
@@ -1044,7 +1070,6 @@
                 if (param.liObjs.first().attr("data-code") != undefined) {
                     param.withCode = true;
                 }
-                console.log("ok")
                 param.liObjs.each(function () {
                     var o = $(this);
                     param.data.push({

@@ -4,15 +4,35 @@
             <div class="list_table_title span35p">
                 用户列表
             </div>
+            <div id="Client_Query" class="list_query">
+                <label for="Client_Query_isAdmin" class="ls_mw_100">按权限筛选</label>
+                <span class="span_box">
+                <input type="text" id="Client_Query_isAdmin" class="input_text_30 span150">
+                <div class="dynamic_plugin_box span150">
+                    <ul class="dynamic_select_ul">
+                        <li class="dynamic_select_li" data-val="1">图书管理员</li>
+                        <li class="dynamic_select_li" data-val="0">普通用户</li>
+                    </ul>
+                </div>
+            </span>
+                <label for="Client_Query_agency" class="ls_mw_100">按单位筛选</label>
+                <span class="span_box">
+                <input type="text" id="Client_Query_agency" class="input_text_30 span150">
+            </span>
+                <span class="span_box float_right">
+                <button id="Client_Query_Reset" class="button_style_80_30">重 置</button>
+            </span>
+            </div>
             <div class="msg_box">
                 <div id="ClientList_Msg" class="msg_style"></div>
             </div>
             <table id="ClientList" class="list_table">
             </table>
-            <div id="ClientList_HandleBox" class="list_table_handle_box span80">
+            <div id="ClientList_HandleBox" class="list_table_handle_box span120">
                 <ul class="list_table_handle_box_ul">
-                    <li class="m_m_s" id="ClientList_Edit">编 辑</li>
-                    <li class="m_m_s" id="ClientList_Delete">删 除</li>
+                    <!--<li class="m_m_s" id="ClientList_Edit">编 辑</li>-->
+                    <!--<li class="m_m_s" id="ClientList_Delete">删 除</li>-->
+                    <li class="m_m_s" id="ClientList_appoint">切换管理员</li>
                     <li class="m_m_s" id="ClientList_Reload">刷 新</li>
                 </ul>
             </div>
@@ -20,126 +40,182 @@
                 -&nbsp;单击表格行可执行操作
             </div>
         </div>
-        <div>
-            <div class="form_detail_title span30p">
-                用户详情
-            </div>
-            <div class="msg_box">
-                <div id="ClientForm_Msg" class="msg_style"></div>
-            </div>
-            <div id="ClientForm" class="form_detail">
-                <input type="hidden" id="ClientForm_id">
-                <div>
-                    <label for="ClientForm_name" class="ls_mw_100 span20p">用户姓名</label>
-                    <span class="span_box span70p">
-                        <input type="text" id="ClientForm_name" class="input_text_35 span100p" placeholder="不能为空">
-                    </span>
-                </div>
-                <div>
-                    <label for="ClientForm_mobile" class="ls_mw_100 span20p">联系电话</label>
-                    <span class="span_box span70p">
-                        <input type="text" id="ClientForm_mobile" class="input_text_35 span100p" placeholder="不能为空">
-                    </span>
-                </div>
-                <div>
-                    <label for="ClientForm_identityNumber" class="ls_mw_100 span20p">身份证号</label>
-                    <span class="span_box span70p">
-                        <input type="text" id="ClientForm_identityNumber" class="input_text_35 span100p" placeholder="不能为空">
-                    </span>
-                </div>
-                <div>
-                    <label for="ClientForm_agencyId" class="ls_mw_100 span20p">所属单位</label>
-                    <span class="span_box span70p">
-                        <input type="text" id="ClientForm_agencyId" class="input_text_35 span100p" placeholder="可以为空">
-                    </span>
-                </div>
-                <div>
-                    <label for="ClientForm_stackIds" class="ls_mw_100 span20p">个人起漂点</label>
-                    <span class="span_box span70p">
-                        <input type="text" id="ClientForm_stackIds" class="input_text_35 span100p" placeholder="可以为空">
-                    </span>
-                </div>
-            </div>
-            <div class="form_detail_bottom">
-                <span class="form_detail_bottom_handle_box span70p">
-                    <button class="button_style_80_30" id="ClientForm_Submit">新 增</button>
-                    <button class="button_style_80_30" id="ClientForm_Unbind">清 空</button>
-                </span>
-                <span class="form_detail_bottom_lines span30p"></span>
-            </div>
-        </div>
+        <!--<div>-->
+            <!--<div class="form_detail_title span30p">-->
+                <!--用户详情-->
+            <!--</div>-->
+            <!--<div class="msg_box">-->
+                <!--<div id="ClientForm_Msg" class="msg_style"></div>-->
+            <!--</div>-->
+            <!--<div id="ClientForm" class="form_detail">-->
+                <!--<input type="hidden" id="ClientForm_id">-->
+                <!--<div>-->
+                    <!--<label for="ClientForm_name" class="ls_mw_100 span20p">用户姓名</label>-->
+                    <!--<span class="span_box span70p">-->
+                        <!--<input type="text" id="ClientForm_name" class="input_text_35 span100p" placeholder="不能为空">-->
+                    <!--</span>-->
+                <!--</div>-->
+                <!--<div>-->
+                    <!--<label for="ClientForm_mobile" class="ls_mw_100 span20p">联系电话</label>-->
+                    <!--<span class="span_box span70p">-->
+                        <!--<input type="text" id="ClientForm_mobile" class="input_text_35 span100p" placeholder="不能为空">-->
+                    <!--</span>-->
+                <!--</div>-->
+                <!--<div>-->
+                    <!--<label for="ClientForm_identityNumber" class="ls_mw_100 span20p">身份证号</label>-->
+                    <!--<span class="span_box span70p">-->
+                        <!--<input type="text" id="ClientForm_identityNumber" class="input_text_35 span100p" placeholder="不能为空">-->
+                    <!--</span>-->
+                <!--</div>-->
+                <!--<div>-->
+                    <!--<label for="ClientForm_agencyId" class="ls_mw_100 span20p">所属单位</label>-->
+                    <!--<span class="span_box span70p">-->
+                        <!--<input type="text" id="ClientForm_agencyId" class="input_text_35 span100p" placeholder="可以为空">-->
+                    <!--</span>-->
+                <!--</div>-->
+                <!--<div>-->
+                    <!--<label for="ClientForm_stackIds" class="ls_mw_100 span20p">个人起漂点</label>-->
+                    <!--<span class="span_box span70p">-->
+                        <!--<input type="text" id="ClientForm_stackIds" class="input_text_35 span100p" placeholder="可以为空">-->
+                    <!--</span>-->
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="form_detail_bottom">-->
+                <!--<span class="form_detail_bottom_handle_box span70p">-->
+                    <!--<button class="button_style_80_30" id="ClientForm_Submit">新 增</button>-->
+                    <!--<button class="button_style_80_30" id="ClientForm_Unbind">清 空</button>-->
+                <!--</span>-->
+                <!--<span class="form_detail_bottom_lines span30p"></span>-->
+            <!--</div>-->
+        <!--</div>-->
     </div>
 
     <script>
         $(function () {
+            var reqId = $.ero.reqIdForPlugin;
             var list = $("#ClientList").list_table({
                 header: {
-                    names: ["!_id", "用户姓名", "联系电话", "所属单位"],
-                    colWith: ["", "span30p", "span30p", "span40p"]
+                    names: ["!_id", "用户姓名", "联系电话", "所属单位", "是否为管理员", "身份证号"],
+                    colWith: ["", "span20p", "span20p", "span20p", "span15p", "span25p"]
                 },
                 handle: {
-                    edit: {
-                        callback: function (data) {
-                            form.getForm(data.id)
-                        }
-                    },
-                    delete: {
-                        before: function () {
-                            return confirm("确认删除数据？")
-                        },
-                        success: function (data) {
-                            form.unbind(data.id)
-                        }
-                    }
-                }
-            });
-            var agencyId = $("#ClientForm_agencyId").dynamic_select();
-            var form = $("#ClientForm").form_detail({
-                inputIds: ["!_id", "name", "mobile", "identityNumber", "agencyId", "stackIds"],
-                validator: [
-                    function (o) {
-                        return o.required().check_simple_length(1, 100).show_check_msg();
-                    },
-                    function (o) {
-                        return o.required().require_strict_phone_number().show_check_msg();
-                    },
-                    function (o) {
-                        return o.required().require_strict_ID_number().show_check_msg();
-                    },
-                    function (o) {
-                        return o.require_number('>', 0).show_check_msg();
-                    },
-                    function (o) {
-                        return o.check_simple_length(0, 100).show_check_msg();
-                    }
-                ],
-                bind: {
-                    after: function () {
-                        agencyId.reset();
-                    }
-                },
-                unbind: {
-                    after: function () {
-                        agencyId.reset();
-                        list.deselect();
-                    }
-                },
-//                gather:{
-//                    before: function () {
-//                        if ($("#ClientForm_id").val() == ""){
-//
+//                    edit: {
+//                        callback: function (data) {
+//                            form.getForm(data.id)
+//                        }
+//                    },
+//                    delete: {
+//                        before: function () {
+//                            return confirm("确认删除数据？")
+//                        },
+//                        success: function (data) {
+//                            form.unbind(data.id)
 //                        }
 //                    }
-//                },
-                submit: {
-                    success: function (data) {
-                        if (data != undefined) {
-                            $("#ClientForm_id").val(data);
+                    appoint: {
+//                        before: function () {
+//                            return confirm("确认将该用户设置为其所在机构的图书管理员？")
+//                        },
+                        callback: function (data) {
+                            $.ajax({
+                                url: 'navigator/validator',
+                                type: 'post',
+                                data: {
+                                    type: 'handle',
+                                    reqId: reqId,
+                                    compId: 'ClientList_appoint',
+                                    handle: 'appoint',
+                                    id: data.id
+                                },
+                                success: function () {
+                                    list.getList()
+                                },
+                                error: function () {
+                                    $("#ClientList_Msg").show_msg("发生错误")
+                                }
+                            })
                         }
-                        list.getList();
+                    },
+                }
+            });
+            var isAdmin = $("#Client_Query_isAdmin").dynamic_select({
+                dynamic: false,
+                writable: false,
+                callback: function () {
+                    agency.reset();
+                    query.reset();
+                    $("#Client_Query_isAdmin").trigger("change");
+                }
+            });
+            var agency = $("#Client_Query_agency").dynamic_select({
+                compId: "ClientForm_agencyId",
+                callback: function () {
+                    isAdmin.reset();
+                    query.reset();
+                    $("#Client_Query_agency").trigger("change");
+                }
+            });
+            var query = $("#Client_Query").query_manager({
+                manually: false,
+                keys: ["isAdmin", "agency"],
+                callback: function (q) {
+                    list.getList(q)
+                },
+                handle: {
+                    resetCall: function () {
+                        isAdmin.reset();
+                        agency.reset();
+                        list.getList('')
                     }
                 }
             });
+//            var agencyId = $("#ClientForm_agencyId").dynamic_select();
+//            var form = $("#ClientForm").form_detail({
+//                inputIds: ["!_id", "name", "mobile", "identityNumber", "agencyId", "stackIds"],
+//                validator: [
+//                    function (o) {
+//                        return o.required().check_simple_length(1, 100).show_check_msg();
+//                    },
+//                    function (o) {
+//                        return o.required().require_strict_phone_number().show_check_msg();
+//                    },
+//                    function (o) {
+//                        return o.required().require_strict_ID_number().show_check_msg();
+//                    },
+//                    function (o) {
+//                        return o.require_number('>', 0).show_check_msg();
+//                    },
+//                    function (o) {
+//                        return o.check_simple_length(0, 100).show_check_msg();
+//                    }
+//                ],
+//                bind: {
+//                    after: function () {
+//                        agencyId.reset();
+//                    }
+//                },
+//                unbind: {
+//                    after: function () {
+//                        agencyId.reset();
+//                        list.deselect();
+//                    }
+//                },
+////                gather:{
+////                    before: function () {
+////                        if ($("#ClientForm_id").val() == ""){
+////
+////                        }
+////                    }
+////                },
+//                submit: {
+//                    success: function (data) {
+//                        if (data != undefined) {
+//                            $("#ClientForm_id").val(data);
+//                        }
+//                        list.getList();
+//                    }
+//                }
+//            });
             $("#ClientPage").reloadData(function () {
                 list.getList(1);
             })

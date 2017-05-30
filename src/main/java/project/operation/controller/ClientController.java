@@ -45,12 +45,24 @@ public class ClientController {
     public Object getClientList(HttpServletRequest request) throws Exception {
         int tarPageNum = Integer.parseInt(request.getParameter("tarPageNum"));
         int perPageNum = Integer.parseInt(request.getParameter("perPageNum"));
-        List<Client> clients = comService.getList(Client.class, tarPageNum, perPageNum, "id desc");
+        Map<String, String> map = DataManager.string2Map(request.getParameter("query"));
+        StringBuffer con = new StringBuffer();
+        if (map != null) {
+            String isAdmin = map.get("isAdmin");
+            String agency = map.get("agency");
+            if (!isAdmin.equals("")) {
+                con.append("isAdmin="+(isAdmin.equals("1")?1:0));
+            }
+            if (!agency.equals("")){
+                con.append((con.length()==0?"":" and ")+"agencyId="+agency);
+            }
+        }
+        List<Client> clients = comService.getList(Client.class, tarPageNum, perPageNum, con.toString(), "id desc");
         List<ClientList> list = new ArrayList<>();
         for (Client client : clients) {
             list.add(new ClientList(client, cacheManager));
         }
-        long total = comService.getCount(Client.class);
+        long total = comService.getCount(Client.class, con.toString());
         Map<String, Object> result = new HashMap<>();
         result.put("list", list);
         result.put("total", total);
@@ -105,6 +117,21 @@ public class ClientController {
         comService.saveDetail(new AdminLog(AdminValidator.getAdminSession(request), OperationTargets.Client, OperationTypes.Delete, String.valueOf(client.getId()), "用户姓名： " + client.getName()));
         return Result.SUCCESS();
     }
+
+    @ResponseBody
+    @RequestMapping(value = Components.ClientList_appoint + "/appoint", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object submitClientAppoint(HttpServletRequest request) throws Exception {
+        String id = request.getParameter("id");
+        Client client = comService.getDetail(Client.class, Long.parseLong(id));
+        if (client.isAdmin()) {
+            client.setAdmin(false);
+        } else {
+            client.setAdmin(true);
+        }
+        comService.saveDetail(client);
+        return Result.SUCCESS();
+    }
+
 
     @ResponseBody
     @RequestMapping(value = Components.ClientForm_agencyId + "/data", method = RequestMethod.POST, produces = "application/json;charset=utf-8")

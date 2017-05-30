@@ -1,8 +1,8 @@
 package project.open.model;
 
-import common.CRUD.service.ComService;
 import common.Util.Base64Util;
 import project.operation.entity.Client;
+import project.resource.properties.ServerProperties;
 
 /**
  * Created by Errol on 17/5/7.
@@ -14,9 +14,9 @@ public class UserInfo {
     private String newBook = "0";
     private String newMsg = "0";
 
-    public UserInfo(Client client, ComService comService) {
+    public UserInfo(Client client) {
         this.nickname = client.getNickName();
-        this.avatar = Base64Util.img2String(comService.getFileBathPath(), client.getAvatar());
+        this.avatar = Base64Util.img2String(ServerProperties.getInstance().getFileBasePath(), client.getAvatar());
     }
 
     public String getNickname() {

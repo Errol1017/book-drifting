@@ -29,8 +29,12 @@
  	<context:property-placeholder location="classpath:jdbc.properties,classpath:server.properties" />
  	
  	<!-- 扫描项目文件自动注入bean -->
-	<context:component-scan base-package="common.CRUD.dao" />
-	<context:component-scan base-package="common.CRUD.service" />
+ 	<context:component-scan base-package="common.*.dao" />
+	<context:component-scan base-package="common.*.service" />
+	<context:component-scan base-package="common.*.controller">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+	</context:component-scan>
  	<context:component-scan base-package="project.*.dao" />
 	<context:component-scan base-package="project.*.service" />
 	<context:component-scan base-package="project.*.controller" />

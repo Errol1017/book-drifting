@@ -68,7 +68,6 @@
             var tarPageId = ero.navigator.getPageId(tarReqNavigation);
             getPage();
             PageTitleObj.text(tarReqObj.text());
-
             function getPage() {
                 var index = ero.pluginManager.loadedPages.lastIndexOf(tarPageId);
                 if (index == -1) {
@@ -158,7 +157,7 @@
                         msgObj.data("redirect", "redirect");
                         message = "登录已超时，请重新登录！";
                         alert(message);
-                        window.location.href = "../../login.html";
+                        window.location.href = "./login.html";
                     }
                     break;
                 case -3://权限不足

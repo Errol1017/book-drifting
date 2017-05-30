@@ -1,6 +1,5 @@
 package project.open.model;
 
-import common.CRUD.service.ComService;
 import project.operation.entity.Book;
 
 /**
@@ -11,8 +10,8 @@ public class BookList extends BookListParent {
     private String author;
     private String status;
 
-    public BookList(Book book, ComService comService) {
-        super(book,comService);
+    public BookList(Book book) {
+        super(book);
         this.author = book.getAuthor();
         this.status = book.getStatus().getName();
     }

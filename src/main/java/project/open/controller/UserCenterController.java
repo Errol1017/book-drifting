@@ -4,8 +4,10 @@ import common.CRUD.service.ComService;
 import common.DataFormatter.DataManager;
 import common.DataFormatter.ErrorCode;
 import common.DataFormatter.Result;
+import common.ServerAdvice.util.LogUtil;
 import common.Util.DateUtil;
-import common.Util.RandomUtil;
+import common.WeChat.pojo.WeChatOAuth2Scope;
+import common.WeChat.util.WeChatOAuth2Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +22,7 @@ import project.operation.model.ClientCache;
 import project.operation.pojo.BookStatus;
 import project.operation.pojo.OwnerType;
 import project.operation.pojo.ReservationStatus;
+import project.resource.properties.ServerProperties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,6 +45,9 @@ public class UserCenterController {
 
     @RequestMapping(value = "/check", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
     public String checkOpenId(HttpServletRequest request) throws Exception {
+        LogUtil.debug("检查用户是否登录");
+        String openid = String.valueOf(request.getSession().getAttribute("openId"));
+        LogUtil.debug("请求session中的openid为： "+openid);
         String k = request.getParameter("k");
         if (k!=null){
             if (k.equals("1")){
@@ -56,36 +62,40 @@ public class UserCenterController {
                 request.getSession().setMaxInactiveInterval(60 * 60 * 24 * 7);
                 request.getSession().setAttribute("openId", client.getOpenId());
             }
-            return "redirect:/public/user/check";
+            return ServerProperties.getInstance().getRedirect()+"public/user/check";
         }
 
 
-
+        LogUtil.debug("ServerProperties.getInstance().getRemote()值为： "+ServerProperties.getInstance().getRemote());
         Result result = ClientValidator.ClientValidate(request, cacheManager);
         if (result.getCode() == -2) {
+            LogUtil.debug("ClientValidator.ClientValidate返回的code为： -2");
             //无openId session，需静默授权
-            //模拟授权获得openId
-//            if (new Random().nextInt(10) >4) {
-//            System.out.println("随机>4  获取已有client");
-            long max = comService.getCount(Client.class);
-            Client client = comService.getList(Client.class, (new Random().nextInt((int) max)), 1).get(0);
-            request.getSession().setMaxInactiveInterval(60 * 60 * 24 * 7);
-            request.getSession().setAttribute("openId", client.getOpenId());
-//            } else {
-//                System.out.println("随机<5  新增openid");
-//                request.getSession().setAttribute("openId", RandomUtil.getRandomString(12, RandomUtil.PATTEN_ALL_CHARS));
-//            }
-            return "redirect:/public/user/check";
+            return "redirect:"+ WeChatOAuth2Util.getRequestUrl("oauth2/redirect", WeChatOAuth2Scope.snsapi_base);
         } else if (result.getCode() == -1) {
+            LogUtil.debug("ClientValidator.ClientValidate返回的code为： -1");
             //有openId session，但clientCache中无对应记录，也即静默授权后未核验身份
-            return "redirect:/index.html#/page/user/verify";
-//            return "redirect:" + comService.getRemoteClientId() + "/index.html#/page/user/verify";
+            return ServerProperties.getInstance().getRemote()+"index.html#/page/user/verify";
         } else {
+            LogUtil.debug("ClientValidator.ClientValidate返回的code为： 0");
             //有openId session，且已核验身份
-            return "redirect:/index.html#/page/user/center";
-//            return "redirect:" + comService.getRemoteClientId() + "/index.html#/page/user/center";
+            return ServerProperties.getInstance().getRemote()+"index.html#/page/user/center";
         }
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/v/test", produces = "application/json;charset=utf-8")
+    public Object test(HttpServletRequest request) throws Exception {
+        String openId = String.valueOf(request.getSession().getAttribute("openId"));
+        LogUtil.debug("userVerify发起的测试请求，request中获得的openId为： "+openId);
+        if (openId.equals("null")){
+            return Result.ERROR(-1);
+        }else {
+            return Result.SUCCESS();
+        }
+    }
+
+
 
     @ResponseBody
     @RequestMapping(value = "/check/result", produces = "application/json;charset=utf-8")
@@ -97,7 +107,9 @@ public class UserCenterController {
     @RequestMapping(value = "/verify", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object userVerify(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String openId = ClientValidator.getOpenId(request);
+        LogUtil.debug("request中openid为： "+openId);
         if (openId.equals("null")) {
+            LogUtil.debug("request中openid为null");
             request.getRequestDispatcher("/public/user/check/result").forward(request, response);
             return false;
         }
@@ -114,7 +126,7 @@ public class UserCenterController {
                 comService.saveDetail(client);
                 ic.setClientId(client.getId());
                 comService.saveDetail(ic);
-                cacheManager.addClientCache(new ClientCache(client, comService));
+                cacheManager.addClientCache(new ClientCache(client));
                 return Result.SUCCESS();
             }
             return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "邀请码错误或已被使用");
@@ -128,7 +140,7 @@ public class UserCenterController {
     public Object getUserInfo(HttpServletRequest request) throws Exception {
         ClientCache cc = ClientValidator.getClientCache(request, cacheManager);
         Client client = comService.getFirst(Client.class, "openId='" + cc.getOpenId() + "'");
-        UserInfo info = new UserInfo(client, comService);
+        UserInfo info = new UserInfo(client);
 //        long nb = comService.getCount(Book.class, "createTime>'"+cc.getLoginTime()+"'");
         Book b = comService.getFirst(Book.class, "createTime>'" + cc.getLoginTime() + "'");
         info.setNewBook(String.valueOf(b == null ? "0" : "1"));
@@ -141,7 +153,7 @@ public class UserCenterController {
     public Object getUserInfoData(HttpServletRequest request) throws Exception {
         ClientCache cc = ClientValidator.getClientCache(request, cacheManager);
         Client client = comService.getFirst(Client.class, "openId='" + cc.getOpenId() + "'");
-        UserInfoData data = new UserInfoData(client, comService, cacheManager);
+        UserInfoData data = new UserInfoData(client, cacheManager);
         return Result.SUCCESS(data);
     }
 
@@ -210,7 +222,7 @@ public class UserCenterController {
             List<Object[]> res = comService.query("select r,b from Reservation r,Book b where r.bookId=b.id" +
                     " and r.clientId=" + cc.getId() + " and r.status='" + ReservationStatus.BORROW + "'");
             for (Object[] o : res) {
-                list.add(new BookListBorrowing((Book) o[1], comService, (Reservation) o[0]));
+                list.add(new BookListBorrowing((Book) o[1], (Reservation) o[0]));
             }
         }
         return Result.SUCCESS(list);
@@ -224,7 +236,7 @@ public class UserCenterController {
         List<Object[]> res = comService.query("select r,b from Reservation r,Book b where r.bookId=b.id and r.clientId=" + cc.getId() +
                 " and r.status='" + ReservationStatus.RECEDE + "' order by r.recedeTime desc", 1, 5);
         for (Object[] o : res) {
-            list.add(new BookListRecede((Book) o[1], comService, (Reservation) o[0]));
+            list.add(new BookListRecede((Book) o[1], (Reservation) o[0]));
         }
         return Result.SUCCESS(list);
     }
@@ -238,7 +250,7 @@ public class UserCenterController {
                 " and r.status='" + ReservationStatus.RESERVE + "'", 1, 5);
         for (Object[] o : res) {
             Book book = (Book) o[0];
-            BookListReserve br = new BookListReserve(book, comService);
+            BookListReserve br = new BookListReserve(book);
             if (book.getStatus().equals(BookStatus.IN_STOCK)) {
                 if (book.getStackType().equals(OwnerType.AGENCY)) {
                     br.setOwner(cacheManager.getAgencyCache((int) book.getStackId()).getName());
@@ -264,7 +276,7 @@ public class UserCenterController {
         List<Book> res = comService.getList(Book.class, "ownerId=" + ClientValidator.getClientId(request, cacheManager));
         List<BookListReserve> list = new ArrayList<>();
         for (Book book : res) {
-            BookListReserve br = new BookListReserve(book, comService);
+            BookListReserve br = new BookListReserve(book);
             if (book.getStatus().equals(BookStatus.IN_STOCK)) {
                 if (book.getStackType().equals(OwnerType.AGENCY)) {
                     br.setOwner("委托 " + cacheManager.getAgencyCache((int) book.getStackId()).getName() + " 进行管理");
@@ -289,10 +301,10 @@ public class UserCenterController {
     public Object getUserComment(HttpServletRequest request) throws Exception {
         String page = request.getParameter("p");
         List<Object[]> objects = comService.query("select c,b from Comment c, Book b where c.clientId=" +
-                ClientValidator.getClientId(request, cacheManager) + " and c.bookId=b.id", Integer.parseInt(page), 10);
+                ClientValidator.getClientId(request, cacheManager) + " and c.bookId=b.id order by c.id desc", Integer.parseInt(page), 10);
         List<UserCommentList> list = new ArrayList<>();
         for (Object[] o: objects){
-            list.add(new UserCommentList((Comment)o[0], (Book)o[1], comService));
+            list.add(new UserCommentList((Comment)o[0], (Book)o[1]));
         }
         return Result.SUCCESS(list);
     }

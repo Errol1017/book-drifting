@@ -1,8 +1,8 @@
 package project.open.model;
 
-import common.CRUD.service.ComService;
 import common.Util.Base64Util;
 import project.operation.entity.Book;
+import project.resource.properties.ServerProperties;
 
 /**
  * Created by Errol on 17/5/19.
@@ -13,11 +13,11 @@ public class BookListParent {
     private String name;
     private String face;
 
-    public BookListParent(Book book, ComService comService) {
+    public BookListParent(Book book) {
         this.id = String.valueOf(book.getId());
         this.name = book.getName();
         String[] a = book.getPictures().split(",");
-        this.face = Base64Util.img2String(comService.getFileBathPath(), a[0]);
+        this.face = Base64Util.img2String(ServerProperties.getInstance().getFileBasePath(), a[0]);
     }
 
     public String getId() {

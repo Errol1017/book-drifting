@@ -1,6 +1,5 @@
 package project.open.model;
 
-import common.CRUD.service.ComService;
 import project.operation.entity.Book;
 
 /**
@@ -11,8 +10,8 @@ public class BookListReserve extends BookListParent {
     private String status;
     private String owner;
 
-    public BookListReserve(Book book, ComService comService) {
-        super(book, comService);
+    public BookListReserve(Book book) {
+        super(book);
         this.status = book.getStatus().getName();
     }
 

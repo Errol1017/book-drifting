@@ -12,6 +12,7 @@ public class Types {
     public static final String delete = "/Alexandre Dumas";
     public static final String data = "/Romain Rolland";
     public static final String upload = "/Honor de Balzac";
+    public static final String handle = "/Jean Jacques Rousseau";
 
     public static String getType(String type) {
         switch (type) {
@@ -22,6 +23,7 @@ public class Types {
             case "delete": return Types.delete;
             case "data": return Types.data;
             case "upload": return Types.upload;
+            case "handle": return Types.handle;
             default: return null;
         }
     }
