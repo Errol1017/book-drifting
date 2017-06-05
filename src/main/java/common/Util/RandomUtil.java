@@ -1,5 +1,7 @@
 package common.Util;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -8,7 +10,8 @@ import java.util.Random;
 public class RandomUtil {
 
     public static final String PATTEN_ALL_CHARS = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-//    public static final String PATTEN_ALL_CHARS_NOT_CONFUSED = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    public static final String PATTEN_ALL_CHARS_NOT_CONFUSED = "23456789abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
+    public static final String PATTEN_ALL_CHARS_EASY_RECOGNISED = "23456789abcdefghkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ";
     public static final String PATTEN_LETTERS = "abcdefghijkllmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public static final String PATTEN_UPPERCASE_LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     public static final String PATTEN_LOWERCASE_LETTERS = "abcdefghijkllmnopqrstuvwxyz";
@@ -22,6 +25,14 @@ public class RandomUtil {
             stringBuffer.append(type.charAt(random.nextInt(type.length())));
         }
         return stringBuffer.toString();
+    }
+
+    public static List<String> getRandomString(int length, String type, int size) {
+        List<String> list = new ArrayList<>();
+        for (int i=0;i<size;i++){
+            list.add(getRandomString(length, type));
+        }
+        return list;
     }
 
 }

@@ -21,9 +21,10 @@ public class Navigation {
         modules.add(new Module(2, "Client", "用户管理", "", "Client", "ClientPage"));
 
         modules.add(new Module(1, "Basic", "基础设置", "com-res/common/img/sidebar/tables.png", "", ""));
-        modules.add(new Module(2, "Invitation", "邀请码管理", "", "Invitation", "InvitationPage"));
+        modules.add(new Module(2, "Invitation", "邀请码使用情况", "", "Invitation", "InvitationPage"));
         modules.add(new Module(2, "Stacks", "固定起漂点管理", "", "Stacks", "StacksPage"));
         modules.add(new Module(2, "Class", "图书分类管理", "", "Class", "ClassPage"));
+        modules.add(new Module(2, "Export", "导入与导出", "", "Export", "ExportPage"));
 
         modules.add(new Module(1, "System", "系统管理", "com-res/common/img/sidebar/tables.png", "", ""));
         modules.add(new Module(2, "Admin", "管理员设置", "", "Admin", "AdminPage"));

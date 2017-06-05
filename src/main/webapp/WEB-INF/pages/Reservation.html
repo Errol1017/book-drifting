@@ -1,32 +1,204 @@
 <div id="ReservationPage" class="cc_main">
-    projectCheckPage
-    <div>
-        <label for="date" class="ls_mw_100 span20p">预约日期</label>
-        <span class="span_box span70p">
-            <input type="text" id="date" class="input_text_35 span100p" placeholder="不能为空">
-        </span>
+    <div id="ReservationPage_PageTab_0">
+        <div class="list_table_title span35p">
+            图书借阅记录
+        </div>
+        <div id="Reservation_Query" class="list_query">
+            <span class="span_box">
+                <label for="Reservation_Query_status" class="ls_mw_100">借阅状态</label>
+                <span class="span_box">
+                    <input type="text" id="Reservation_Query_status" class="input_text_30 span150">
+                </span>
+            </span>
+            <span class="span_box">
+                <label for="Reservation_Query_start" class="ls_mw_100">开始时间</label>
+                <span class="span_box">
+                    <input type="text" id="Reservation_Query_start" class="input_text_30 span150">
+                </span>
+            </span>
+            <span class="span_box">
+                <label for="Reservation_Query_end" class="ls_mw_100">结束时间</label>
+                <span class="span_box">
+                    <input type="text" id="Reservation_Query_end" class="input_text_30 span150">
+                </span>
+            </span>
+            <span class="span_box float_right">
+                <button id="Reservation_Query_Reset" class="button_style_80_30">重 置</button>
+            </span>
+        </div>
+        <div class="msg_box">
+            <div id="ReservationList_Msg" class="msg_style"></div>
+        </div>
+        <table id="ReservationList" class="list_table">
+        </table>
+        <div id="ReservationList_HandleBox" class="list_table_handle_box span80">
+            <ul class="list_table_handle_box_ul">
+                <li class="m_m_s" id="ReservationList_Edit">详 情</li>
+                <li class="m_m_s" id="ReservationList_Delete">删 除</li>
+                <li class="m_m_s" id="ReservationList_Reload">刷 新</li>
+            </ul>
+        </div>
+        <div class="list_table_bottom">
+            -&nbsp;单击表格行可执行操作
+        </div>
     </div>
-    <div>
-        <label for="time" class="ls_mw_100 span20p">预约日期</label>
-        <span class="span_box span70p">
-            <input type="text" id="time" class="input_text_35 span100p" placeholder="不能为空">
-        </span>
+    <div id="ReservationPage_PageTab_1">
+        <div class="form_detail_title span30p">
+            图书借阅详情
+        </div>
+        <div class="msg_box">
+            <div id="ReservationForm_Msg" class="msg_style"></div>
+        </div>
+        <div id="ReservationForm" class="form_detail">
+            <input type="hidden" id="ReservationForm_id">
+            <input type="hidden" id="ReservationForm_bookId">
+            <input type="hidden" id="ReservationForm_clientId">
+            <div>
+                <label for="ReservationForm_bookName" class="ls_mw_100 span20p">书名</label>
+                <span class="span_box span70p">
+                    <input type="text" id="ReservationForm_bookName" class="input_text_35 span100p" disabled>
+                </span>
+            </div>
+            <div>
+                <label for="ReservationForm_holder" class="ls_mw_100 span20p">借出方</label>
+                <span class="span_box span70p">
+                    <input type="text" id="ReservationForm_holder" class="input_text_35 span100p" disabled>
+                </span>
+            </div>
+            <div>
+                <label for="ReservationForm_client" class="ls_mw_100 span20p">借阅用户</label>
+                <span class="span_box span70p">
+                    <input type="text" id="ReservationForm_client" class="input_text_35 span100p" disabled>
+                </span>
+            </div>
+            <div>
+                <label for="ReservationForm_status" class="ls_mw_100 span20p">借阅状态</label>
+                <span class="span_box span70p">
+                    <input type="text" id="ReservationForm_status" class="input_text_35 span100p" disabled>
+                </span>
+            </div>
+            <div>
+                <label for="ReservationForm_createTime" class="ls_mw_100 span20p">申请时间</label>
+                <span class="span_box span70p">
+                    <input type="text" id="ReservationForm_createTime" class="input_text_35 span100p" disabled>
+                </span>
+            </div>
+            <div>
+                <label for="ReservationForm_borrowedTime" class="ls_mw_100 span20p">借阅时间</label>
+                <span class="span_box span70p">
+                    <input type="text" id="ReservationForm_borrowedTime" class="input_text_35 span100p" disabled>
+                </span>
+            </div>
+            <div>
+                <label for="ReservationForm_recedeTime" class="ls_mw_100 span20p">还书时间</label>
+                <span class="span_box span70p">
+                    <input type="text" id="ReservationForm_recedeTime" class="input_text_35 span100p" disabled>
+                </span>
+            </div>
+            <div>
+                <label for="ReservationForm_expireTime" class="ls_mw_100 span20p">到期时间</label>
+                <span class="span_box span70p">
+                    <input type="text" id="ReservationForm_expireTime" class="input_text_35 span100p" disabled>
+                </span>
+            </div>
+        </div>
+        <div class="form_detail_bottom">
+            <span class="form_detail_bottom_handle_box span70p">
+                <!--<button class="button_style_80_30" id="ReservationForm_Submit">新 增</button>-->
+                <button class="button_style_80_30" id="ReservationForm_Unbind">返 回</button>
+            </span>
+            <span class="form_detail_bottom_lines span30p"></span>
+        </div>
     </div>
 
     <script>
         $(function () {
-            $("#date").date_picker({
-                shortDate: false
+            var tab = $("#ReservationPage").page_tab({
+                showBtn: false
+            });
+            var list = $("#ReservationList").list_table({
+                header: {
+                    names: ["!_id", "!_bookId", "!_clientId", "书名", "借出方", "借阅用户", "借阅状态", "申请时间"],
+                    colWith: ["", "", "", "span20p", "span20p", "span20p", "span20p", "span20p"]
+                },
+                body: {
+                    tdConf: ["", "", "", "nowrap", "nowrap", "nowrap", "nowrap", "nowrap"]
+                },
+                handle: {
+                    edit: {
+                        callback: function (data) {
+                            tab.toggle();
+                            form.getForm(data.id)
+                        }
+                    },
+                    delete: {
+                        before: function () {
+                            return confirm("确认删除借阅记录？")
+                        },
+                        success: function (data) {
+                            form.unbind(data.id)
+                        }
+                    }
+                }
+            });
+            var status = $("#Reservation_Query_status").dynamic_select({
+                writable: false
+            });
+            var start = $("#Reservation_Query_start").date_picker();
+            var end = $("#Reservation_Query_end").date_picker();
+            var query = $("#Reservation_Query").query_manager({
+                manually: false,
+                keys: ["status", "start", "end"],
+                callback: function (q) {
+                    list.getList(q)
+                },
+                handle: {
+                    resetCall: function () {
+                        status.reset();
+                        start.reset();
+                        end.reset();
+                        list.getList('')
+                    }
+                }
+            });
+            var form = $("#ReservationForm").form_detail({
+                inputIds: ["!_id", "!_bookId", "!_clientId", "bookName", "holder", "client", "status", "createTime", "borrowedTime", "recedeTime", "expireTime"],
+//                validator: [
+//                    function (o) {
+//                        return o.required().show_check_msg();
+//                    },
+//                    function (o) {
+//                        return o.required().show_check_msg();
+//                    },
+//                    function (o) {
+//                        return o.required().show_check_msg();
+//                    },
+//                    function (o) {
+//                        return o.required().show_check_msg();
+//                    }
+//                ],
+                bind: {
+                    after: function () {
+                    }
+                },
+                unbind: {
+                    after: function () {
+                        tab.toggle();
+                        list.deselect();
+                    }
+                },
+//                submit: {
+//                    success: function (data) {
+//                        if (data != undefined) {
+//                            $("#ReservationForm_id").val(data);
+//                        }
+//                        list.getList();
+//                    }
+//                }
+            });
+            $("#ReservationPage").reloadData(function () {
+                list.getList(1);
             })
-            $("#date").change(function () {
-                console.log("change")
-            })
-            $("#time").date_picker();
-            $("#time").change(function () {
-                console.log("time change")
-            })
-            var d = new Date()
-            console.log(d.getTime())
         })
     </script>
 </div>

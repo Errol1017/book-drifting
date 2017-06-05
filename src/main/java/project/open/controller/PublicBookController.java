@@ -267,7 +267,10 @@ public class PublicBookController {
         for (Comment c: res){
             list.add(new BookCommentList(c, cacheManager));
         }
-        return Result.SUCCESS(list);
+        Map<String, Object> map = new HashMap<>();
+        map.put("list", list);
+        map.put("title", cacheManager.getBookCache(Long.parseLong(bookId)).getName());
+        return Result.SUCCESS(map);
     }
 
     @ResponseBody

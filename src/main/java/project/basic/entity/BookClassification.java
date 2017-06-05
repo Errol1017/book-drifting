@@ -18,6 +18,9 @@ public class BookClassification {
     //分类名称
     @Column(nullable = false, unique = true)
     private String name;
+    //帅选code
+    @Column(nullable = false, unique = true)
+    private String code;
 
     public BookClassification() {
     }
@@ -31,6 +34,7 @@ public class BookClassification {
 
     public BookClassification(ClassList form) {
         this.name = form.getName();
+        this.code = form.getCode();
     }
 
     public int getId() {
@@ -47,5 +51,13 @@ public class BookClassification {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }

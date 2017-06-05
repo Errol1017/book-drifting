@@ -1,6 +1,5 @@
 package project.operation.entity;
 
-import common.Util.SecretKeyCoder;
 import project.open.model.BookAddForm;
 import project.operation.model.BookForm;
 import project.operation.pojo.OwnerType;
@@ -87,6 +86,7 @@ public class Book {
     public Book() {
     }
 
+    //后台添加图书
     public Book(BookForm form) {
         this.name = form.getName();
         this.author = form.getAuthor();
@@ -95,15 +95,16 @@ public class Book {
         this.pictures = form.getPictures();
         this.status = BookStatus.valueOf(form.getStatus());
         this.ownerType = OwnerType.valueOf(form.getOwnerType());
-        this.ownerId = Long.parseLong(form.getOwnerId());
+        this.ownerId = Long.parseLong(form.getOwner());
 //        this.stackIds = form.getStackId();
         this.stackType = OwnerType.AGENCY;
-        this.stackId = Long.parseLong(form.getStackId());
+//        this.stackId = Long.parseLong(form.getStackId());
 //        this.salt = SecretKeyCoder.getSalt(20);
 //        this.qrCode = qrCode;
 //        this.createTime = createTime;
     }
 
+    //用户上传图书
     public Book(BookAddForm form, long ownerId) {
         this.name = form.getName();
         this.author = form.getAuthor();
@@ -120,6 +121,14 @@ public class Book {
         if (!form.getStackType().equals("a")) {
             this.status = BookStatus.IN_STOCK;
         }
+    }
+
+    //后台修改图书
+    public void modify(BookForm form) {
+        this.name = form.getName();
+        this.author = form.getAuthor();
+        this.classificationId = Integer.parseInt(form.getBookClass());
+        this.introduction = form.getIntroduction();
     }
 
     /**

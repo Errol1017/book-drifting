@@ -1,0 +1,157 @@
+<div id="ExportPage" class="cc_main">
+    <div class="box_style_A">
+        <span class="box_style_A_title">
+            邀请码管理
+        </span>
+        <div class="box_style_A_container">
+            <div class="msg_box msg_style">
+                <div id="Export_IC_Msg" class="msg_style"></div>
+            </div>
+            <div>
+                <label for="Export_IC_num" class="ls_mw_100 span20p">生成并导出邀请码</label>
+                <label style="display: none">邀请码数量</label>
+                <span class="span_box span70p">
+                    <input type="text" id="Export_IC_num" class="input_text_30 span150" placeholder="生成多少邀请码？">
+                    <button class="button_style_80_30" style="margin-left: 20px" id="Export_Add_Invitation_Code">生成</button>
+                </span>
+            </div>
+            <div>
+                <label class="ls_mw_100 span20p">导出未使用邀请码</label>
+                <span class="span_box span70p">
+                    <button class="button_style_80_30" style="margin-left: 1px" id="Export_out_Invitation_Code">导出</button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="box_style_A" style="margin-top: 20px">
+        <span class="box_style_A_title">
+            图书二维码管理
+        </span>
+        <div class="box_style_A_container">
+            <div class="msg_box msg_style">
+                <div id="Export_QR_Msg" class="msg_style"></div>
+            </div>
+            <div>
+                <label for="Export_qrCode_num" class="ls_mw_100 span20p">生成并导出邀请码</label>
+                <label style="display: none">邀请码数量</label>
+                <span class="span_box span70p">
+                    <input type="text" id="Export_qrCode_num" class="input_text_30 span150" placeholder="生成多少图书二维码？">
+                    <button class="button_style_80_30" style="margin-left: 20px" id="Export_Add_QR_Code">生成</button>
+                </span>
+            </div>
+            <div>
+                <label class="ls_mw_100 span20p">导出未使用邀请码</label>
+                <span class="span_box span70p">
+                    <button class="button_style_80_30" style="margin-left: 1px" id="Export_out_QR_Code">导出</button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            var reqId = $.ero.reqIdForPlugin;
+            var icNumObj = $("#Export_IC_num");
+            icNumObj.change(function () {
+                $(this).require_number(0, 1000).show_check_msg($("#Export_IC_Msg"))
+            });
+            $("#Export_Add_Invitation_Code").click(function () {
+                if (icNumObj.required().require_number(0, 1000).show_check_msg($("#Export_IC_Msg"))) {
+                    var num = icNumObj.val();
+                    icNumObj.val("");
+                    $.ajax({
+                        url: 'navigator/validator',
+                        type: 'post',
+                        data: {
+                            type: 'handle',
+                            reqId: reqId,
+                            compId: 'Export_Add_Invitation_Code',
+                            handle: 'add',
+                            num: num
+                        },
+                        success: function (res) {
+                            if (res.code==0) {
+                                location.href = "navigator/download?key="+res.data
+                            }
+                        },
+//                        error: function () {
+//
+//                        }
+                    })
+                }
+            })
+            $("#Export_out_Invitation_Code").click(function () {
+                $.ajax({
+                    url: 'navigator/validator',
+                    type: 'post',
+                    data: {
+                        type: 'handle',
+                        reqId: reqId,
+                        compId: 'Export_out_Invitation_Code',
+                        handle: 'out',
+                    },
+                    success: function (res) {
+                        if (res.code==0) {
+                            location.href = "navigator/download?key="+res.data
+                        }
+                    },
+//                        error: function () {
+//
+//                        }
+                })
+            })
+
+            var qrNumObj = $("#Export_qrCode_num");
+            qrNumObj.change(function () {
+                $(this).require_number(0, 1000).show_check_msg($("#Export_QR_Msg"))
+            });
+            $("#Export_Add_QR_Code").click(function () {
+                if (qrNumObj.required().require_number(0, 1000).show_check_msg($("#Export_QR_Msg"))) {
+                    var num = qrNumObj.val();
+                    qrNumObj.val("");
+                    $.ajax({
+                        url: 'navigator/validator',
+                        type: 'post',
+                        data: {
+                            type: 'handle',
+                            reqId: reqId,
+                            compId: 'Export_Add_QR_Code',
+                            handle: 'add',
+                            num: num
+                        },
+                        success: function (res) {
+                            if (res.code==0) {
+                                location.href = "navigator/download?key="+res.data
+                            }
+                        },
+//                        error: function () {
+//
+//                        }
+                    })
+                }
+            })
+            $("#Export_out_QR_Code").click(function () {
+                $.ajax({
+                    url: 'navigator/validator',
+                    type: 'post',
+                    data: {
+                        type: 'handle',
+                        reqId: reqId,
+                        compId: 'Export_out_QR_Code',
+                        handle: 'out',
+                    },
+                    success: function (res) {
+                        if (res.code==0) {
+                            location.href = "navigator/download?key="+res.data
+                        }
+                    },
+//                        error: function () {
+//
+//                        }
+                })
+            })
+
+        })
+    </script>
+</div>

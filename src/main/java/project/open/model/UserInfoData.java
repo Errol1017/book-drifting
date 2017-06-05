@@ -17,6 +17,7 @@ public class UserInfoData {
     private String mobile;
     private String idNum;
     private String agency;
+    private String agencyId;
     private String stacks;
 
     public UserInfoData(Client client, CacheManager cacheManager) {
@@ -27,6 +28,7 @@ public class UserInfoData {
         this.mobile = client.getMobile();
         this.idNum = client.getIdentityNumber();
         this.agency = cacheManager.getAgencyCache(client.getAgencyId()).getName();
+        this.agencyId = String.valueOf(client.getAgencyId());
         this.stacks = "";
     }
 
@@ -84,6 +86,14 @@ public class UserInfoData {
 
     public void setAgency(String agency) {
         this.agency = agency;
+    }
+
+    public String getAgencyId() {
+        return agencyId;
+    }
+
+    public void setAgencyId(String agencyId) {
+        this.agencyId = agencyId;
     }
 
     public String getStacks() {

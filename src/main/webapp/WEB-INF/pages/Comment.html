@@ -1,3 +1,179 @@
 <div id="CommentPage" class="cc_main">
-    projectCreatePage
+    <div id="CommentPage_PageTab_0">
+        <div class="list_table_title span35p">
+            书评列表
+        </div>
+        <div id="Comment_Query" class="list_query">
+            <!--<span class="span_box">-->
+                <!--<label for="Comment_Query_bookName" class="ls_mw_100">书名</label>-->
+                <!--<span class="span_box">-->
+                    <!--<input type="text" id="Comment_Query_bookName" class="input_text_30 span150">-->
+                <!--</span>-->
+            <!--</span>-->
+            <span class="span_box">
+                <label for="Comment_Query_start" class="ls_mw_100">开始时间</label>
+                <span class="span_box">
+                    <input type="text" id="Comment_Query_start" class="input_text_30 span150">
+                </span>
+            </span>
+            <span class="span_box">
+                <label for="Comment_Query_end" class="ls_mw_100">结束时间</label>
+                <span class="span_box">
+                    <input type="text" id="Comment_Query_end" class="input_text_30 span150">
+                </span>
+            </span>
+            <span class="span_box float_right">
+                <button id="Comment_Query_Reset" class="button_style_80_30">重 置</button>
+            </span>
+        </div>
+        <div class="msg_box">
+            <div id="CommentList_Msg" class="msg_style"></div>
+        </div>
+        <table id="CommentList" class="list_table">
+        </table>
+        <div id="CommentList_HandleBox" class="list_table_handle_box span80">
+            <ul class="list_table_handle_box_ul">
+                <li class="m_m_s" id="CommentList_Edit">详 情</li>
+                <li class="m_m_s" id="CommentList_Delete">删 除</li>
+                <li class="m_m_s" id="CommentList_Reload">刷 新</li>
+            </ul>
+        </div>
+        <div class="list_table_bottom">
+            -&nbsp;单击表格行可执行操作
+        </div>
+    </div>
+    <div id="CommentPage_PageTab_1">
+        <div class="form_detail_title span30p">
+            书评详情
+        </div>
+        <div class="msg_box">
+            <div id="CommentForm_Msg" class="msg_style"></div>
+        </div>
+        <div id="CommentForm" class="form_detail">
+            <input type="hidden" id="CommentForm_id">
+            <input type="hidden" id="CommentForm_bookId">
+            <input type="hidden" id="CommentForm_clientId">
+            <div>
+                <label for="CommentForm_bookName" class="ls_mw_100 span20p">书名</label>
+                <span class="span_box span70p">
+                    <input type="text" id="CommentForm_bookName" class="input_text_35 span100p" disabled>
+                </span>
+            </div>
+            <div>
+                <label for="CommentForm_clientNickname" class="ls_mw_100 span20p">评论用户</label>
+                <span class="span_box span70p">
+                    <input type="text" id="CommentForm_clientNickname" class="input_text_35 span100p" disabled>
+                </span>
+            </div>
+            <div class="text_area_box">
+                <label for="CommentForm_content" class="ls_mw_100 span20p alain_top">图书简介</label>
+                <span class="span_box span70p">
+                    <textarea id="CommentForm_content" class="input_text_area_100 span100p" disabled></textarea>
+                </span>
+            </div>
+            <div>
+                <label for="CommentForm_createTime" class="ls_mw_100 span20p">图书所有者类型</label>
+                <span class="span_box span70p">
+                    <input type="text" id="CommentForm_createTime" class="input_text_35 span100p" disabled>
+                </span>
+            </div>
+        </div>
+        <div class="form_detail_bottom">
+            <span class="form_detail_bottom_handle_box span70p">
+                <!--<button class="button_style_80_30" id="CommentForm_Submit">新 增</button>-->
+                <button class="button_style_80_30" id="CommentForm_Unbind">返 回</button>
+            </span>
+            <span class="form_detail_bottom_lines span30p"></span>
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            var tab = $("#CommentPage").page_tab({
+                showBtn: false
+            });
+            var list = $("#CommentList").list_table({
+                header: {
+                    names: ["!_id", "!_bookId", "书名", "!_clientId", "评论用户", "评论内容", "评论日期"],
+                    colWith: ["", "", "span20p", "", "span20p", "span40p", "span20p"]
+                },
+                body: {
+                    tdConf: ["", "", "nowrap", "", "nowrap", "nowrap", "nowrap"]
+                },
+                handle: {
+                    edit: {
+                        callback: function (data) {
+                            tab.toggle();
+                            form.getForm(data.id)
+                        }
+                    },
+                    delete: {
+                        before: function () {
+                            return confirm("确认删除评论？")
+                        },
+                        success: function (data) {
+                            form.unbind(data.id)
+                        }
+                    }
+                }
+            });
+//            var bookName = $("#Comment_Query_bookName");
+            var start = $("#Comment_Query_start").date_picker();
+            var end = $("#Comment_Query_end").date_picker();
+            var query = $("#Comment_Query").query_manager({
+                manually: false,
+                keys: ["start", "end"],
+//                keys: ["bookName", "start", "end"],
+                callback: function (q) {
+                    list.getList(q)
+                },
+                handle: {
+                    resetCall: function () {
+//                        bookName.val("");
+                        start.reset();
+                        end.reset();
+                        list.getList('')
+                    }
+                }
+            });
+            var form = $("#CommentForm").form_detail({
+                inputIds: ["!_id", "!_bookId", "!_clientId", "bookName", "clientNickname", "content", "createTime"],
+//                validator: [
+//                    function (o) {
+//                        return o.required().show_check_msg();
+//                    },
+//                    function (o) {
+//                        return o.required().show_check_msg();
+//                    },
+//                    function (o) {
+//                        return o.required().show_check_msg();
+//                    },
+//                    function (o) {
+//                        return o.required().show_check_msg();
+//                    }
+//                ],
+                bind: {
+                    after: function () {
+                    }
+                },
+                unbind: {
+                    after: function () {
+                        tab.toggle();
+                        list.deselect();
+                    }
+                },
+//                submit: {
+//                    success: function (data) {
+//                        if (data != undefined) {
+//                            $("#CommentForm_id").val(data);
+//                        }
+//                        list.getList();
+//                    }
+//                }
+            });
+            $("#CommentPage").reloadData(function () {
+                list.getList(1);
+            })
+        })
+    </script>
 </div>

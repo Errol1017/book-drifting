@@ -1,104 +1,134 @@
 <div id="BooksPage" class="cc_main">
-    <div>
-        <div>
-            <div class="list_table_title span35p">
-                图书列表
+    <div id="BooksPage_PageTab_0">
+        <div class="list_table_title span35p">
+            图书列表
+        </div>
+        <div id="Books_Query" class="list_query">
+            <span class="span_box">
+                <label for="Books_Query_status" class="ls_mw_100">图书状态</label>
+                <span class="span_box">
+                    <input type="text" id="Books_Query_status" class="input_text_30 span150">
+                </span>
+            </span>
+            <span class="span_box">
+                <label for="Books_Query_manager" class="ls_mw_100">管理者类型</label>
+                <span class="span_box">
+                    <input type="text" id="Books_Query_manager" class="input_text_30 span150">
+                    <div class="dynamic_plugin_box span150">
+                        <ul class="dynamic_select_ul">
+                            <li class="dynamic_select_li" data-val="1">委托机构管理</li>
+                            <li class="dynamic_select_li" data-val="0">用户个人管理</li>
+                        </ul>
+                    </div>
+                </span>
+            </span>
+            <span class="span_box">
+                <label for="Books_Query_agency" class="ls_mw_100">委托机构</label>
+                <span class="span_box">
+                    <input type="text" id="Books_Query_agency" class="input_text_30 span150">
+                </span>
+            </span>
+            <span class="span_box float_right">
+                <button id="Books_Query_Reset" class="button_style_80_30">重 置</button>
+            </span>
+        </div>
+        <div class="msg_box">
+            <div id="BookList_Msg" class="msg_style"></div>
+        </div>
+        <table id="BookList" class="list_table">
+        </table>
+        <div id="BookList_HandleBox" class="list_table_handle_box span80">
+            <ul class="list_table_handle_box_ul">
+                <li class="m_m_s" id="BookList_Edit">编 辑</li>
+                <li class="m_m_s" id="BookList_Delete">删 除</li>
+                <li class="m_m_s" id="BookList_Reload">刷 新</li>
+            </ul>
+        </div>
+        <div class="list_table_bottom">
+            -&nbsp;单击表格行可执行操作
+        </div>
+    </div>
+    <div id="BooksPage_PageTab_1">
+        <div class="form_detail_title span30p">
+            图书详情
+        </div>
+        <div class="msg_box">
+            <div id="BookForm_Msg" class="msg_style"></div>
+        </div>
+        <div id="BookForm" class="form_detail">
+            <input type="hidden" id="BookForm_id">
+            <div>
+                <label for="BookForm_name" class="ls_mw_100 span20p">书名</label>
+                <span class="span_box span70p">
+                    <input type="text" id="BookForm_name" class="input_text_35 span100p" placeholder="不能为空">
+                </span>
             </div>
-            <div class="msg_box">
-                <div id="BookList_Msg" class="msg_style"></div>
+            <div>
+                <label for="BookForm_author" class="ls_mw_100 span20p">作者</label>
+                <span class="span_box span70p">
+                    <input type="text" id="BookForm_author" class="input_text_35 span100p" placeholder="不能为空">
+                </span>
             </div>
-            <table id="BookList" class="list_table">
-            </table>
-            <div id="BookList_HandleBox" class="list_table_handle_box span80">
-                <ul class="list_table_handle_box_ul">
-                    <li class="m_m_s" id="BookList_Edit">编 辑</li>
-                    <li class="m_m_s" id="BookList_Delete">删 除</li>
-                    <li class="m_m_s" id="BookList_Reload">刷 新</li>
-                </ul>
+            <div>
+                <label for="BookForm_bookClass" class="ls_mw_100 span20p">所属分类</label>
+                <span class="span_box span70p">
+                    <input type="text" id="BookForm_bookClass" class="input_text_35 span100p" placeholder="不能为空">
+                </span>
             </div>
-            <div class="list_table_bottom">
-                -&nbsp;单击表格行可执行操作
+            <div class="text_area_box">
+                <label for="BookForm_introduction" class="ls_mw_100 span20p alain_top">图书简介</label>
+                <span class="span_box span70p">
+                    <textarea id="BookForm_introduction" class="input_text_area_100 span100p" placeholder="不能为空"></textarea>
+                </span>
+            </div>
+            <div>
+                <label for="BookForm_pictures" class="ls_mw_100 span20p alain_top">图书照片</label>
+                <span class="span_box span70p">
+                    <input type="hidden" id="BookForm_pictures">
+                </span>
+            </div>
+            <div>
+                <label for="BookForm_ownerType" class="ls_mw_100 span20p">图书所有者类型</label>
+                <span class="span_box span70p">
+                    <input type="text" id="BookForm_ownerType" class="input_text_35 span100p" placeholder="可以为空" disabled>
+                </span>
+            </div>
+            <div>
+                <label for="BookForm_owner" class="ls_mw_100 span20p">图书所有者</label>
+                <span class="span_box span70p">
+                    <input type="text" id="BookForm_owner" class="input_text_35 span100p" placeholder="可以为空" disabled>
+                </span>
+            </div>
+            <div>
+                <label for="BookForm_stack" class="ls_mw_100 span20p">图书管理者</label>
+                <span class="span_box span70p">
+                    <input type="text" id="BookForm_stack" class="input_text_35 span100p" placeholder="可以为空" disabled>
+                </span>
+            </div>
+            <div>
+                <label for="BookForm_status" class="ls_mw_100 span20p">图书状态</label>
+                <span class="span_box span70p">
+                    <input type="text" id="BookForm_status" class="input_text_35 span100p" placeholder="可以为空" disabled>
+                </span>
             </div>
         </div>
-        <div>
-            <div class="form_detail_title span30p">
-                图书详情
-            </div>
-            <div class="msg_box">
-                <div id="BookForm_Msg" class="msg_style"></div>
-            </div>
-            <div id="BookForm" class="form_detail">
-                <input type="hidden" id="BookForm_id">
-                <div>
-                    <label for="BookForm_name" class="ls_mw_100 span20p">书名</label>
-                    <span class="span_box span70p">
-                        <input type="text" id="BookForm_name" class="input_text_35 span100p" placeholder="不能为空">
-                    </span>
-                </div>
-                <div>
-                    <label for="BookForm_author" class="ls_mw_100 span20p">作者</label>
-                    <span class="span_box span70p">
-                        <input type="text" id="BookForm_author" class="input_text_35 span100p" placeholder="不能为空">
-                    </span>
-                </div>
-                <div>
-                    <label for="BookForm_bookClass" class="ls_mw_100 span20p">所属分类</label>
-                    <span class="span_box span70p">
-                        <input type="text" id="BookForm_bookClass" class="input_text_35 span100p" placeholder="不能为空">
-                    </span>
-                </div>
-                <div>
-                    <label for="BookForm_introduction" class="ls_mw_100 span20p">图书简介</label>
-                    <span class="span_box span70p">
-                        <input type="text" id="BookForm_introduction" class="input_text_35 span100p" placeholder="可以为空">
-                    </span>
-                </div>
-                <div>
-                    <label for="BookForm_pictures" class="ls_mw_100 span20p">图书照片</label>
-                    <span class="span_box span70p">
-                        <input type="text" id="BookForm_pictures" class="input_text_35 span100p" placeholder="可以为空">
-                    </span>
-                </div>
-                <div>
-                    <label for="BookForm_ownerType" class="ls_mw_100 span20p">图书所有者类型</label>
-                    <span class="span_box span70p">
-                        <input type="text" id="BookForm_ownerType" class="input_text_35 span100p" placeholder="可以为空">
-                    </span>
-                </div>
-                <div>
-                    <label for="BookForm_ownerId" class="ls_mw_100 span20p">图书所有者</label>
-                    <span class="span_box span70p">
-                        <input type="text" id="BookForm_ownerId" class="input_text_35 span100p" placeholder="可以为空">
-                    </span>
-                </div>
-                <div>
-                    <label for="BookForm_stackId" class="ls_mw_100 span20p">图书起漂点</label>
-                    <span class="span_box span70p">
-                        <input type="text" id="BookForm_stackId" class="input_text_35 span100p" placeholder="可以为空">
-                    </span>
-                </div>
-                <div>
-                    <label for="BookForm_status" class="ls_mw_100 span20p">图书状态</label>
-                    <span class="span_box span70p">
-                        <input type="text" id="BookForm_status" class="input_text_35 span100p" placeholder="可以为空">
-                    </span>
-                </div>
-            </div>
-            <div class="form_detail_bottom">
-                <span class="form_detail_bottom_handle_box span70p">
-                    <button class="button_style_80_30" id="BookForm_Submit">新 增</button>
-                    <button class="button_style_80_30" id="BookForm_Unbind">清 空</button>
-                </span>
-                <span class="form_detail_bottom_lines span30p"></span>
-            </div>
+        <div class="form_detail_bottom">
+            <span class="form_detail_bottom_handle_box span70p">
+                <button class="button_style_80_30" id="BookForm_Submit">新 增</button>
+                <button class="button_style_80_30" id="BookForm_Unbind">返 回</button>
+            </span>
+            <span class="form_detail_bottom_lines span30p"></span>
         </div>
     </div>
 
     <script>
         $(function () {
+            var tab = $("#BooksPage").page_tab({
+                showBtn: false
+            });
             var list = $("#BookList").list_table({
                 header: {
-                    names: ["!_id", "书名", "作者", "图书分类", "所有者类型", "图书所有者", "图书状态"],
+                    names: ["!_id", "书名", "作者", "图书分类", "图书所有者", "委托机构", "图书状态"],
                     colWith: ["", "span20p", "span20p", "span20p", "span10p", "span20p", "span10p"]
                 },
                 body: {
@@ -107,12 +137,13 @@
                 handle: {
                     edit: {
                         callback: function (data) {
+                            tab.toggle();
                             form.getForm(data.id)
                         }
                     },
                     delete: {
                         before: function () {
-                            return confirm("确认删除数据？")
+                            return confirm("确认删除图书？将同时删除图书相关的借阅和评论记录")
                         },
                         success: function (data) {
                             form.unbind(data.id)
@@ -120,8 +151,46 @@
                     }
                 }
             });
+            var status = $("#Books_Query_status").dynamic_select({
+                writable: false
+            });
+            var manager = $("#Books_Query_manager").dynamic_select({
+                dynamic: false,
+                writable: false,
+                callback: function () {
+                    agency.reset("");
+                    query.reset();
+                    $("#Books_Query_status").trigger("change");
+                }
+            });
+            var agency = $("#Books_Query_agency").dynamic_select({
+                callback: function () {
+                    manager.reset("1");
+                    query.reset();
+                    $("#Books_Query_agency").trigger("change");
+                }
+            });
+            var query = $("#Books_Query").query_manager({
+                manually: false,
+                keys: ["status", "manager", "agency"],
+                callback: function (q) {
+                    list.getList(q)
+                },
+                handle: {
+                    resetCall: function () {
+                        status.reset();
+                        manager.reset();
+                        agency.reset();
+                        list.getList('')
+                    }
+                }
+            });
+            var bookClass = $("#BookForm_bookClass").dynamic_select();
+            var pics = $("#BookForm_pictures").img_previewer({
+//                editable: false
+            });
             var form = $("#BookForm").form_detail({
-                inputIds: ["!_id", "name", "author", "bookClass", "introduction", "pictures", "ownerType", "ownerId", "stackId", "status"],
+                inputIds: ["!_id", "name", "author", "bookClass", "introduction", "pictures", "ownerType", "owner", "stack", "status"],
                 validator: [
                     function (o) {
                         return o.required().check_simple_length(1, 100).show_check_msg();
@@ -139,24 +208,29 @@
                         return o.required().show_check_msg();
                     },
                     function (o) {
-                        return o.required().require_number('>', 0).show_check_msg();
+                        return o.required().show_check_msg();
                     },
                     function (o) {
-                        return o.required().require_number('>', 0).show_check_msg();
+                        return o.required().show_check_msg();
                     },
                     function (o) {
-                        return o.check_simple_length(0, 500).show_check_msg();
+                        return o.required().show_check_msg();
                     },
                     function (o) {
-                        return o.required().require_number('>', 0).show_check_msg();
-                    },
+                        return o.required().show_check_msg();
+                    }
                 ],
                 bind: {
                     after: function () {
+                        bookClass.reset();
+                        pics.reset()
                     }
                 },
                 unbind: {
                     after: function () {
+                        tab.toggle();
+                        bookClass.reset();
+                        pics.reset();
                         list.deselect();
                     }
                 },
@@ -174,5 +248,4 @@
             })
         })
     </script>
-
 </div>

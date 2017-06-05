@@ -1,14 +1,13 @@
 package project.navigator.service;
 
 import common.CRUD.service.ComService;
-import common.Util.InvitationCodeGenerator;
+import common.FileProcessor.excel.ExcelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import project.basic.entity.Agency;
 import project.basic.entity.BookClassification;
-import project.basic.entity.InvitationCode;
 import project.basic.model.AgencyCache;
 import project.navigator.model.Navigation;
 import project.operation.entity.Book;
@@ -17,6 +16,8 @@ import project.operation.entity.Reservation;
 import project.operation.entity.Stacks;
 import project.operation.model.BookCache;
 import project.operation.model.ClientCache;
+import project.resource.properties.ServerProperties;
+import project.resource.service.PropertiesInitializer;
 import project.system.entity.Admin;
 import project.system.entity.AdminRole;
 
@@ -30,10 +31,13 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
 
     @Autowired
     private ComService comService;
+    @Autowired
+    private PropertiesInitializer propertiesInitializer;
 
     //admin cache
     private Map<Integer, String> bookClassificationCache;
     private Map<Integer, AgencyCache> agencyCache;
+    private Map<String, String> downloadMap = new HashMap<>();
     //dynamic select
     private List<Map<String, String>> bookClassificationSelect;
     private List<Map<String, String>> agencySelect;
@@ -53,7 +57,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
 
         /** 初始化root管理员和root权限 */
         initRootAdmin();
-        /** 初始化数据 */
+        /** 初始化测试数据 */
         initData();
         /** 加载缓存 */
         initCache();
@@ -96,18 +100,18 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
             comService.saveDetail(list);
         }
 
-        /**
-         * 初始化邀请码
-         */
-        InvitationCode ic = comService.getFirst(InvitationCode.class, "id asc");
-        if (ic == null) {
-            List<String> codes = InvitationCodeGenerator.getMany(100);
-            List<InvitationCode> list = new ArrayList<>();
-            for (String s : codes) {
-                list.add(new InvitationCode(s));
-            }
-            comService.saveDetail(list);
-        }
+//        /**
+//         * 初始化邀请码
+//         */
+//        InvitationCode ic = comService.getFirst(InvitationCode.class, "id asc");
+//        if (ic == null) {
+//            List<String> codes = InvitationCodeGenerator.getMany(100);
+//            List<InvitationCode> list = new ArrayList<>();
+//            for (String s : codes) {
+//                list.add(new InvitationCode(s));
+//            }
+//            comService.saveDetail(list);
+//        }
 
         /**
          * 初始化单位信息
@@ -188,6 +192,7 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
         for (BookClassification bc: list) {
             map = new HashMap<>();
             map.put("val", String.valueOf(bc.getId()));
+            map.put("code", bc.getCode());
             map.put("text", bc.getName());
             bookClassificationSelect.add(map);
             map = new HashMap<>();
@@ -306,6 +311,17 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
         }
         return null;
     }
+    //书名、作者名，模糊查找图书
+    public String searchBook(String s) {
+        StringBuffer sb = new StringBuffer();
+        for (BookCache bc : bookCacheMap.values()) {
+            if (bc.getName().indexOf(s) != -1 || bc.getAuthor().indexOf(s) != -1) {
+                sb.append("," + bc.getId());
+            }
+        }
+        sb.deleteCharAt(0);
+        return sb.toString();
+    }
     //重置图书缓存
     private void resetBookCache() {
         bookCacheMap = new HashMap<>();
@@ -322,6 +338,19 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
         }
     }
 
+    /**
+     * 下载随机数map
+     */
+    public void addElement(String key, String value) {
+        downloadMap.put(key, value);
+    }
+    public String getElement(String key) {
+        return downloadMap.get(key);
+    }
+    public void removeElement(String key) {
+        downloadMap.remove(key);
+    }
+
 
 
 
@@ -331,6 +360,9 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     public static void main(String[] args) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
+        System.out.println(calendar.getTime());
     }
 
 }

@@ -2,11 +2,13 @@ package project.navigator.controller;
 
 import common.DataFormatter.ErrorCode;
 import common.DataFormatter.Result;
+import common.FileProcessor.FileManager;
+import common.Util.Base64Util;
 import common.Util.ValidateUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,11 +18,15 @@ import project.navigator.route.Components;
 import project.navigator.route.Forms;
 import project.navigator.route.Lists;
 import project.navigator.route.Types;
+import project.navigator.service.CacheManager;
+import project.resource.properties.ServerProperties;
 import project.system.util.AdminValidator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Errol on 2016/9/28.
@@ -29,8 +35,10 @@ import java.io.File;
 @RequestMapping("/navigator")
 public class NavController {
 
-    @Value("${project.file.path}")
-    private String fileBasePath;
+//    @Value("${project.file.path}")
+//    private String fileBasePath;
+    @Autowired
+    private CacheManager cacheManager;
 
     @ResponseBody
     @RequestMapping(value = "/validator", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -184,6 +192,30 @@ public class NavController {
             return "";
         } else {
             return Result.ERROR(ErrorCode.ILLEGAL_OPERATION);
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping(value = Types.image, method = RequestMethod.POST, produces = "application/json;chasrset=utf-8")
+    public Object getImage(HttpServletRequest request) throws Exception {
+        String imgs = request.getParameter("imgs");
+        List<String> res = new ArrayList<>();
+        for (String s: imgs.split(",")) {
+            res.add(Base64Util.img2String(ServerProperties.getInstance().getFileBasePath(), s));
+        }
+        return Result.SUCCESS(res);
+    }
+
+    @RequestMapping(value = "/download", produces = "text/html;charset=utf-8")
+    public void download(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String key = request.getParameter("key");
+        if (key != null && !key.equals("")) {
+            String filename = cacheManager.getElement(key);
+            if (filename != null) {
+                cacheManager.removeElement(key);
+                FileManager.output(filename, response);
+                FileManager.deleteFile(filename);
+            }
         }
     }
 

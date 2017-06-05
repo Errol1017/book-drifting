@@ -33,6 +33,9 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReservationStatus status = ReservationStatus.RESERVE;
+    //当前可续借一次，续借一次+1，==0不可续借
+    @Column(nullable = false)
+    private int renew = -1;
     //预约时间
     @Column(nullable = false)
     private Date createTime = new Date();
@@ -100,6 +103,14 @@ public class Reservation {
 
     public void setStatus(ReservationStatus status) {
         this.status = status;
+    }
+
+    public int getRenew() {
+        return renew;
+    }
+
+    public void setRenew(int renew) {
+        this.renew = renew;
     }
 
     public Date getCreateTime() {

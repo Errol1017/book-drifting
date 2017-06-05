@@ -34,6 +34,12 @@
                     <input type="text" id="ClassForm_name" class="input_text_35 span100p" placeholder="不能为空">
                 </span>
             </div>
+            <div>
+                <label for="ClassForm_code" class="ls_mw_100 span20p">图书分类代号</label>
+                <span class="span_box span70p">
+                    <input type="text" id="ClassForm_code" class="input_text_35 span100p" placeholder="不能为空 大写字母 五个字符以内">
+                </span>
+            </div>
         </div>
         <div class="form_detail_bottom">
             <span class="form_detail_bottom_handle_box span70p">
@@ -42,13 +48,17 @@
             </span>
             <span class="form_detail_bottom_lines span30p"></span>
         </div>
+        <div class="form_detail_hint">
+            -&nbsp;图书分类代号用于管理系统中，图书分类下拉框的快速筛选
+        </div>
     </div>
 
     <script>
         $(function () {
             var list = $("#ClassList").list_table({
                 header: {
-                    names: ["!_id", "图书分类名"],
+                    names: ["!_id", "图书分类名", "筛选代号"],
+                    colWith: ["", "span70p", "span30p"]
                 },
                 handle: {
                     edit: {
@@ -67,10 +77,13 @@
                 }
             });
             var form = $("#ClassForm").form_detail({
-                inputIds: ["!_id", "name"],
+                inputIds: ["!_id", "name", "code"],
                 validator: [
                     function (o) {
                         return o.required().check_simple_length(1, 15).show_check_msg();
+                    },
+                    function (o) {
+                        return o.required().require_chart(true).check_simple_length(1, 5).show_check_msg();
                     }
                 ],
                 unbind: {

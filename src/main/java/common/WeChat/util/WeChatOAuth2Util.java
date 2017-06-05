@@ -33,4 +33,9 @@ public class WeChatOAuth2Util {
                 WeChatProperties.getInstance().getAppId(), WeChatProperties.getInstance().getAppSecret(), code);
     }
 
+    public static String getRequestUrlForUserInfo(String accessToken, String openid) {
+        return String.format("https://api.weixin.qq.com/sns/userinfo?access_token=%s&openid=%s&lang=zh_CN",
+                accessToken, openid);
+    }
+
 }

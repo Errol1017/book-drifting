@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import project.resource.properties.ServerProperties;
 import project.resource.properties.WeChatProperties;
 
+import java.io.File;
+
 /**
  * Created by Errol on 17/5/29.
  */
@@ -33,5 +35,18 @@ public class PropertiesInitializer implements ApplicationListener<ContextRefresh
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         ServerProperties.getInstance().init(fileBasePath, host, redirect, remote);
         WeChatProperties.getInstance().init(wxAppId, wxAppSecret, wxRedirectUri);
+
+        checkFolder();
     }
+
+    private void checkFolder() {
+        String[] folders = new String[]{"avatar", "doc", "excel", "img", "qrcode", "temp", "zip"};
+        for (String s: folders) {
+            File folder = new File(fileBasePath +"/" + s);
+            if (!folder.exists() || !folder.isDirectory()) {
+                folder.mkdir();
+            }
+        }
+    }
+
 }

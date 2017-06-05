@@ -135,7 +135,7 @@ public class ClientController {
 
     @ResponseBody
     @RequestMapping(value = Components.ClientForm_agencyId + "/data", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
-    public Object getAgencyData() {
+    public Object getAgencyData() throws Exception {
         return Result.SUCCESS(cacheManager.getAgencySelect());
     }
 }

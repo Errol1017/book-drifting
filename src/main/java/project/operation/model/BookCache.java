@@ -11,6 +11,8 @@ public class BookCache {
 
     private String code;
     private long id;
+    private String name;
+    private String author;
     private long ownerId;
     //图书是否委托机构管理，如果是则为机构id，否为为-1
     private int agencyId;
@@ -23,6 +25,8 @@ public class BookCache {
     public BookCache(Book book) {
         this.code = book.getQrCode();
         this.id = book.getId();
+        this.name = book.getName();
+        this.author = book.getAuthor();
         this.ownerId = book.getOwnerId();
         this.agencyId = book.getStackType().equals(OwnerType.AGENCY) ? (int) (book.getStackId()) : -1;
         this.status = book.getStatus();
@@ -42,6 +46,22 @@ public class BookCache {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public long getOwnerId() {

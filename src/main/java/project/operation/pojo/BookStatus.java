@@ -1,5 +1,10 @@
 package project.operation.pojo;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Created by Errol on 17/4/16.
  */
@@ -28,5 +33,17 @@ public enum  BookStatus {
 
     public String getName() {
         return name;
+    }
+
+    public static List<Map<String, String>> getBookStatusSelect() {
+        List<Map<String, String>> select = new ArrayList<>();
+        Map<String, String> map;
+        for (BookStatus bookStatus: BookStatus.values()) {
+            map = new HashMap<>();
+            map.put("val", bookStatus.toString());
+            map.put("text", bookStatus.getName());
+            select.add(map);
+        }
+        return select;
     }
 }

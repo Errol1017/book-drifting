@@ -3,11 +3,13 @@ package project.system.controller;
 import common.CRUD.service.ComService;
 import common.DataFormatter.ErrorCode;
 import common.DataFormatter.Result;
+import common.FileProcessor.ZXing.ZXingUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import project.navigator.model.Navigation;
+import project.resource.properties.ServerProperties;
 import project.system.entity.Admin;
 import project.system.entity.AdminRole;
 import project.system.model.AdminSession;
@@ -61,7 +63,7 @@ public class LoginController {
     @RequestMapping(value = "/admin/login_out", produces = "text/html;charset=UTF-8")
     public String loginOut(HttpServletRequest request) throws Exception {
         request.getSession().invalidate();
-        return "redirect:/login.html";
+        return ServerProperties.getInstance().getRedirect() + "login.html";
     }
 
 }

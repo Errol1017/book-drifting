@@ -16,6 +16,7 @@ public class ClientCache {
     private long id;
     private String avatar;
     private String nickName;
+    private String name;
     private String openId;
     private String loginTime;
     private int borrowingSum;
@@ -29,6 +30,7 @@ public class ClientCache {
         this.id = client.getId();
         this.avatar = Base64Util.img2String(ServerProperties.getInstance().getFileBasePath(), client.getAvatar());
         this.nickName = client.getNickName();
+        this.name = client.getName();
         this.openId = client.getOpenId();
         this.loginTime = DateUtil.date2String(client.getLoginTime(), DateUtil.PATTERN_A);
         this.borrowingSum = client.getBorrowingSum();
@@ -57,6 +59,14 @@ public class ClientCache {
 
     public void setNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getOpenId() {

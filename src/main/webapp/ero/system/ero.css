@@ -408,10 +408,12 @@ body {
     background-color: inherit;
     color: #777;                                   /* #666 #777 #888 */
     border: 1px solid #ccc;
-    padding: 0px;
-    text-indent: 0.5em;
     border-radius: 3px;
+    padding: 0px;
     box-shadow: inset 1px 1px 1px #ccc;
+}
+.input_text_25, .input_text_30, .input_text_35 {
+    text-indent: 0.5em;
 }
 .input_text_25 {
     height: 25px;

@@ -9,12 +9,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import project.navigator.route.Components;
 import project.navigator.route.Forms;
 import project.navigator.route.Lists;
 import project.navigator.service.CacheManager;
 import project.operation.entity.Book;
 import project.operation.model.BookForm;
 import project.operation.model.BookList;
+import project.operation.pojo.BookStatus;
+import project.operation.pojo.OwnerType;
 import project.system.entity.AdminLog;
 import project.system.model.AdminSession;
 import project.system.pojo.OperationTargets;
@@ -44,12 +47,28 @@ public class BookController {
     public Object getBookList(HttpServletRequest request) throws Exception {
         int tarPageNum = Integer.parseInt(request.getParameter("tarPageNum"));
         int perPageNum = Integer.parseInt(request.getParameter("perPageNum"));
-        List<Book> books = comService.getList(Book.class, tarPageNum, perPageNum, "id desc");
+        Map<String, String> map = DataManager.string2Map(request.getParameter("query"));
+        StringBuffer con = new StringBuffer();
+        if (map != null) {
+            String status = map.get("status");
+            String manager = map.get("manager");
+            String agency = map.get("agency");
+            if (!status.equals("")) {
+                con.append("status='"+BookStatus.valueOf(status)+"'");
+            }
+            if (!manager.equals("")){
+                con.append((con.length()==0?"":" and ")+"stackType='"+ (manager.equals("1")?OwnerType.AGENCY:OwnerType.INDIVIDUAL)+"'");
+            }
+            if (!agency.equals("")){
+                con.append((con.length()==0?"":" and ")+"stackId="+agency);
+            }
+        }
+        List<Book> books = comService.getList(Book.class, tarPageNum, perPageNum, con.toString(), "id desc");
         List<BookList> list = new ArrayList<>();
         for (Book book : books) {
             list.add(new BookList(book, cacheManager));
         }
-        long total = comService.getCount(Book.class);
+        long total = comService.getCount(Book.class, con.toString());
         Map<String, Object> result = new HashMap<>();
         result.put("list", list);
         result.put("total", total);
@@ -61,7 +80,7 @@ public class BookController {
     public Object getBookForm(HttpServletRequest request) throws Exception {
         String dataId = request.getParameter("dataId");
         Book book = comService.getDetail(Book.class, Long.parseLong(dataId));
-        BookForm form = new BookForm(book);
+        BookForm form = new BookForm(book, cacheManager);
         return Result.SUCCESS(form);
     }
 
@@ -74,20 +93,15 @@ public class BookController {
             return Result.ERROR(ErrorCode.ILLEGAL_OPERATION);
         }
         AdminSession adminSession = AdminValidator.getAdminSession(request);
-        if (form.getId().equals("")) {
-//            if (comService.hasExist(Book.class, "identityNumber='"+form.getIdentityNumber()+"'")){
-//                return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "用户身份证号已存在");
-//            }
+        if (form.getId().equals("")) { //新增
             Book book = new Book(form);
             comService.saveDetail(book);
             comService.saveDetail(new AdminLog(adminSession, OperationTargets.Book, OperationTypes.Create, String.valueOf(book.getId()), "书名： " + book.getName()));
             return Result.SUCCESS(book.getId());
-        } else {
-//            if (comService.hasExist(Book.class, "identityNumber='"+form.getIdentityNumber()+"' and id!="+Long.parseLong(form.getId()))){
-//                return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "用户身份证号已存在");
-//            }
-            Book book = new Book(form);
-            book.setId(Long.parseLong(form.getId()));
+        } else { //编辑
+            Book book = comService.getDetail(Book.class, Long.parseLong(form.getId()));
+            book.modify(form);
+//            book.setId(Long.parseLong(form.getId()));
             comService.saveDetail(book);
             comService.saveDetail(new AdminLog(adminSession, OperationTargets.Book, OperationTypes.Update, String.valueOf(book.getId()), "书名： " + book.getName()));
             return Result.SUCCESS();
@@ -99,9 +113,30 @@ public class BookController {
     public Object deleteBookList(HttpServletRequest request) throws Exception {
         String dataId = request.getParameter("dataId");
         Book book = comService.getDetail(Book.class, Long.parseLong(dataId));
+        if (!book.getStatus().equals(BookStatus.FROZEN)) {
+            return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "图书尚未出库，无法删除");
+        }
         comService.deleteDetail(book);
         comService.saveDetail(new AdminLog(AdminValidator.getAdminSession(request), OperationTargets.Book, OperationTypes.Delete, String.valueOf(book.getId()), "书名： " + book.getName()));
         return Result.SUCCESS();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = Components.Books_Query_agency + "/data", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object getAgencyData() throws Exception {
+        return Result.SUCCESS(cacheManager.getAgencySelect());
+    }
+
+    @ResponseBody
+    @RequestMapping(value = Components.Books_Query_status + "/data", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object getBookStatusData() throws Exception {
+        return Result.SUCCESS(BookStatus.getBookStatusSelect());
+    }
+
+    @ResponseBody
+    @RequestMapping(value = Components.BookForm_bookClass + "/data", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object getBookClassData() throws Exception {
+        return Result.SUCCESS(cacheManager.getBookClassificationSelect());
     }
 
 }

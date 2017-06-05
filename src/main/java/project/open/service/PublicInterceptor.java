@@ -1,6 +1,7 @@
 package project.open.service;
 
 import common.DataFormatter.Result;
+import common.ServerAdvice.util.LogUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -20,12 +21,12 @@ public class PublicInterceptor  extends HandlerInterceptorAdapter {
     private CacheManager cacheManager;
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        System.out.println("--------------------------------");
+        LogUtil.debug("--------------------------------");
         String route = request.getServletPath();
-        System.out.println("publicInterceptor拦截的路由：  "+route);
-        System.out.println("请求携带的openId：  "+ClientValidator.getOpenId(request));
+        LogUtil.debug("publicInterceptor拦截的路由：  "+route);
+        LogUtil.debug("请求携带的openId：  "+ClientValidator.getOpenId(request));
         Result result = ClientValidator.ClientValidate(request, cacheManager);
-        System.out.println("身份检查返回的result的code：  "+result.getCode());
+        LogUtil.debug("身份检查返回的result的code：  "+result.getCode());
         if (result.getCode() == 0) {
             return true;
         } else {

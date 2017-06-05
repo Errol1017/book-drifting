@@ -7,7 +7,9 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
+import java.util.Formatter;
 
 /**
  * Created by Errol on 16/10/13.
@@ -16,6 +18,7 @@ public class EncryptUtil {
 
     public static final String KEY_SHA = "SHA";
     public static final String KEY_MD5 = "MD5";
+    public static final String KEY_SHA_1 = "SHA-1";
 
     /**
      * MAC算法可选以下多种算法
@@ -52,20 +55,6 @@ public class EncryptUtil {
     }
 
     /**
-     * MD5 SHA
-     */
-    public static byte[] encryptDigest(byte[] data, String type) {
-        try {
-            MessageDigest messageDigest = MessageDigest.getInstance(type);
-            messageDigest.update(data);
-            return messageDigest.digest();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
      * 初始化HMAC密钥
      */
     public static String initMacKey() {
@@ -93,4 +82,41 @@ public class EncryptUtil {
         }
         return null;
     }
+
+    /**
+     * MD5 SHA
+     */
+    public static byte[] encryptDigest(byte[] data, String type) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance(type);
+            messageDigest.reset();
+            messageDigest.update(data);
+            return messageDigest.digest();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * SHA-1
+     */
+    public static String encryptSHA1(String string) {
+        try {
+            byte[] digest = encryptDigest(string.getBytes("UTF-8"), EncryptUtil.KEY_SHA_1);
+            Formatter formatter = new Formatter();
+            for (byte b : digest)
+            {
+                formatter.format("%02x", b);
+            }
+            String result = formatter.toString();
+            formatter.close();
+            return result;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
 }

@@ -15,6 +15,7 @@ import project.navigator.route.Forms;
 import project.navigator.route.Lists;
 import project.navigator.service.CacheManager;
 import project.operation.entity.Book;
+import project.operation.entity.Client;
 import project.operation.entity.Stacks;
 import project.system.entity.AdminLog;
 import project.system.model.AdminSession;
@@ -106,6 +107,10 @@ public class AgencyController {
         Book book = comService.getFirst(Book.class, "stackId=" + agency.getStackId());
         if (book != null) {
             return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "该机构尚有委托管理的图书未处理，请先转移这批图书！");
+        }
+        Client client = comService.getFirst(Client.class, "agencyId=" + agency.getId());
+        if (client != null) {
+            return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "该机构尚有关联的用户，无法删除");
         }
         comService.deleteDetail(Stacks.class, "id=" + agency.getStackId());
         comService.deleteDetail(agency);

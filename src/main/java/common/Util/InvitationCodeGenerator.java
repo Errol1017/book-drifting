@@ -20,7 +20,7 @@ public class InvitationCodeGenerator {
     }
 
     private static String generate() {
-        return month + (number++) + RandomUtil.getRandomString(6, RandomUtil.PATTEN_ALL_CHARS);
+        return month + (number++) + RandomUtil.getRandomString(6, RandomUtil.PATTEN_ALL_CHARS_EASY_RECOGNISED);
     }
 
     public static String getOne() {

@@ -469,6 +469,7 @@
          * param.keys
          * param.inputObjs
          * param.data
+         * param.editable
          * param.validator        array[fun]
          * param.bind             object
          *      bind.before
@@ -509,6 +510,11 @@
                 if (param.msgObj == undefined) {
                     param.msgObj = $("#" + param.formId + "_Msg")
                 }
+                if (param.validator == undefined) {
+                    param.editable = false
+                } else {
+                    param.editable = true
+                }
                 param.data = new Object();
             }
             function initValidateEvent() {
@@ -520,14 +526,18 @@
                         keys[i] = ids[i];
                         ids[i] = param.formId + '_' + ids[i];
                         objs[i] = $("#" + ids[i]);
-                        objs[i].change(function () {
-                            param.msgObj.set_promptObj();
-                            param.validator[$.indexOf(param.inputIds, $(this).attr("id"))]($(this))
-                        });
+                        if (param.editable) {
+                            objs[i].change(function () {
+                                param.msgObj.set_promptObj();
+                                param.validator[$.indexOf(param.inputIds, $(this).attr("id"))]($(this))
+                            });
+                        }
                     } else {
                         keys[i] = ids[i].slice(2);
                         objs[i] = $("#" + param.formId + ids[i].slice(1));
-                        param.validator.splice(i, 0, '')
+                        if (param.editable) {
+                            param.validator.splice(i, 0, '')
+                        }
                     }
                 }
                 param.keys = keys;
@@ -550,9 +560,11 @@
                         //     param.handle.unbindObj = $("#" + param.formId + '_Unbind');
                         // }
                     }
-                    param.handle.submitObj.click(function () {
-                        submit();
-                    });
+                    if (param.editable) {
+                        param.handle.submitObj.click(function () {
+                            submit();
+                        });
+                    }
                     param.handle.unbindObj.click(function () {
                         unbind();
                     });
@@ -977,7 +989,7 @@
          * param.css
          *      css.lineHeight
          *      css.paddingTop
-         * param.callback       default valObj.trigger('change')
+         * param.callback       default valObj.trigger('change')    for trigger search
          * param.out
          */
         if (param == undefined) {
@@ -2120,6 +2132,227 @@
         }
     };
 
+    //page tab
+    $.fn.page_tab = function (param) {
+        /**
+         * @param param
+         * param.len            number
+         * param.prefix         required
+         * param.showBtn        boolean default true
+         * param.curIndex       number
+         * param.tabObjs        array
+         */
+        if (param == undefined) {
+            param = {}
+        }
+        param.prefix = $(this).attr("id");
+        init();
+        return {
+            toggle: function (index) {
+                toggle(index);
+            }
+        };
+        function init() {
+            if (param.len == undefined) {
+                param.len = 2
+            }
+            if (param.showBtn == undefined) {
+                param.showBtn = true
+            }
+            param.curIndex = 0;
+            param.tabObjs = new Array()
+            for (var i = 0; i < param.len; i++) {
+                var o = $("#" + param.prefix + "_PageTab_" + i);
+                if (i > 0) {
+                    o.hide();
+                }
+                param.tabObjs.push(o)
+            }
+            if (param.showBtn) {
+                param.tabObjs[0].prepend("<button class='button_style_80_30' style='float: right'>新 增</button>")
+                param.tabObjs[0].find("button").first().click(function () {
+                    toggle(1)
+                });
+                param.tabObjs[1].prepend("<button class='button_style_80_30' style='float: right'>返 回</button>")
+                param.tabObjs[1].find("button").first().click(function () {
+                    toggle(0)
+                });
+            }
+        }
+        function toggle(index) {
+            if (index == undefined) {
+                index = param.curIndex + 1;
+                if (index == param.len) {
+                    index = 0;
+                }
+            }
+            param.tabObjs[param.curIndex].fadeOut(FadeToggleSpeed, function () {
+                param.tabObjs[index].fadeIn(FadeToggleSpeed, function () {
+                    param.curIndex = index;
+                })
+            })
+        }
+    };
+
+    //img previewer
+    $.fn.img_previewer = function (param) {
+        /**
+         * @param param
+         * param.len            number
+         * param.editable       boolean default true
+         * param.valObj         required
+         * param.boxObj
+         * param.addObj
+         * param.compId         default param.valObj.attr("id")         * param.prefix         required
+         * param.val
+         * param.data           array
+         */
+        if (param == undefined) {
+            param = {}
+        }
+        param.valObj = $(this);
+        init();
+        return {
+            reset: function (val) {
+                reset(val);
+            }
+        };
+        function init() {
+            if (param.reqId == undefined) {
+                param.reqId = $.ero.reqIdForPlugin;
+            }
+            if (param.editable == undefined) {
+                param.editable = true
+            }
+            initBoxObj();
+            iniEvent();
+            function initBoxObj() {
+                var id = param.valObj.attr("id");
+                if (param.editable) {
+                    param.valObj.after('<div><img class="img_btn" src="./com-res/common/img/add/add.png"></div>');
+                } else {
+                    param.valObj.after('<div><img class="img_btn" src="./com-res/common/img/add/add.png"></div>');
+                }
+                param.boxObj = param.valObj.next();
+                param.addObj = param.boxObj.find("img").first();
+            }
+            function iniEvent() {
+                if (param.editable) {
+                    param.addObj.click(function () {
+                        
+                    })
+                }
+            }
+        }
+        function draw(data) {
+            if (data == undefined) {
+                data = param.data;
+                clear();
+            } else {
+                param.data = param.data.concat(data)
+            }
+            add();
+            function clear() {
+                param.addObj.prevAll().remove();
+                if (!param.editable){
+                    param.addObj.show()
+                }
+            }
+            function add() {
+                if (data.length > 0) {
+                    if (!param.editable) {
+                        param.addObj.hide()
+                    }
+                    param.addObj.before("<span><img class='fu_img' src='data:image/png;base64," + data[0] + "'></span>");
+                    addEvent();
+                    var len = data.length;
+                    if (len > 1) {
+                        var i = 1;
+                        var t = setInterval(function () {
+                            param.addObj.before("<span><img class='fu_img' src='data:image/png;base64," + data[i] + "'></span>");
+                            addEvent();
+                            if (++i >= len) {
+                                clearInterval(t)
+                            }
+                        }, 100)
+                    }
+                }
+            }
+            function addEvent() {
+                addPreview();
+                if (param.editable) {
+                    addDelete();
+                    function addDelete() {
+                        var spanObj = param.addObj.prev();
+                        var imgObj = spanObj.find("img").first();
+                        spanObj.mouseenter(function () {
+                            var p = imgObj.position();
+                            imgObj.after("<span class='fu_img_box' style='width: " + imgObj.css("width") + ";top: " + p.top + "px;left: " + p.left + "px;'>删 除</span>");
+                            var boxObj = imgObj.next();
+                            boxObj.click(function () {
+                                var index = spanObj.index();
+                                param.data.splice(index, 1);
+                                param.val = param.val.split(",").splice(index, 1).join(",");
+                                param.valObj.val(param.val)
+                                $(this).parent().animate({opacity: '0', width: '0px'}, "800", function () {
+                                    $(this).remove()
+                                });
+                            })
+                        });
+                        spanObj.mouseleave(function () {
+                            imgObj.next().stop().animate({opacity: '0', height: '0px'}, "800", function () {
+                                $(this).remove()
+                            });
+                        })
+                    }
+                }
+                function addPreview() {
+
+                }
+            }
+        }
+        function reset(val) {
+            if (val == undefined) {
+                param.val = param.valObj.val()
+            } else {
+                param.val = val;
+                param.valObj.val(val)
+            }
+            if (param.val == "") {
+                param.data = [];
+                draw();
+            } else {
+                getImg();
+            }
+            function getImg() {
+                $.ajax({
+                    url: "navigator/validator",
+                    type: "post",
+                    data: {
+                        type: 'image',
+                        reqId: param.reqId,
+                        // compId: param.compId,
+                        imgs: param.val
+                    },
+                    success: function (res) {
+                        if (res.code == 0) {
+                            param.data = res.data;
+                            draw();
+                        } else {
+                            $.ero.showErrorMessage(res.code, res.data);
+                        }
+                    },
+                    error: function (xhr, msg, obj) {
+                        $.ero.showErrorMessage(-9);
+                        $.ero.getAjaxErrorMessage(xhr, msg, obj);
+                    }
+                });
+            }
+
+        }
+    }
+
+
 })(jQuery)
 
 
@@ -2166,7 +2399,7 @@
             pluginObj.register_form_tabs(obj);
             pluginObj.register_form_tabs_validator(obj);
             pluginObj.register_form_tabs_event_trigger(obj);
-            $.register_plugin_config(pageId, pluginId, obj);
+            // $.register_plugin_config(pageId, pluginId, obj);
         },
         register_form_tabs: function (obj) {
             var tabsObj = $("#" + obj.tabsId);

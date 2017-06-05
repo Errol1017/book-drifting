@@ -12,14 +12,16 @@ public class ClientList {
     private String name;
     private String mobile;
     private String agency;
+    private String sum;
     private String isAdmin;
     private String idNum;
 
     public ClientList(Client client, CacheManager cacheManager) {
         this.id = String.valueOf(client.getId());
-        this.name = client.getName();
+        this.name = client.getNickName() + "（" + client.getName() + "）";
         this.mobile = client.getMobile();
         this.agency = cacheManager.getAgencyCache(client.getAgencyId()).getName();
+        this.sum = client.getBorrowingSum()==0?"":String.valueOf(client.getBorrowingSum());
         this.isAdmin = client.isAdmin()?"图书管理员":"";
         this.idNum = client.getIdentityNumber();
     }
@@ -38,6 +40,10 @@ public class ClientList {
 
     public String getAgency() {
         return agency;
+    }
+
+    public String getSum() {
+        return sum;
     }
 
     public String getIdNum() {

@@ -8,6 +8,7 @@ import common.ServerAdvice.util.LogUtil;
 import common.Util.DateUtil;
 import common.WeChat.pojo.WeChatOAuth2Scope;
 import common.WeChat.util.WeChatOAuth2Util;
+import common.pojo.Gender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,17 +27,14 @@ import project.resource.properties.ServerProperties;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by Errol on 17/5/4.
  */
 @Controller
 @RequestMapping("/public/user")
-public class UserCenterController {
+public class PublicUserController {
 
     @Autowired
     private ComService comService;
@@ -47,59 +45,47 @@ public class UserCenterController {
     public String checkOpenId(HttpServletRequest request) throws Exception {
         LogUtil.debug("检查用户是否登录");
         String openid = String.valueOf(request.getSession().getAttribute("openId"));
-        LogUtil.debug("请求session中的openid为： "+openid);
+        LogUtil.debug("请求session中的openid为： " + openid);
         String k = request.getParameter("k");
-        if (k!=null){
-            if (k.equals("1")){
+        if (k != null) {
+            if (k.equals("1")) {
                 request.getSession().setAttribute("openId", "hiU47jOZQpCx");
-            }else if (k.equals("2")){
+            } else if (k.equals("2")) {
                 request.getSession().setAttribute("openId", "8PCdldvgp7ok");
-            }else if (k.equals("3")){
+            } else if (k.equals("3")) {
                 request.getSession().setAttribute("openId", "Z8RnFPafBI5U");
-            }else {
+            } else {
                 long max = comService.getCount(Client.class);
                 Client client = comService.getList(Client.class, (new Random().nextInt((int) max)), 1).get(0);
                 request.getSession().setMaxInactiveInterval(60 * 60 * 24 * 7);
                 request.getSession().setAttribute("openId", client.getOpenId());
             }
-            return ServerProperties.getInstance().getRedirect()+"public/user/check";
+            return ServerProperties.getInstance().getRedirect() + "public/user/check";
         }
 
 
-        LogUtil.debug("ServerProperties.getInstance().getRemote()值为： "+ServerProperties.getInstance().getRemote());
+        LogUtil.debug("ServerProperties.getInstance().getRemote()值为： " + ServerProperties.getInstance().getRemote());
         Result result = ClientValidator.ClientValidate(request, cacheManager);
         if (result.getCode() == -2) {
             LogUtil.debug("ClientValidator.ClientValidate返回的code为： -2");
             //无openId session，需静默授权
-            return "redirect:"+ WeChatOAuth2Util.getRequestUrl("oauth2/redirect", WeChatOAuth2Scope.snsapi_base);
+            LogUtil.debug("redirect:" + WeChatOAuth2Util.getRequestUrl("oauth2/redirect", WeChatOAuth2Scope.snsapi_base));
+            return "redirect:" + WeChatOAuth2Util.getRequestUrl("oauth2/redirect", WeChatOAuth2Scope.snsapi_base);
         } else if (result.getCode() == -1) {
             LogUtil.debug("ClientValidator.ClientValidate返回的code为： -1");
             //有openId session，但clientCache中无对应记录，也即静默授权后未核验身份
-            return ServerProperties.getInstance().getRemote()+"index.html#/page/user/verify";
+            return ServerProperties.getInstance().getRemote() + "index.html#/page/user/verify";
         } else {
             LogUtil.debug("ClientValidator.ClientValidate返回的code为： 0");
             //有openId session，且已核验身份
-            return ServerProperties.getInstance().getRemote()+"index.html#/page/user/center";
+            return ServerProperties.getInstance().getRemote() + "index.html#/page/user/center";
         }
     }
-
-    @ResponseBody
-    @RequestMapping(value = "/v/test", produces = "application/json;charset=utf-8")
-    public Object test(HttpServletRequest request) throws Exception {
-        String openId = String.valueOf(request.getSession().getAttribute("openId"));
-        LogUtil.debug("userVerify发起的测试请求，request中获得的openId为： "+openId);
-        if (openId.equals("null")){
-            return Result.ERROR(-1);
-        }else {
-            return Result.SUCCESS();
-        }
-    }
-
-
 
     @ResponseBody
     @RequestMapping(value = "/check/result", produces = "application/json;charset=utf-8")
     public Object checkResult() throws Exception {
+        LogUtil.debug("服务端导航user/check/result");
         return Result.ERROR(ErrorCode.LOGIN_TIMEOUT, "/public/user/check");
     }
 
@@ -107,7 +93,7 @@ public class UserCenterController {
     @RequestMapping(value = "/verify", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object userVerify(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String openId = ClientValidator.getOpenId(request);
-        LogUtil.debug("request中openid为： "+openId);
+        LogUtil.debug("request中openid为： " + openId);
         if (openId.equals("null")) {
             LogUtil.debug("request中openid为null");
             request.getRequestDispatcher("/public/user/check/result").forward(request, response);
@@ -124,10 +110,12 @@ public class UserCenterController {
                 Client client = new Client(form);
                 client.setOpenId(openId);
                 comService.saveDetail(client);
+                LogUtil.debug("保存用户");
                 ic.setClientId(client.getId());
                 comService.saveDetail(ic);
                 cacheManager.addClientCache(new ClientCache(client));
-                return Result.SUCCESS();
+                LogUtil.debug("建立用户，返回链接，拉取用户信息： " + WeChatOAuth2Util.getRequestUrl("oauth2/redirect", WeChatOAuth2Scope.snsapi_userinfo));
+                return Result.SUCCESS(WeChatOAuth2Util.getRequestUrl("oauth2/redirect", WeChatOAuth2Scope.snsapi_userinfo));
             }
             return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "邀请码错误或已被使用");
         } else {
@@ -250,7 +238,7 @@ public class UserCenterController {
                 " and r.status='" + ReservationStatus.RESERVE + "'", 1, 5);
         for (Object[] o : res) {
             Book book = (Book) o[0];
-            BookListReserve br = new BookListReserve(book);
+            BookListReserve br = new BookListReserve(book, String.valueOf(o[1]));
             if (book.getStatus().equals(BookStatus.IN_STOCK)) {
                 if (book.getStackType().equals(OwnerType.AGENCY)) {
                     br.setOwner(cacheManager.getAgencyCache((int) book.getStackId()).getName());
@@ -303,11 +291,91 @@ public class UserCenterController {
         List<Object[]> objects = comService.query("select c,b from Comment c, Book b where c.clientId=" +
                 ClientValidator.getClientId(request, cacheManager) + " and c.bookId=b.id order by c.id desc", Integer.parseInt(page), 10);
         List<UserCommentList> list = new ArrayList<>();
-        for (Object[] o: objects){
-            list.add(new UserCommentList((Comment)o[0], (Book)o[1]));
+        for (Object[] o : objects) {
+            list.add(new UserCommentList((Comment) o[0], (Book) o[1]));
         }
         return Result.SUCCESS(list);
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/agency/submit", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object submitUserAgency(HttpServletRequest request) throws Exception {
+        comService.updateDetail(Client.class, ClientValidator.getClientId(request, cacheManager),
+                "agencyId=" + request.getParameter("aId") + ",isAdmin=0");
+        return Result.SUCCESS();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/nickname/submit", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object submitUserNickname(HttpServletRequest request) throws Exception {
+        comService.updateDetail(Client.class, ClientValidator.getClientId(request, cacheManager),
+                "nickName='" + request.getParameter("n") + "'");
+        return Result.SUCCESS();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/name/submit", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object submitUserName(HttpServletRequest request) throws Exception {
+        comService.updateDetail(Client.class, ClientValidator.getClientId(request, cacheManager),
+                "name='" + request.getParameter("n") + "'");
+        return Result.SUCCESS();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/gender/submit", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object submitUserGender(HttpServletRequest request) throws Exception {
+        String gid = request.getParameter("gid");
+        comService.updateDetail(Client.class, ClientValidator.getClientId(request, cacheManager),
+                "gender='" + (gid.equals("1")? Gender.MALE:Gender.FEMALE) + "'");
+        return Result.SUCCESS();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/mobile/submit", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object submitUserMobile(HttpServletRequest request) throws Exception {
+        comService.updateDetail(Client.class, ClientValidator.getClientId(request, cacheManager),
+                "mobile='" + request.getParameter("m") + "'");
+        return Result.SUCCESS();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/number/submit", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object submitUserNumber(HttpServletRequest request) throws Exception {
+        comService.updateDetail(Client.class, ClientValidator.getClientId(request, cacheManager),
+                "identityNumber='" + request.getParameter("n") + "'");
+        return Result.SUCCESS();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/book/renew", method = RequestMethod.POST, produces = "application/json;chatset=utf-8")
+    public Object submitBookRenew(HttpServletRequest request) throws Exception {
+        String rid = request.getParameter("rid");
+        Reservation reservation = comService.getDetail(Reservation.class, Long.parseLong(rid));
+        if (reservation.getRenew() != 0 && reservation.getExpireTime().getTime() > System.currentTimeMillis()) {
+            int r = reservation.getRenew();
+            reservation.setRenew(++r);
+            Calendar c = Calendar.getInstance();
+            c.setTime(reservation.getExpireTime());
+            c.add(Calendar.DATE, 15);
+            c.set(Calendar.HOUR_OF_DAY, 23);
+            reservation.setExpireTime(c.getTime());
+            comService.saveDetail(reservation);
+            return Result.SUCCESS();
+        }
+        return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "您已无法再续借");
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/reservation/cancel", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object submitReservationCancel(HttpServletRequest request) throws Exception {
+        String rid = request.getParameter("rid");
+        comService.deleteDetail(Reservation.class, "id="+rid);
+        return Result.SUCCESS();
+    }
+
+
+
+
 
 
 }

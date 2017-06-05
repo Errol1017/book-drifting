@@ -5,23 +5,27 @@
                 用户列表
             </div>
             <div id="Client_Query" class="list_query">
-                <label for="Client_Query_isAdmin" class="ls_mw_100">按权限筛选</label>
                 <span class="span_box">
-                <input type="text" id="Client_Query_isAdmin" class="input_text_30 span150">
-                <div class="dynamic_plugin_box span150">
-                    <ul class="dynamic_select_ul">
-                        <li class="dynamic_select_li" data-val="1">图书管理员</li>
-                        <li class="dynamic_select_li" data-val="0">普通用户</li>
-                    </ul>
-                </div>
-            </span>
-                <label for="Client_Query_agency" class="ls_mw_100">按单位筛选</label>
+                    <label for="Client_Query_isAdmin" class="ls_mw_100">按权限筛选</label>
+                    <span class="span_box">
+                        <input type="text" id="Client_Query_isAdmin" class="input_text_30 span150">
+                        <div class="dynamic_plugin_box span150">
+                            <ul class="dynamic_select_ul">
+                                <li class="dynamic_select_li" data-val="1">图书管理员</li>
+                                <li class="dynamic_select_li" data-val="0">普通用户</li>
+                            </ul>
+                        </div>
+                    </span>
+                </span>
                 <span class="span_box">
-                <input type="text" id="Client_Query_agency" class="input_text_30 span150">
-            </span>
+                    <label for="Client_Query_agency" class="ls_mw_100">按单位筛选</label>
+                    <span class="span_box">
+                        <input type="text" id="Client_Query_agency" class="input_text_30 span150">
+                    </span>
+                </span>
                 <span class="span_box float_right">
-                <button id="Client_Query_Reset" class="button_style_80_30">重 置</button>
-            </span>
+                    <button id="Client_Query_Reset" class="button_style_80_30">重 置</button>
+                </span>
             </div>
             <div class="msg_box">
                 <div id="ClientList_Msg" class="msg_style"></div>
@@ -41,52 +45,52 @@
             </div>
         </div>
         <!--<div>-->
-            <!--<div class="form_detail_title span30p">-->
-                <!--用户详情-->
-            <!--</div>-->
-            <!--<div class="msg_box">-->
-                <!--<div id="ClientForm_Msg" class="msg_style"></div>-->
-            <!--</div>-->
-            <!--<div id="ClientForm" class="form_detail">-->
-                <!--<input type="hidden" id="ClientForm_id">-->
-                <!--<div>-->
-                    <!--<label for="ClientForm_name" class="ls_mw_100 span20p">用户姓名</label>-->
-                    <!--<span class="span_box span70p">-->
-                        <!--<input type="text" id="ClientForm_name" class="input_text_35 span100p" placeholder="不能为空">-->
-                    <!--</span>-->
-                <!--</div>-->
-                <!--<div>-->
-                    <!--<label for="ClientForm_mobile" class="ls_mw_100 span20p">联系电话</label>-->
-                    <!--<span class="span_box span70p">-->
-                        <!--<input type="text" id="ClientForm_mobile" class="input_text_35 span100p" placeholder="不能为空">-->
-                    <!--</span>-->
-                <!--</div>-->
-                <!--<div>-->
-                    <!--<label for="ClientForm_identityNumber" class="ls_mw_100 span20p">身份证号</label>-->
-                    <!--<span class="span_box span70p">-->
-                        <!--<input type="text" id="ClientForm_identityNumber" class="input_text_35 span100p" placeholder="不能为空">-->
-                    <!--</span>-->
-                <!--</div>-->
-                <!--<div>-->
-                    <!--<label for="ClientForm_agencyId" class="ls_mw_100 span20p">所属单位</label>-->
-                    <!--<span class="span_box span70p">-->
-                        <!--<input type="text" id="ClientForm_agencyId" class="input_text_35 span100p" placeholder="可以为空">-->
-                    <!--</span>-->
-                <!--</div>-->
-                <!--<div>-->
-                    <!--<label for="ClientForm_stackIds" class="ls_mw_100 span20p">个人起漂点</label>-->
-                    <!--<span class="span_box span70p">-->
-                        <!--<input type="text" id="ClientForm_stackIds" class="input_text_35 span100p" placeholder="可以为空">-->
-                    <!--</span>-->
-                <!--</div>-->
-            <!--</div>-->
-            <!--<div class="form_detail_bottom">-->
-                <!--<span class="form_detail_bottom_handle_box span70p">-->
-                    <!--<button class="button_style_80_30" id="ClientForm_Submit">新 增</button>-->
-                    <!--<button class="button_style_80_30" id="ClientForm_Unbind">清 空</button>-->
-                <!--</span>-->
-                <!--<span class="form_detail_bottom_lines span30p"></span>-->
-            <!--</div>-->
+        <!--<div class="form_detail_title span30p">-->
+        <!--用户详情-->
+        <!--</div>-->
+        <!--<div class="msg_box">-->
+        <!--<div id="ClientForm_Msg" class="msg_style"></div>-->
+        <!--</div>-->
+        <!--<div id="ClientForm" class="form_detail">-->
+        <!--<input type="hidden" id="ClientForm_id">-->
+        <!--<div>-->
+        <!--<label for="ClientForm_name" class="ls_mw_100 span20p">用户姓名</label>-->
+        <!--<span class="span_box span70p">-->
+        <!--<input type="text" id="ClientForm_name" class="input_text_35 span100p" placeholder="不能为空">-->
+        <!--</span>-->
+        <!--</div>-->
+        <!--<div>-->
+        <!--<label for="ClientForm_mobile" class="ls_mw_100 span20p">联系电话</label>-->
+        <!--<span class="span_box span70p">-->
+        <!--<input type="text" id="ClientForm_mobile" class="input_text_35 span100p" placeholder="不能为空">-->
+        <!--</span>-->
+        <!--</div>-->
+        <!--<div>-->
+        <!--<label for="ClientForm_identityNumber" class="ls_mw_100 span20p">身份证号</label>-->
+        <!--<span class="span_box span70p">-->
+        <!--<input type="text" id="ClientForm_identityNumber" class="input_text_35 span100p" placeholder="不能为空">-->
+        <!--</span>-->
+        <!--</div>-->
+        <!--<div>-->
+        <!--<label for="ClientForm_agencyId" class="ls_mw_100 span20p">所属单位</label>-->
+        <!--<span class="span_box span70p">-->
+        <!--<input type="text" id="ClientForm_agencyId" class="input_text_35 span100p" placeholder="可以为空">-->
+        <!--</span>-->
+        <!--</div>-->
+        <!--<div>-->
+        <!--<label for="ClientForm_stackIds" class="ls_mw_100 span20p">个人起漂点</label>-->
+        <!--<span class="span_box span70p">-->
+        <!--<input type="text" id="ClientForm_stackIds" class="input_text_35 span100p" placeholder="可以为空">-->
+        <!--</span>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--<div class="form_detail_bottom">-->
+        <!--<span class="form_detail_bottom_handle_box span70p">-->
+        <!--<button class="button_style_80_30" id="ClientForm_Submit">新 增</button>-->
+        <!--<button class="button_style_80_30" id="ClientForm_Unbind">清 空</button>-->
+        <!--</span>-->
+        <!--<span class="form_detail_bottom_lines span30p"></span>-->
+        <!--</div>-->
         <!--</div>-->
     </div>
 
@@ -95,8 +99,8 @@
             var reqId = $.ero.reqIdForPlugin;
             var list = $("#ClientList").list_table({
                 header: {
-                    names: ["!_id", "用户姓名", "联系电话", "所属单位", "是否为管理员", "身份证号"],
-                    colWith: ["", "span20p", "span20p", "span20p", "span15p", "span25p"]
+                    names: ["!_id", "用户姓名", "联系电话", "所属单位", "借阅数", "是否为管理员", "身份证号"],
+                    colWith: ["", "span20p", "span15p", "span15p", "span10p", "span15p", "span25p"]
                 },
                 handle: {
 //                    edit: {
@@ -141,19 +145,19 @@
             var isAdmin = $("#Client_Query_isAdmin").dynamic_select({
                 dynamic: false,
                 writable: false,
-                callback: function () {
-                    agency.reset();
-                    query.reset();
-                    $("#Client_Query_isAdmin").trigger("change");
-                }
+//                callback: function () {
+//                    agency.reset();
+//                    query.reset();
+//                    $("#Client_Query_isAdmin").trigger("change");
+//                }
             });
             var agency = $("#Client_Query_agency").dynamic_select({
                 compId: "ClientForm_agencyId",
-                callback: function () {
-                    isAdmin.reset();
-                    query.reset();
-                    $("#Client_Query_agency").trigger("change");
-                }
+//                callback: function () {
+//                    isAdmin.reset();
+//                    query.reset();
+//                    $("#Client_Query_agency").trigger("change");
+//                }
             });
             var query = $("#Client_Query").query_manager({
                 manually: false,

@@ -44,6 +44,7 @@ public class ReservationUtil {
         reservation.setBorrowedTime(new Date());
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 23);
         reservation.setExpireTime(calendar.getTime());
         reservation.setOwnerType(type);
         reservation.setOwnerId(ownerId);

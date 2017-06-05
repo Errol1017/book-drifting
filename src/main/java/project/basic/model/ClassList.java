@@ -9,6 +9,7 @@ public class ClassList {
 
     private String id;
     private String name;
+    private String code;
 
     public ClassList() {
     }
@@ -16,6 +17,7 @@ public class ClassList {
     public ClassList(BookClassification bc) {
         this.id = String.valueOf(bc.getId());
         this.name = bc.getName();
+        this.code = bc.getCode();
     }
 
     public String getId() {
@@ -24,5 +26,9 @@ public class ClassList {
 
     public String getName() {
         return name;
+    }
+
+    public String getCode() {
+        return code;
     }
 }
