@@ -14,6 +14,7 @@ import project.navigator.route.Forms;
 import project.navigator.route.Lists;
 import project.navigator.service.CacheManager;
 import project.operation.entity.Reservation;
+import project.operation.model.ClientCache;
 import project.operation.model.ReservationForm;
 import project.operation.model.ReservationList;
 import project.operation.pojo.ReservationStatus;
@@ -109,8 +110,9 @@ public class ReservationController {
         String dataId = request.getParameter("dataId");
         Reservation reservation = comService.getDetail(Reservation.class, Long.parseLong(dataId));
         comService.deleteDetail(reservation);
-        comService.saveDetail(new AdminLog(AdminValidator.getAdminSession(request), OperationTargets.Reservation, OperationTypes.Delete, String.valueOf(reservation.getId()),
-                "用户 " + cacheManager.getClientCache(reservation.getClientId()).getName() + " 对图书  的借阅申请"));
+        ClientCache cc = cacheManager.getClientCache(reservation.getClientId());
+        comService.saveDetail(new AdminLog(AdminValidator.getAdminSession(request), OperationTargets.Reservation, OperationTypes.Delete, String.valueOf(reservation.getClientId()),
+                "用户：" + cc.getNickName() + "（" + cc.getName() + "） 对图书 《" + cacheManager.getBookCache(reservation.getBookId()).getName() + "》 的借阅申请"));
         return Result.SUCCESS();
     }
 

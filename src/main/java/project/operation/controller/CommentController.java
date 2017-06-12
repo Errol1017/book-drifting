@@ -13,6 +13,7 @@ import project.navigator.route.Forms;
 import project.navigator.route.Lists;
 import project.navigator.service.CacheManager;
 import project.operation.entity.Comment;
+import project.operation.model.ClientCache;
 import project.operation.model.CommentForm;
 import project.operation.model.CommentList;
 import project.system.entity.AdminLog;
@@ -106,8 +107,9 @@ public class CommentController {
         String dataId = request.getParameter("dataId");
         Comment comment = comService.getDetail(Comment.class, Long.parseLong(dataId));
         comService.deleteDetail(comment);
-        comService.saveDetail(new AdminLog(AdminValidator.getAdminSession(request), OperationTargets.Comment, OperationTypes.Delete, String.valueOf(comment.getId()),
-                "评论的图书是： " + cacheManager.getBookCache(comment.getBookId()).getName()));
+        ClientCache cc = cacheManager.getClientCache(comment.getClientId());
+        comService.saveDetail(new AdminLog(AdminValidator.getAdminSession(request), OperationTargets.Comment, OperationTypes.Delete, String.valueOf(comment.getClientId()),
+                "用户：" + cc.getNickName() + "（" + cc.getName() + "） 对图书 《" + cacheManager.getBookCache(comment.getBookId()).getName() + "》 的评论"));
         return Result.SUCCESS();
     }
 }

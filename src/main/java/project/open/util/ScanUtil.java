@@ -49,7 +49,7 @@ public class ScanUtil {
             } else {
                 return checkClientBorrowingSum(clientCache);
             }
-        } else if (bookCache.getStatus().equals(BookStatus.RELEASED)) {
+        } else if (bookCache.getStatus().equals(BookStatus.RELEASED)) {//图书已申请出库
             if (bookCache.getOwnerId() == clientCache.getId()) { //等待出库且用户即图书所有人
                 return Result.SUCCESS("您已申请该图书出库");
             } else if (bookCache.getAgencyId() != -1 && bookCache.getAgencyId() == clientCache.getAgencyId()) {   //图书由机构管理且用户由管理权限

@@ -14,8 +14,10 @@ import project.navigator.route.Forms;
 import project.navigator.route.Lists;
 import project.navigator.service.CacheManager;
 import project.operation.entity.Client;
+import project.operation.model.ClientCache;
 import project.operation.model.ClientForm;
 import project.operation.model.ClientList;
+import project.operation.service.MessageService;
 import project.system.entity.AdminLog;
 import project.system.model.AdminSession;
 import project.system.pojo.OperationTargets;
@@ -39,6 +41,8 @@ public class ClientController {
     private ComService comService;
     @Autowired
     private CacheManager cacheManager;
+    @Autowired
+    private MessageService messageService;
 
     @ResponseBody
     @RequestMapping(value = Lists.ClientList + "/list", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
@@ -103,6 +107,7 @@ public class ClientController {
             Client client = new Client(form);
             client.setId(Long.parseLong(form.getId()));
             comService.saveDetail(client);
+            cacheManager.addClientCache(new ClientCache(client));
             comService.saveDetail(new AdminLog(adminSession, OperationTargets.Client, OperationTypes.Update, String.valueOf(client.getId()), "用户姓名： " + client.getName()));
             return Result.SUCCESS();
         }
@@ -123,15 +128,26 @@ public class ClientController {
     public Object submitClientAppoint(HttpServletRequest request) throws Exception {
         String id = request.getParameter("id");
         Client client = comService.getDetail(Client.class, Long.parseLong(id));
+        String s;
+        String content;
+        String agName = "【" + cacheManager.getAgencyCache(client.getAgencyId()).getName() + "】";
         if (client.isAdmin()) {
             client.setAdmin(false);
+            s = "解除";
+            content = "您对机构" + agName + "的图书管理权限已被管理员收回，感谢您的服务！";
         } else {
             client.setAdmin(true);
+            s = "授予";
+            content = "您已被授予对机构" + agName + "的图书管理权限，现在您可以审批该机构的图书借阅与入库申请了。";
         }
+        messageService.send(-1, client.getId(), content);
         comService.saveDetail(client);
+        cacheManager.addClientCache(new ClientCache(client));
+        AdminSession adminSession = AdminValidator.getAdminSession(request);
+        comService.saveDetail(new AdminLog(adminSession, OperationTargets.Client, OperationTypes.Update, String.valueOf(client.getId()),
+                s + "用户： " + client.getNickName() + "（" + client.getName() + "） 对 " + agName + " 的图书管理权限"));
         return Result.SUCCESS();
     }
-
 
     @ResponseBody
     @RequestMapping(value = Components.ClientForm_agencyId + "/data", method = RequestMethod.POST, produces = "application/json;charset=utf-8")

@@ -172,7 +172,14 @@ public class ComServiceImpl implements ComService {
     public void deleteDetail(Object object) {
         comDao.deleteDetail(object);
     }
-
+    @Override
+    public <T> void deleteDetail(Class<T> typeValue, int id) {
+        comDao.deleteDetail(typeValue, id);
+    }
+    @Override
+    public <T> void deleteDetail(Class<T> typeValue, long id) {
+        comDao.deleteDetail(typeValue, id);
+    }
     @Override
     public <T> void deleteDetail(Class<T> typeValue, String condition) {
         comDao.deleteDetail(typeValue, condition);

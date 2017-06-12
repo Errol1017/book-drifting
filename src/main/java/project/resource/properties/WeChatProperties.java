@@ -11,6 +11,8 @@ public class WeChatProperties {
 
     private static WeChatProperties instance = new WeChatProperties();
 
+    private WeChatProperties() {}
+
     public static WeChatProperties getInstance() {
         return instance;
     }

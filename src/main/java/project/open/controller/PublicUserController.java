@@ -158,6 +158,12 @@ public class PublicUserController {
     @RequestMapping(value = "/stack/delete", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object deleteUserStack(HttpServletRequest request) throws Exception {
         String id = request.getParameter("id");
+        if (id == null || id.equals("")) {
+            return Result.ERROR(ErrorCode.CODING_ERROR);
+        }
+        if (comService.hasExist(Book.class, "stackType='" + OwnerType.INDIVIDUAL + "' and stackId=" + id)) {
+            return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "您有图书绑定了该起漂点，无法删除");
+        }
         Client client = comService.getDetail(Client.class, ClientValidator.getClientId(request, cacheManager));
         String[] stackIds = client.getStackIds().split(",");
         StringBuffer sb = new StringBuffer();
@@ -238,21 +244,28 @@ public class PublicUserController {
                 " and r.status='" + ReservationStatus.RESERVE + "'", 1, 5);
         for (Object[] o : res) {
             Book book = (Book) o[0];
-            BookListReserve br = new BookListReserve(book, String.valueOf(o[1]));
-            if (book.getStatus().equals(BookStatus.IN_STOCK)) {
-                if (book.getStackType().equals(OwnerType.AGENCY)) {
-                    br.setOwner(cacheManager.getAgencyCache((int) book.getStackId()).getName());
-                } else {
-                    br.setOwner(cacheManager.getClientCache(book.getOwnerId()).getNickName());
-                }
-            } else if (book.getStatus().equals(BookStatus.UNPREPARED)) {
-                br.setOwner(cacheManager.getClientCache(book.getOwnerId()).getNickName());
-            } else if (book.getStatus().equals(BookStatus.FROZEN)) {
-                br.setOwner("");
-            } else {
-                Reservation r = comService.getDetail(Reservation.class, book.getReservationId());
-                br.setOwner(cacheManager.getClientCache(r.getClientId()).getNickName());
-            }
+            BookListReserve br = new BookListReserve(book, String.valueOf(o[1]), cacheManager, comService);
+//            if (book.getStatus().equals(BookStatus.IN_STOCK)) {
+//                if (book.getStackType().equals(OwnerType.AGENCY)) {
+//                    br.setOwner(cacheManager.getAgencyCache((int) book.getStackId()).getName());
+//                } else {
+//                    br.setOwner(cacheManager.getClientCache(book.getOwnerId()).getNickName());
+//                }
+//            } else if (book.getStatus().equals(BookStatus.UNPREPARED)) {
+//                br.setOwner(cacheManager.getClientCache(book.getOwnerId()).getNickName());
+//            } else if (book.getStatus().equals(BookStatus.FROZEN)) {
+//                br.setOwner("");
+//            }else if (book.getStatus().equals(BookStatus.RELEASED)) {
+//                if (book.getReservationId() == -1) {
+//                    br.setOwner(cacheManager.getAgencyCache((int) book.getStackId()).getName());
+//                } else {
+//                    Reservation r = comService.getDetail(Reservation.class, book.getReservationId());
+//                    br.setOwner("目前用户 " + cacheManager.getClientCache(r.getClientId()).getNickName() + " 正在借阅");
+//                }
+//            } else {
+//                Reservation r = comService.getDetail(Reservation.class, book.getReservationId());
+//                br.setOwner("目前用户 " + cacheManager.getClientCache(r.getClientId()).getNickName() + " 正在借阅");
+//            }
             list.add(br);
         }
         return Result.SUCCESS(list);
@@ -262,23 +275,9 @@ public class PublicUserController {
     @RequestMapping(value = "/books", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object getUserBooks(HttpServletRequest request) throws Exception {
         List<Book> res = comService.getList(Book.class, "ownerId=" + ClientValidator.getClientId(request, cacheManager));
-        List<BookListReserve> list = new ArrayList<>();
+        List<UserBookList> list = new ArrayList<>();
         for (Book book : res) {
-            BookListReserve br = new BookListReserve(book);
-            if (book.getStatus().equals(BookStatus.IN_STOCK)) {
-                if (book.getStackType().equals(OwnerType.AGENCY)) {
-                    br.setOwner("委托 " + cacheManager.getAgencyCache((int) book.getStackId()).getName() + " 进行管理");
-                } else {
-                    br.setOwner("由您亲自管理");
-                }
-            } else if (book.getStatus().equals(BookStatus.UNPREPARED)) {
-                br.setOwner("尚未移交 " + cacheManager.getAgencyCache((int) book.getStackId()).getName() + " 入库管理");
-            } else if (book.getStatus().equals(BookStatus.FROZEN)) {
-                br.setOwner("已出库");
-            } else {
-                Reservation r = comService.getDetail(Reservation.class, book.getReservationId());
-                br.setOwner("目前用户 " + cacheManager.getClientCache(r.getClientId()).getNickName() + " 正在借阅");
-            }
+            UserBookList br = new UserBookList(book, cacheManager, comService);
             list.add(br);
         }
         return Result.SUCCESS(list);
@@ -298,26 +297,51 @@ public class PublicUserController {
     }
 
     @ResponseBody
+    @RequestMapping(value = "/comment/delete", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object removeUserComment(HttpServletRequest request) throws Exception {
+        String cid = request.getParameter("cid");
+        String page = request.getParameter("page");
+        comService.deleteDetail(Comment.class, Long.parseLong(cid));
+        if (!page.equals("-1")) {
+            List<Object[]> objects = comService.query("select c,b from Comment c, Book b where c.clientId=" +
+                    ClientValidator.getClientId(request, cacheManager) + " and c.bookId=b.id order by c.id desc", Integer.parseInt(page) * 10, 1);
+            if (objects.size() == 1) {
+                Object[] o = objects.get(0);
+                return Result.SUCCESS(new UserCommentList((Comment) o[0], (Book) o[1]));
+            }
+        }
+        return Result.SUCCESS();
+    }
+
+    @ResponseBody
     @RequestMapping(value = "/agency/submit", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object submitUserAgency(HttpServletRequest request) throws Exception {
         comService.updateDetail(Client.class, ClientValidator.getClientId(request, cacheManager),
                 "agencyId=" + request.getParameter("aId") + ",isAdmin=0");
+        Client client = comService.getDetail(Client.class, ClientValidator.getClientId(request, cacheManager));
+        client.setAgencyId(Integer.parseInt(request.getParameter("aId")));
+        comService.saveDetail(client);
+        cacheManager.addClientCache(new ClientCache(client));
         return Result.SUCCESS();
     }
 
     @ResponseBody
     @RequestMapping(value = "/nickname/submit", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object submitUserNickname(HttpServletRequest request) throws Exception {
-        comService.updateDetail(Client.class, ClientValidator.getClientId(request, cacheManager),
-                "nickName='" + request.getParameter("n") + "'");
+        Client client = comService.getDetail(Client.class, ClientValidator.getClientId(request, cacheManager));
+        client.setNickName(request.getParameter("n"));
+        comService.saveDetail(client);
+        cacheManager.addClientCache(new ClientCache(client));
         return Result.SUCCESS();
     }
 
     @ResponseBody
     @RequestMapping(value = "/name/submit", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object submitUserName(HttpServletRequest request) throws Exception {
-        comService.updateDetail(Client.class, ClientValidator.getClientId(request, cacheManager),
-                "name='" + request.getParameter("n") + "'");
+        Client client = comService.getDetail(Client.class, ClientValidator.getClientId(request, cacheManager));
+        client.setName(request.getParameter("n"));
+        comService.saveDetail(client);
+        cacheManager.addClientCache(new ClientCache(client));
         return Result.SUCCESS();
     }
 
@@ -326,7 +350,7 @@ public class PublicUserController {
     public Object submitUserGender(HttpServletRequest request) throws Exception {
         String gid = request.getParameter("gid");
         comService.updateDetail(Client.class, ClientValidator.getClientId(request, cacheManager),
-                "gender='" + (gid.equals("1")? Gender.MALE:Gender.FEMALE) + "'");
+                "gender='" + (gid.equals("1") ? Gender.MALE : Gender.FEMALE) + "'");
         return Result.SUCCESS();
     }
 
@@ -369,13 +393,25 @@ public class PublicUserController {
     @RequestMapping(value = "/reservation/cancel", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object submitReservationCancel(HttpServletRequest request) throws Exception {
         String rid = request.getParameter("rid");
-        comService.deleteDetail(Reservation.class, "id="+rid);
+        comService.deleteDetail(Reservation.class, "id=" + rid);
         return Result.SUCCESS();
     }
 
-
-
-
+    @ResponseBody
+    @RequestMapping(value = "/message", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object getUserMessage(HttpServletRequest request) throws Exception {
+        String p = request.getParameter("p");
+        List<Message> messages = comService.getList(Message.class, Integer.parseInt(p), 10,"clientId=" + ClientValidator.getClientId(request, cacheManager), "id desc");
+        List<UserMessageList> list = new ArrayList<>();
+        for (Message message : messages) {
+            if (message.getSenderId() == -1) {
+                list.add(new UserMessageList(message, cacheManager.getClientCache(message.getClientId())));
+            } else {
+                list.add(new UserMessageList(message, cacheManager.getClientCache(message.getSenderId())));
+            }
+        }
+        return Result.SUCCESS(list);
+    }
 
 
 }

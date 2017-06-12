@@ -289,6 +289,18 @@ public class ComDaoImpl extends BaseDao {
     public void deleteDetail(Object object) {
         this.getHibernateTemplate().delete(object);
     }
+    public <T> void deleteDetail(Class<T> typeValue, int id) {
+        String con = " where id=" + id;
+        Query query = getSessionFactory().getCurrentSession().createQuery("delete from " + typeValue.getSimpleName() + con);
+        query.executeUpdate();
+
+    }
+    public <T> void deleteDetail(Class<T> typeValue, long id) {
+        String con = " where id=" + id;
+        Query query = getSessionFactory().getCurrentSession().createQuery("delete from " + typeValue.getSimpleName() + con);
+        query.executeUpdate();
+
+    }
     public <T> void deleteDetail(Class<T> typeValue, String condition) {
         String c = condition.equals("") ? "" : " where " + condition;
         Query query = getSessionFactory().getCurrentSession().createQuery("delete from " + typeValue.getSimpleName() + c);

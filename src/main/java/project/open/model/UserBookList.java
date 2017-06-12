@@ -1,0 +1,54 @@
+package project.open.model;
+
+import common.CRUD.service.ComService;
+import project.navigator.service.CacheManager;
+import project.operation.entity.Book;
+import project.operation.pojo.BookStatus;
+
+/**
+ * Created by Errol on 17/6/11.
+ */
+public class UserBookList extends BookListParent {
+
+    private String status;
+    private String owner;
+    private String editable;
+    private String releasable;
+
+    public UserBookList(Book book, CacheManager cacheManager, ComService comService) {
+        super(book);
+        BookStatus status = book.getStatus();
+        this.status = status.getName();
+        if (status.equals(BookStatus.RELEASED) || status.equals(BookStatus.FROZEN)) {
+            this.releasable = "0";
+        } else {
+            this.releasable = "1";
+        }
+        if (status.equals(BookStatus.UNPREPARED) || status.equals(BookStatus.FROZEN)) {
+            this.editable = "1";
+        } else {
+            this.editable = "0";
+        }
+        this.owner = this.getOwnerString(book, cacheManager, comService);
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+//    public void setOwner(String owner) {
+//        this.owner = owner;
+//    }
+
+    public String getEditable() {
+        return editable;
+    }
+
+    public String getReleasable() {
+        return releasable;
+    }
+}

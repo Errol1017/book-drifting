@@ -1,5 +1,7 @@
 package project.open.model;
 
+import common.CRUD.service.ComService;
+import project.navigator.service.CacheManager;
 import project.operation.entity.Book;
 
 /**
@@ -11,16 +13,17 @@ public class BookListReserve extends BookListParent {
     private String owner;
     private String rid;
 
-    public BookListReserve(Book book, String rid) {
+    public BookListReserve(Book book, String rid, CacheManager cacheManager, ComService comService) {
         super(book);
         this.rid = rid;
         this.status = book.getStatus().getName();
+        this.owner = this.getOwnerString(book, cacheManager, comService);
     }
-    public BookListReserve(Book book) {
-        super(book);
-        this.status = book.getStatus().getName();
-        this.rid = "";
-    }
+//    public BookListReserve(Book book) {
+//        super(book);
+//        this.status = book.getStatus().getName();
+//        this.rid = "";
+//    }
 
     public String getRid() {
         return rid;
@@ -34,7 +37,7 @@ public class BookListReserve extends BookListParent {
         return owner;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
+//    public void setOwner(String owner) {
+//        this.owner = owner;
+//    }
 }

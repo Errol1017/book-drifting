@@ -26,6 +26,7 @@ public class WeChatJsSdkConfig {
         this.jsApiList = new ArrayList<>();
         this.jsApiList.add("chooseImage");
         this.jsApiList.add("scanQRCode");
+        this.jsApiList.add("getLocalImgData");
     }
 
     public void refresh(String timestamp, String nonceStr, String signature) {

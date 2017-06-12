@@ -12,6 +12,8 @@ public class ServerProperties {
 
     private static ServerProperties instance = new ServerProperties();
 
+    private ServerProperties() {}
+
     public static ServerProperties getInstance() {
         return instance;
     }

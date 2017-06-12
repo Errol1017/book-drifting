@@ -11,7 +11,7 @@ import java.util.Map;
 public class Navigation {
 
     private static ArrayList<Module> modules = new ArrayList<>();
-    private static final Navigation NAVIGATION = new Navigation();
+    private static final Navigation instance = new Navigation();
 
     private Navigation() {
         modules.add(new Module(1, "Operation", "运营管理", "com-res/common/img/sidebar/tables.png", "", ""));
@@ -33,7 +33,7 @@ public class Navigation {
     }
 
     public static Navigation getInstance() {
-        return NAVIGATION;
+        return instance;
     }
 
     /**

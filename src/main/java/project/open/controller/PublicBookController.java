@@ -101,6 +101,7 @@ public class PublicBookController {
         if (form != null) {
             Book book = new Book(form, ClientValidator.getClientId(request, cacheManager));
             comService.saveDetail(book);
+            cacheManager.addBookCache(new BookCache(book));
             return Result.SUCCESS();
         }
         return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "数据有误");

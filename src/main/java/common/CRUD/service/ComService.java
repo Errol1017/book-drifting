@@ -54,6 +54,8 @@ public interface ComService {
     <T> void updateDetail(Class<T> typeValue, String condition, String setString);
 
     void deleteDetail(Object object);
+    <T> void deleteDetail(Class<T> typeValue, int id);
+    <T> void deleteDetail(Class<T> typeValue, long id);
     <T> void deleteDetail(Class<T> typeValue, String condition);
 
     <T> boolean hasExist(Class<T> typeValue, String condition);
