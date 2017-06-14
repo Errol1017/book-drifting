@@ -25,13 +25,6 @@ public class BookClassification {
     public BookClassification() {
     }
 
-    /**
-     * 测试环境下初始化数据用
-     */
-    public BookClassification(String name) {
-        this.name = name;
-    }
-
     public BookClassification(ClassList form) {
         this.name = form.getName();
         this.code = form.getCode();

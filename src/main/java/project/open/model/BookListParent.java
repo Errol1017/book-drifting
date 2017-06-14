@@ -5,9 +5,9 @@ import common.Util.Base64Util;
 import project.navigator.service.CacheManager;
 import project.operation.entity.Book;
 import project.operation.entity.Reservation;
+import project.operation.model.BookCache;
 import project.operation.pojo.BookStatus;
 import project.operation.pojo.OwnerType;
-import project.resource.properties.ServerProperties;
 
 /**
  * Created by Errol on 17/5/19.
@@ -18,11 +18,10 @@ public class BookListParent {
     private String name;
     private String face;
 
-    public BookListParent(Book book) {
-        this.id = String.valueOf(book.getId());
-        this.name = book.getName();
-        String[] a = book.getPictures().split(",");
-        this.face = Base64Util.img2String(ServerProperties.getInstance().getFileBasePath(), a[0]);
+    public BookListParent(BookCache bookCache) {
+        this.id = String.valueOf(bookCache.getId());
+        this.name = bookCache.getName();
+        this.face = bookCache.getFace();
     }
 
     protected String getOwnerString(Book book, CacheManager cacheManager, ComService comService) {

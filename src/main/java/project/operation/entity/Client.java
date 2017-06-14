@@ -32,11 +32,15 @@ public class Client {
     //是否为所在单位图书管理员
     @Column(nullable = false)
     private boolean isAdmin = false;
-    /** 个人起漂点 */
+    /**
+     * 个人起漂点
+     */
     //是否建立默认起漂点？申请图书流转时可以显示持有用户的默认起漂点
     @Column(nullable = false)
     private String stackIds = "";
-    /** 微信身份相关 */
+    /**
+     * 微信身份相关
+     */
     //微信openId
     @Column(nullable = false, unique = true)
     private String openId = "";
@@ -44,6 +48,8 @@ public class Client {
     @Column(nullable = false)
     private String nickName = "";
     //头像
+    @Column(nullable = false)
+    private String portrait = "avatar/avatar.png";
     @Column(nullable = false)
     private String avatar = "avatar/avatar.png";
     //性别
@@ -53,7 +59,9 @@ public class Client {
 
     @Column(nullable = false)
     private Date createTime = new Date();
-    /** 较频繁变动项 */
+    /**
+     * 较频繁变动项
+     */
     //最近登录时间
     @Column(nullable = false)
     private Date loginTime = new Date();
@@ -63,6 +71,7 @@ public class Client {
 
     public Client() {
     }
+
     public Client(ClientForm form) {
         this.name = form.getName();
         this.mobile = form.getMobile();
@@ -73,6 +82,7 @@ public class Client {
         this.stackIds = form.getStackIds();
         this.nickName = form.getName();
     }
+
     public Client(UserVerifyForm form) {
         this.name = form.getName();
         this.mobile = form.getMobile();
@@ -151,6 +161,14 @@ public class Client {
 
     public void setNickName(String nickName) {
         this.nickName = nickName;
+    }
+
+    public String getPortrait() {
+        return portrait;
+    }
+
+    public void setPortrait(String portrait) {
+        this.portrait = portrait;
     }
 
     public String getAvatar() {

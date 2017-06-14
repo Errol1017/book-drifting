@@ -4,6 +4,7 @@ import common.CRUD.service.ComService;
 import project.navigator.service.CacheManager;
 import project.operation.entity.Book;
 import project.operation.pojo.BookStatus;
+import project.operation.pojo.OwnerType;
 
 /**
  * Created by Errol on 17/6/11.
@@ -16,7 +17,7 @@ public class UserBookList extends BookListParent {
     private String releasable;
 
     public UserBookList(Book book, CacheManager cacheManager, ComService comService) {
-        super(book);
+        super(cacheManager.getBookCache(book.getId()));
         BookStatus status = book.getStatus();
         this.status = status.getName();
         if (status.equals(BookStatus.RELEASED) || status.equals(BookStatus.FROZEN)) {
@@ -24,7 +25,7 @@ public class UserBookList extends BookListParent {
         } else {
             this.releasable = "1";
         }
-        if (status.equals(BookStatus.UNPREPARED) || status.equals(BookStatus.FROZEN)) {
+        if (status.equals(BookStatus.UNPREPARED) || status.equals(BookStatus.FROZEN) || (book.getStackType().equals(OwnerType.INDIVIDUAL) && status.equals(BookStatus.IN_STOCK))) {
             this.editable = "1";
         } else {
             this.editable = "0";

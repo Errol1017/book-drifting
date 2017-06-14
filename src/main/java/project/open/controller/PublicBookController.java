@@ -4,11 +4,16 @@ import common.CRUD.service.ComService;
 import common.DataFormatter.DataManager;
 import common.DataFormatter.ErrorCode;
 import common.DataFormatter.Result;
+import common.FileProcessor.FileType;
+import common.HttpClient.util.HttpClientUtil;
+import common.Util.Base64Util;
+import common.WeChat.util.WeChatMediaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import project.basic.entity.BookQrCode;
 import project.basic.model.AgencyCache;
 import project.navigator.service.CacheManager;
 import project.open.model.*;
@@ -70,7 +75,7 @@ public class PublicBookController {
         List<Book> books = comService.getList(Book.class, p == null ? 1 : Integer.parseInt(p), 10, sb.toString(), "id desc");
         List<BookList> list = new ArrayList<>();
         for (Book book : books) {
-            list.add(new BookList(book));
+            list.add(new BookList(book, cacheManager.getBookCache(book.getId())));
         }
         return Result.SUCCESS(list);
     }
@@ -98,10 +103,16 @@ public class PublicBookController {
     @RequestMapping(value = "/add/submit", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object submitBookAdd(HttpServletRequest request) throws Exception {
         BookAddForm form = DataManager.string2Object(request.getParameter("data"), BookAddForm.class);
+        BookQrCode bookQrCode = comService.getFirst(BookQrCode.class, "code='"+form.getQrCode()+"'");
+        if (bookQrCode==null||bookQrCode.getBookId()!=-1){
+            return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "二维码错误或已被使用");
+        }
         if (form != null) {
             Book book = new Book(form, ClientValidator.getClientId(request, cacheManager));
             comService.saveDetail(book);
             cacheManager.addBookCache(new BookCache(book));
+            bookQrCode.setBookId(book.getId());
+            comService.saveDetail(bookQrCode);
             return Result.SUCCESS();
         }
         return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "数据有误");
@@ -319,6 +330,28 @@ public class PublicBookController {
         }
         return Result.SUCCESS(list);
     }
+
+    @ResponseBody
+    @RequestMapping(value = "/wechat/media", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object getWeChatMediaDownload(HttpServletRequest request) throws Exception {
+        String ids = request.getParameter("ids");
+        List<String> pictures = new ArrayList<>();
+        List<String> pics = new ArrayList<>();
+        if (ids != null && !ids.equals("")) {
+            String[] arr = ids.split(",");
+            for (String s: arr) {
+                String filename = HttpClientUtil.fetch(WeChatMediaUtil.getRequestUrlForDownloadMedia(s), FileType.jpg);
+                pictures.add(filename);
+                pics.add(Base64Util.img2String(filename));
+            }
+        }
+        Map<String, Object> map = new HashMap<>();
+        map.put("pictures", pictures);
+        map.put("pics", pics);
+        return Result.SUCCESS(map);
+    }
+
+
 
 
 

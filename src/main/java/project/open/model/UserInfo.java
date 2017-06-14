@@ -2,7 +2,7 @@ package project.open.model;
 
 import common.Util.Base64Util;
 import project.operation.entity.Client;
-import project.resource.properties.ServerProperties;
+import project.operation.model.ClientCache;
 
 /**
  * Created by Errol on 17/5/7.
@@ -14,9 +14,9 @@ public class UserInfo {
     private String newBook = "0";
     private String newMsg = "0";
 
-    public UserInfo(Client client) {
-        this.nickname = client.getNickName();
-        this.avatar = Base64Util.img2String(ServerProperties.getInstance().getFileBasePath(), client.getAvatar());
+    public UserInfo(ClientCache clientCache) {
+        this.nickname = clientCache.getNickName();
+        this.avatar = clientCache.getAvatar();
     }
 
     public String getNickname() {

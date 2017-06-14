@@ -21,7 +21,6 @@ public class CommonDataController {
 
     @RequestMapping(value = "/agency/list", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public @ResponseBody Object getAgencySelect() throws Exception {
-        LogUtil.debug("common/agency/list获取机构下拉数据");
         return Result.SUCCESS(cacheManager.getPublicAgencySelect());
     }
 

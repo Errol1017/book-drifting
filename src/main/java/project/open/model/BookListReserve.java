@@ -14,7 +14,7 @@ public class BookListReserve extends BookListParent {
     private String rid;
 
     public BookListReserve(Book book, String rid, CacheManager cacheManager, ComService comService) {
-        super(book);
+        super(cacheManager.getBookCache(book.getId()));
         this.rid = rid;
         this.status = book.getStatus().getName();
         this.owner = this.getOwnerString(book, cacheManager, comService);

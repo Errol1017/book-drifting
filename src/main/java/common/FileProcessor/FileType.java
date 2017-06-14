@@ -5,12 +5,12 @@ package common.FileProcessor;
  */
 public enum FileType {
 
-    TEMP,
-
-    IMG,
-
-    DOC,
-
-    XLS,
+    jpg,
+    png,
+    doc,
+    docx,
+    xls,
+    xlsx,
+    pdf,
 
 }

@@ -81,52 +81,8 @@ public class uploadManager {
 //    }
 
     //delete files
-    public static void deleteFiles(String fileBathPath, String fileName) {
-
-        String filePath = fileBathPath + "/img/" + fileName;
-        File file = new File(filePath);
-        file.delete();
-    }
 
     //reduce image by equal proportion
-    public static String reduceImgToGivenLength(String fileBathPath, String fileName, int maxWidth, int maxHeight) {
-        String newFileName = System.currentTimeMillis() + "_" + (int)(Math.random()*100) + ".jpg";
-        try{
-            //读入文件
-            File file = new File(fileBathPath + "/temp/" + fileName);
-            // 构造Image对象
-            BufferedImage bufferedImage = ImageIO.read(file);
-            int width = bufferedImage.getWidth();
-            int height = bufferedImage.getHeight();
-            if (width > maxWidth || height > maxHeight){
-                BigDecimal ratio = BigDecimal.valueOf(width).divide(BigDecimal.valueOf(height), 10, BigDecimal.ROUND_HALF_UP);
-                int newWidth;
-                int newHeight;
-                if (width >= height && width > maxWidth) {
-                    newWidth = maxWidth;
-                    newHeight = (int)(BigDecimal.valueOf(newWidth).divide(ratio, 10, BigDecimal.ROUND_HALF_UP).doubleValue());
-                }else if (height > width && height > maxHeight) {
-                    newHeight = maxHeight;
-                    newWidth = (int)(BigDecimal.valueOf(newHeight).multiply(ratio).doubleValue());
-                }else {
-                    newWidth = width;
-                    newHeight = height;
-                }
-                BufferedImage newImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
-                newImage.getGraphics().drawImage(bufferedImage, 0, 0, newWidth, newHeight, null);
-                FileOutputStream fileOutputStream = new FileOutputStream(fileBathPath + "/temp/" + newFileName);
-                JPEGImageEncoder jpegImageEncoder = JPEGCodec.createJPEGEncoder(fileOutputStream);
-                JPEGEncodeParam jpegEncodeParam = JPEGCodec.getDefaultJPEGEncodeParam(newImage);
-                jpegEncodeParam.setQuality((float) 1.0, true);
-                jpegImageEncoder.encode(newImage, jpegEncodeParam);
-                fileOutputStream.close();
-            }else {
-                newFileName = fileName;
-            }
-        }catch(IOException ioe){
-            ioe.printStackTrace();
-        }
-        return newFileName;
-    }
+
 
 }

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import project.resource.pojo.UploadFolders;
 import project.resource.properties.ServerProperties;
 import project.resource.properties.WeChatProperties;
 
@@ -40,7 +41,7 @@ public class PropertiesInitializer implements ApplicationListener<ContextRefresh
     }
 
     private void checkFolder() {
-        String[] folders = new String[]{"avatar", "doc", "excel", "img", "qrcode", "temp", "zip"};
+        String[] folders = UploadFolders.toArray();
         for (String s: folders) {
             File folder = new File(fileBasePath +"/" + s);
             if (!folder.exists() || !folder.isDirectory()) {

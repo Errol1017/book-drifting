@@ -19,7 +19,6 @@ import project.navigator.route.Forms;
 import project.navigator.route.Lists;
 import project.navigator.route.Types;
 import project.navigator.service.CacheManager;
-import project.resource.properties.ServerProperties;
 import project.system.util.AdminValidator;
 
 import javax.servlet.http.HttpServletRequest;
@@ -201,7 +200,7 @@ public class NavController {
         String imgs = request.getParameter("imgs");
         List<String> res = new ArrayList<>();
         for (String s: imgs.split(",")) {
-            res.add(Base64Util.img2String(ServerProperties.getInstance().getFileBasePath(), s));
+            res.add(Base64Util.img2String(s));
         }
         return Result.SUCCESS(res);
     }
@@ -214,7 +213,7 @@ public class NavController {
             if (filename != null) {
                 cacheManager.removeElement(key);
                 FileManager.output(filename, response);
-                FileManager.deleteFile(filename);
+                FileManager.delete(filename);
             }
         }
     }

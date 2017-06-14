@@ -1,6 +1,7 @@
 package project.open.model;
 
 import common.Util.DateUtil;
+import project.navigator.service.CacheManager;
 import project.operation.entity.Book;
 import project.operation.entity.Comment;
 
@@ -13,8 +14,8 @@ public class UserCommentList extends BookListParent {
     private String time;
     private String cid;
 
-    public UserCommentList(Comment comment, Book book) {
-        super(book);
+    public UserCommentList(Comment comment, Book book, CacheManager cacheManager) {
+        super(cacheManager.getBookCache(book.getId()));
         this.content = comment.getContent();
         this.time = DateUtil.date2String(comment.getCreateTime(), DateUtil.PATTERN_D);
         this.cid = String.valueOf(comment.getId());

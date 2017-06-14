@@ -20,7 +20,6 @@ public class PublicWeChatController {
     @ResponseBody
     @RequestMapping(value = "/jsapi/config", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object getJsApiConfig(HttpServletRequest request) throws Exception {
-        LogUtil.debug("获取jsapi的config");
         String url = request.getParameter("url");
         return Result.SUCCESS(WeChatJsSdkUtil.getWeChatJsSdkConfig(url));
     }

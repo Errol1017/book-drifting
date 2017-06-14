@@ -3,7 +3,6 @@ package project.operation.model;
 import common.Util.Base64Util;
 import common.Util.DateUtil;
 import project.operation.entity.Client;
-import project.resource.properties.ServerProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +27,7 @@ public class ClientCache {
 
     public ClientCache(Client client) {
         this.id = client.getId();
-        this.avatar = Base64Util.img2String(ServerProperties.getInstance().getFileBasePath(), client.getAvatar());
+        this.avatar = Base64Util.img2String(client.getAvatar());
         this.nickName = client.getNickName();
         this.name = client.getName();
         this.openId = client.getOpenId();

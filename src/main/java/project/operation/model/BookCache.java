@@ -1,5 +1,6 @@
 package project.operation.model;
 
+import common.Util.Base64Util;
 import project.operation.entity.Book;
 import project.operation.pojo.BookStatus;
 import project.operation.pojo.OwnerType;
@@ -12,6 +13,7 @@ public class BookCache {
     private String code;
     private long id;
     private String name;
+    private String face;
     private String author;
     private long ownerId;
     //图书是否委托机构管理，如果是则为机构id，否为为-1
@@ -26,6 +28,7 @@ public class BookCache {
         this.code = book.getQrCode();
         this.id = book.getId();
         this.name = book.getName();
+        this.face = Base64Util.img2String(book.getFace());
         this.author = book.getAuthor();
         this.ownerId = book.getOwnerId();
         this.agencyId = book.getStackType().equals(OwnerType.AGENCY) ? (int) (book.getStackId()) : -1;
@@ -54,6 +57,14 @@ public class BookCache {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getFace() {
+        return face;
+    }
+
+    public void setFace(String face) {
+        this.face = face;
     }
 
     public String getAuthor() {

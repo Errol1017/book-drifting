@@ -28,7 +28,6 @@ public class Stacks {
         this.openTime = al.getOpenTime();
     }
 
-    //不止初始化用到了
     public Stacks(String location, String openTime) {
         this.location = location;
         this.openTime = openTime;

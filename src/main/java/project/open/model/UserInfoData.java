@@ -3,7 +3,6 @@ package project.open.model;
 import common.Util.Base64Util;
 import project.navigator.service.CacheManager;
 import project.operation.entity.Client;
-import project.resource.properties.ServerProperties;
 
 /**
  * Created by Errol on 17/5/8.
@@ -21,7 +20,7 @@ public class UserInfoData {
     private String stacks;
 
     public UserInfoData(Client client, CacheManager cacheManager) {
-        this.avatar = Base64Util.img2String(ServerProperties.getInstance().getFileBasePath(), client.getAvatar());
+        this.avatar = cacheManager.getClientCache(client.getId()).getAvatar();
         this.nickname = client.getNickName();
         this.name = client.getName();
         this.gender = client.getGender().getName();

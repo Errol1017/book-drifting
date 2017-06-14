@@ -1,12 +1,10 @@
 package common.WeChat.util;
 
 import common.HttpClient.util.HttpClientUtil;
-import common.ServerAdvice.util.LogUtil;
 import common.Util.EncryptUtil;
 import common.Util.RandomUtil;
 import common.WeChat.model.WeChatJsSdkConfig;
 
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -14,16 +12,13 @@ import java.util.Map;
  */
 public class WeChatJsSdkUtil {
 
-    private static WeChatJsSdkConfig config = new WeChatJsSdkConfig(true);
+    private static WeChatJsSdkConfig config = new WeChatJsSdkConfig(false);
     private static long expire = -1;
     private static String jsapi_ticket = "";
 
     public static WeChatJsSdkConfig getWeChatJsSdkConfig(String url) {
-        LogUtil.debug("需要js-sdk config");
         if (System.currentTimeMillis() > expire) {
-            LogUtil.debug("jsapi_ticket已过期，刷新ticket");
             jsapi_ticket = getJsApiTicket();
-            LogUtil.debug("新的jsapi_ticket： " + jsapi_ticket);
         }
         refreshWeChatJsSdkConfig(url);
         return config;
@@ -49,7 +44,6 @@ public class WeChatJsSdkUtil {
             String nonceStr = RandomUtil.getRandomString(16, RandomUtil.PATTEN_ALL_CHARS);
             String timestamp = String.valueOf(System.currentTimeMillis() / 1000);
             String signature = getSignature(nonceStr, timestamp, url);
-            LogUtil.debug("新的signature： " + signature);
             config.refresh(timestamp, nonceStr, signature);
         }
     }
@@ -57,7 +51,6 @@ public class WeChatJsSdkUtil {
     private static String getSignature(String nonceStr, String timestamp, String url) {
         String s = String.format("jsapi_ticket=%s&noncestr=%s&timestamp=%s&url=%s",
                 jsapi_ticket, nonceStr, String.valueOf(timestamp), url);
-        LogUtil.debug("拼接后的字符串s： " + s);
         return EncryptUtil.encryptSHA1(s);
     }
 

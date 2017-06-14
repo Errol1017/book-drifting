@@ -1,9 +1,12 @@
 package project.operation.entity;
 
+import common.FileProcessor.FileManager;
+import common.FileProcessor.image.ImgUtil;
 import project.open.model.BookAddForm;
 import project.operation.model.BookForm;
 import project.operation.pojo.OwnerType;
 import project.operation.pojo.BookStatus;
+import project.resource.pojo.UploadFolders;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -34,6 +37,8 @@ public class Book {
     @Column(nullable = false, columnDefinition = "varchar(1000)")
     private String introduction;
     //图片（第一张做封面）
+    @Column(nullable = false)
+    private String face;
     @Column(nullable = false)
     private String pictures;
     /**
@@ -87,22 +92,22 @@ public class Book {
     }
 
     //后台添加图书
-    public Book(BookForm form) {
-        this.name = form.getName();
-        this.author = form.getAuthor();
-        this.classificationId = Integer.parseInt(form.getBookClass());
-        this.introduction = form.getIntroduction();
-        this.pictures = form.getPictures();
-        this.status = BookStatus.valueOf(form.getStatus());
-        this.ownerType = OwnerType.valueOf(form.getOwnerType());
-        this.ownerId = Long.parseLong(form.getOwner());
-//        this.stackIds = form.getStackId();
-        this.stackType = OwnerType.AGENCY;
-//        this.stackId = Long.parseLong(form.getStackId());
-//        this.salt = SecretKeyCoder.getSalt(20);
-//        this.qrCode = qrCode;
-//        this.createTime = createTime;
-    }
+//    public Book(BookForm form) {
+//        this.name = form.getName();
+//        this.author = form.getAuthor();
+//        this.classificationId = Integer.parseInt(form.getBookClass());
+//        this.introduction = form.getIntroduction();
+//        this.pictures = form.getPictures();
+//        this.status = BookStatus.valueOf(form.getStatus());
+//        this.ownerType = OwnerType.valueOf(form.getOwnerType());
+//        this.ownerId = Long.parseLong(form.getOwner());
+////        this.stackIds = form.getStackId();
+//        this.stackType = OwnerType.AGENCY;
+////        this.stackId = Long.parseLong(form.getStackId());
+////        this.salt = SecretKeyCoder.getSalt(20);
+////        this.qrCode = qrCode;
+////        this.createTime = createTime;
+//    }
 
     //用户上传图书
     public Book(BookAddForm form, long ownerId) {
@@ -110,7 +115,19 @@ public class Book {
         this.author = form.getAuthor();
         this.classificationId = Integer.parseInt(form.getClassId());
         this.introduction = form.getIntro();
-        this.pictures = form.getPictures();
+        String[] pics = form.getPictures().split(",");
+        String f = "";
+        StringBuffer pictures = new StringBuffer();
+        for (String s : pics) {
+            String c = ImgUtil.cut(s, 3, 4);
+            if (f.equals("")) {
+                f = c;
+            }
+            pictures.append(FileManager.save(c, UploadFolders.img) + ",");
+        }
+        pictures.deleteCharAt(pictures.length() - 1);
+        this.pictures = pictures.toString();
+        this.face = FileManager.save(ImgUtil.scale(f, 132), UploadFolders.img);
         this.ownerType = OwnerType.INDIVIDUAL; //目前图书所有人只有个人
         this.ownerId = ownerId;
         this.stackType = form.getStackType().equals("a") ? OwnerType.AGENCY : OwnerType.INDIVIDUAL;
@@ -130,25 +147,6 @@ public class Book {
         this.classificationId = Integer.parseInt(form.getBookClass());
         this.introduction = form.getIntroduction();
     }
-
-    /**
-     * 开发阶段初始化数据
-     */
-    public Book(int s) {
-        this.name = "毛泽东选集  " + s;
-        this.author = "毛泽东  " + s;
-        this.classificationId = 1;
-        this.introduction = "《毛泽东选集》是毛泽东思想的重要载体，《毛泽东选集》是毛泽东思想的集中展现，是对20世纪中国影响最大的书籍之一。";
-        this.pictures = "img/bookface.png";
-        this.ownerType = OwnerType.INDIVIDUAL;
-        this.ownerId = 1;
-//        this.stackIds = "";
-        this.stackType = OwnerType.AGENCY;
-        this.stackId = -1;
-        this.salt = "qazwsx";
-        this.qrCode = "zaqxsw";
-    }
-
 
     public long getId() {
         return id;
@@ -188,6 +186,14 @@ public class Book {
 
     public void setIntroduction(String introduction) {
         this.introduction = introduction;
+    }
+
+    public String getFace() {
+        return face;
+    }
+
+    public void setFace(String face) {
+        this.face = face;
     }
 
     public String getPictures() {

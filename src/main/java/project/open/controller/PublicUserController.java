@@ -4,7 +4,10 @@ import common.CRUD.service.ComService;
 import common.DataFormatter.DataManager;
 import common.DataFormatter.ErrorCode;
 import common.DataFormatter.Result;
+import common.FileProcessor.FileManager;
+import common.FileProcessor.image.ImgUtil;
 import common.ServerAdvice.util.LogUtil;
+import common.Util.Base64Util;
 import common.Util.DateUtil;
 import common.WeChat.pojo.WeChatOAuth2Scope;
 import common.WeChat.util.WeChatOAuth2Util;
@@ -23,6 +26,7 @@ import project.operation.model.ClientCache;
 import project.operation.pojo.BookStatus;
 import project.operation.pojo.OwnerType;
 import project.operation.pojo.ReservationStatus;
+import project.resource.pojo.UploadFolders;
 import project.resource.properties.ServerProperties;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,9 +47,7 @@ public class PublicUserController {
 
     @RequestMapping(value = "/check", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
     public String checkOpenId(HttpServletRequest request) throws Exception {
-        LogUtil.debug("检查用户是否登录");
         String openid = String.valueOf(request.getSession().getAttribute("openId"));
-        LogUtil.debug("请求session中的openid为： " + openid);
         String k = request.getParameter("k");
         if (k != null) {
             if (k.equals("1")) {
@@ -64,19 +66,14 @@ public class PublicUserController {
         }
 
 
-        LogUtil.debug("ServerProperties.getInstance().getRemote()值为： " + ServerProperties.getInstance().getRemote());
         Result result = ClientValidator.ClientValidate(request, cacheManager);
         if (result.getCode() == -2) {
-            LogUtil.debug("ClientValidator.ClientValidate返回的code为： -2");
             //无openId session，需静默授权
-            LogUtil.debug("redirect:" + WeChatOAuth2Util.getRequestUrl("oauth2/redirect", WeChatOAuth2Scope.snsapi_base));
             return "redirect:" + WeChatOAuth2Util.getRequestUrl("oauth2/redirect", WeChatOAuth2Scope.snsapi_base);
         } else if (result.getCode() == -1) {
-            LogUtil.debug("ClientValidator.ClientValidate返回的code为： -1");
             //有openId session，但clientCache中无对应记录，也即静默授权后未核验身份
             return ServerProperties.getInstance().getRemote() + "index.html#/page/user/verify";
         } else {
-            LogUtil.debug("ClientValidator.ClientValidate返回的code为： 0");
             //有openId session，且已核验身份
             return ServerProperties.getInstance().getRemote() + "index.html#/page/user/center";
         }
@@ -85,7 +82,6 @@ public class PublicUserController {
     @ResponseBody
     @RequestMapping(value = "/check/result", produces = "application/json;charset=utf-8")
     public Object checkResult() throws Exception {
-        LogUtil.debug("服务端导航user/check/result");
         return Result.ERROR(ErrorCode.LOGIN_TIMEOUT, "/public/user/check");
     }
 
@@ -93,9 +89,7 @@ public class PublicUserController {
     @RequestMapping(value = "/verify", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object userVerify(HttpServletRequest request, HttpServletResponse response) throws Exception {
         String openId = ClientValidator.getOpenId(request);
-        LogUtil.debug("request中openid为： " + openId);
         if (openId.equals("null")) {
-            LogUtil.debug("request中openid为null");
             request.getRequestDispatcher("/public/user/check/result").forward(request, response);
             return false;
         }
@@ -110,11 +104,9 @@ public class PublicUserController {
                 Client client = new Client(form);
                 client.setOpenId(openId);
                 comService.saveDetail(client);
-                LogUtil.debug("保存用户");
                 ic.setClientId(client.getId());
                 comService.saveDetail(ic);
                 cacheManager.addClientCache(new ClientCache(client));
-                LogUtil.debug("建立用户，返回链接，拉取用户信息： " + WeChatOAuth2Util.getRequestUrl("oauth2/redirect", WeChatOAuth2Scope.snsapi_userinfo));
                 return Result.SUCCESS(WeChatOAuth2Util.getRequestUrl("oauth2/redirect", WeChatOAuth2Scope.snsapi_userinfo));
             }
             return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "邀请码错误或已被使用");
@@ -127,8 +119,8 @@ public class PublicUserController {
     @RequestMapping(value = "/center/info", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object getUserInfo(HttpServletRequest request) throws Exception {
         ClientCache cc = ClientValidator.getClientCache(request, cacheManager);
-        Client client = comService.getFirst(Client.class, "openId='" + cc.getOpenId() + "'");
-        UserInfo info = new UserInfo(client);
+//        Client client = comService.getFirst(Client.class, "openId='" + cc.getOpenId() + "'");
+        UserInfo info = new UserInfo(cc);
 //        long nb = comService.getCount(Book.class, "createTime>'"+cc.getLoginTime()+"'");
         Book b = comService.getFirst(Book.class, "createTime>'" + cc.getLoginTime() + "'");
         info.setNewBook(String.valueOf(b == null ? "0" : "1"));
@@ -216,7 +208,7 @@ public class PublicUserController {
             List<Object[]> res = comService.query("select r,b from Reservation r,Book b where r.bookId=b.id" +
                     " and r.clientId=" + cc.getId() + " and r.status='" + ReservationStatus.BORROW + "'");
             for (Object[] o : res) {
-                list.add(new BookListBorrowing((Book) o[1], (Reservation) o[0]));
+                list.add(new BookListBorrowing((Book) o[1], (Reservation) o[0], cacheManager));
             }
         }
         return Result.SUCCESS(list);
@@ -230,7 +222,7 @@ public class PublicUserController {
         List<Object[]> res = comService.query("select r,b from Reservation r,Book b where r.bookId=b.id and r.clientId=" + cc.getId() +
                 " and r.status='" + ReservationStatus.RECEDE + "' order by r.recedeTime desc", 1, 5);
         for (Object[] o : res) {
-            list.add(new BookListRecede((Book) o[1], (Reservation) o[0]));
+            list.add(new BookListRecede((Book) o[1], (Reservation) o[0], cacheManager));
         }
         return Result.SUCCESS(list);
     }
@@ -291,7 +283,7 @@ public class PublicUserController {
                 ClientValidator.getClientId(request, cacheManager) + " and c.bookId=b.id order by c.id desc", Integer.parseInt(page), 10);
         List<UserCommentList> list = new ArrayList<>();
         for (Object[] o : objects) {
-            list.add(new UserCommentList((Comment) o[0], (Book) o[1]));
+            list.add(new UserCommentList((Comment) o[0], (Book) o[1], cacheManager));
         }
         return Result.SUCCESS(list);
     }
@@ -307,10 +299,33 @@ public class PublicUserController {
                     ClientValidator.getClientId(request, cacheManager) + " and c.bookId=b.id order by c.id desc", Integer.parseInt(page) * 10, 1);
             if (objects.size() == 1) {
                 Object[] o = objects.get(0);
-                return Result.SUCCESS(new UserCommentList((Comment) o[0], (Book) o[1]));
+                return Result.SUCCESS(new UserCommentList((Comment) o[0], (Book) o[1], cacheManager));
             }
         }
         return Result.SUCCESS();
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/portrait", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object getUserPortrait(HttpServletRequest request) throws Exception {
+        Client client = comService.getDetail(Client.class, ClientValidator.getClientId(request, cacheManager));
+        return Result.SUCCESS(Base64Util.img2String(client.getPortrait()));
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/portrait/save", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object saveUserPortrait(HttpServletRequest request) throws Exception {
+        String name = request.getParameter("name");
+        ClientCache clientCache = ClientValidator.getClientCache(request, cacheManager);
+        Client client = comService.getDetail(Client.class, clientCache.getId());
+        String cut = ImgUtil.cut(name, 1, 1);
+        client.setPortrait(FileManager.save(cut, UploadFolders.avatar));
+        String scale = ImgUtil.scale(cut, 132);
+        client.setAvatar(FileManager.save(scale, UploadFolders.avatar));
+        comService.saveDetail(client);
+        String d = Base64Util.img2String(scale);
+        clientCache.setAvatar(d);
+        return Result.SUCCESS(d);
     }
 
     @ResponseBody

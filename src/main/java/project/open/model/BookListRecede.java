@@ -1,6 +1,7 @@
 package project.open.model;
 
 import common.Util.DateUtil;
+import project.navigator.service.CacheManager;
 import project.operation.entity.Book;
 import project.operation.entity.Reservation;
 
@@ -11,8 +12,8 @@ public class BookListRecede extends BookListParent {
 
     private String period;
 
-    public BookListRecede(Book book, Reservation reservation) {
-        super(book);
+    public BookListRecede(Book book, Reservation reservation, CacheManager cacheManager) {
+        super(cacheManager.getBookCache(book.getId()));
         this.period = DateUtil.date2String(reservation.getBorrowedTime(), DateUtil.PATTERN_K)+" - "+DateUtil.date2String(reservation.getExpireTime(), DateUtil.PATTERN_K);
     }
 

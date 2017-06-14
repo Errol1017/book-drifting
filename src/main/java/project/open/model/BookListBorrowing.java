@@ -1,6 +1,7 @@
 package project.open.model;
 
 import common.Util.DateUtil;
+import project.navigator.service.CacheManager;
 import project.operation.entity.Book;
 import project.operation.entity.Reservation;
 
@@ -14,8 +15,8 @@ public class BookListBorrowing extends BookListParent {
     private String status;
     private String renew;
 
-    public BookListBorrowing(Book book, Reservation reservation) {
-        super(book);
+    public BookListBorrowing(Book book, Reservation reservation, CacheManager cacheManager) {
+        super(cacheManager.getBookCache(book.getId()));
         this.rid = String.valueOf(reservation.getId());
         this.expire = DateUtil.date2String(reservation.getExpireTime(), DateUtil.PATTERN_D);
         if (reservation.getRenew() == 0) {

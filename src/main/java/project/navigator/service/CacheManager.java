@@ -1,14 +1,13 @@
 package project.navigator.service;
 
 import common.CRUD.service.ComService;
-import common.FileProcessor.excel.ExcelUtil;
-import common.Util.Base64Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import project.basic.entity.Agency;
 import project.basic.entity.BookClassification;
+import project.basic.entity.InvitationCode;
 import project.basic.model.AgencyCache;
 import project.navigator.model.Navigation;
 import project.operation.entity.Book;
@@ -17,7 +16,7 @@ import project.operation.entity.Reservation;
 import project.operation.entity.Stacks;
 import project.operation.model.BookCache;
 import project.operation.model.ClientCache;
-import project.resource.properties.ServerProperties;
+import project.resource.pojo.UploadFolders;
 import project.resource.service.PropertiesInitializer;
 import project.system.entity.Admin;
 import project.system.entity.AdminRole;
@@ -58,12 +57,12 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
 
         /** 初始化root管理员和root权限 */
         initRootAdmin();
-        /** 初始化测试数据 */
-        initData();
+//        /** 初始化测试数据 */
+//        initData();
         /** 加载缓存 */
         initCache();
 
-        test();
+//        test();
     }
 
     private void initRootAdmin() {
@@ -82,25 +81,25 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
         }
     }
 
-    private void initData() {
-        /**
-         * 初始化图书分类，或读取数据加入缓存
-         * “其他”分类暂未加入，是否加入排序待定 ？
-         * getCurrentSession().save() 自动提交数据 ？ 打印 sql 语句， 但是数据表查不到值
-         */
-        BookClassification bc = comService.getFirst(BookClassification.class, "id asc");
-        if (bc == null) {
-            String s = "马克思主义、列宁主义、毛泽东思想、邓小平理论,哲学、宗教,社会科学总论,政治、法律,军事,经济,文化、科学、教育、体育,语言、文字,文学,艺术," +
-                    "历史、地理,自然科学总论,数理科学和化学,天文学、地球科学,生物科学,医药、卫生,农业科学,工业技术,交通运输,航空、航天,环境科学、安全科学,综合性图书";
-            String[] arr = s.split(",");
-            List<BookClassification> list = new ArrayList<>();
-            for (int i = 0; i < arr.length; i++) {
-                list.add(new BookClassification(arr[i]));
-//                comService.saveDetail(new BookClassification(arr[i]));
-            }
-            comService.saveDetail(list);
-        }
-
+//    private void initData() {
+//        /**
+//         * 初始化图书分类，或读取数据加入缓存
+//         * “其他”分类暂未加入，是否加入排序待定 ？
+//         * getCurrentSession().save() 自动提交数据 ？ 打印 sql 语句， 但是数据表查不到值
+//         */
+//        BookClassification bc = comService.getFirst(BookClassification.class, "id asc");
+//        if (bc == null) {
+//            String s = "马克思主义、列宁主义、毛泽东思想、邓小平理论,哲学、宗教,社会科学总论,政治、法律,军事,经济,文化、科学、教育、体育,语言、文字,文学,艺术," +
+//                    "历史、地理,自然科学总论,数理科学和化学,天文学、地球科学,生物科学,医药、卫生,农业科学,工业技术,交通运输,航空、航天,环境科学、安全科学,综合性图书";
+//            String[] arr = s.split(",");
+//            List<BookClassification> list = new ArrayList<>();
+//            for (int i = 0; i < arr.length; i++) {
+//                list.add(new BookClassification(arr[i]));
+////                comService.saveDetail(new BookClassification(arr[i]));
+//            }
+//            comService.saveDetail(list);
+//        }
+//
 //        /**
 //         * 初始化邀请码
 //         */
@@ -113,35 +112,35 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
 //            }
 //            comService.saveDetail(list);
 //        }
-
-        /**
-         * 初始化单位信息
-         */
-        Agency ag = comService.getFirst(Agency.class, "id asc");
-        if (ag == null) {
-            Stacks s1 = new Stacks("海虞北路","上午 8:30-11:00 ,下午 13:00-16:30");
-            comService.saveDetail(s1);
-            comService.saveDetail(new Agency("国土局", "GTJ", s1.getId()));
-            Stacks s2 = new Stacks("枫林路","上午 9:00-11:00 ,下午 13:00-16:00");
-            comService.saveDetail(s2);
-            comService.saveDetail(new Agency("常熟海关", "CSHG", s2.getId()));
-            Stacks s3 = new Stacks("长江路","上午 8:00-11:00 ,下午 12:30-16:30");
-            comService.saveDetail(s3);
-            comService.saveDetail(new Agency("地税", "DS", s3.getId()));
-        }
-
-        /**
-         * 初始化图书
-         */
-        Book book = comService.getFirst(Book.class, "id asc");
-        if (book ==null) {
-            List<Book> list = new ArrayList<>();
-            for (int i=0;i<24;i++){
-                list.add(new Book(i));
-            }
-            comService.saveDetail(list);
-        }
-    }
+//
+//        /**
+//         * 初始化单位信息
+//         */
+//        Agency ag = comService.getFirst(Agency.class, "id asc");
+//        if (ag == null) {
+//            Stacks s1 = new Stacks("海虞北路","上午 8:30-11:00 ,下午 13:00-16:30");
+//            comService.saveDetail(s1);
+//            comService.saveDetail(new Agency("国土局", "GTJ", s1.getId()));
+//            Stacks s2 = new Stacks("枫林路","上午 9:00-11:00 ,下午 13:00-16:00");
+//            comService.saveDetail(s2);
+//            comService.saveDetail(new Agency("常熟海关", "CSHG", s2.getId()));
+//            Stacks s3 = new Stacks("长江路","上午 8:00-11:00 ,下午 12:30-16:30");
+//            comService.saveDetail(s3);
+//            comService.saveDetail(new Agency("地税", "DS", s3.getId()));
+//        }
+//
+//        /**
+//         * 初始化图书
+//         */
+//        Book book = comService.getFirst(Book.class, "id asc");
+//        if (book ==null) {
+//            List<Book> list = new ArrayList<>();
+//            for (int i=0;i<24;i++){
+//                list.add(new Book(i));
+//            }
+//            comService.saveDetail(list);
+//        }
+//    }
 
     private void initCache() {
         //加载图书分类缓存
@@ -377,7 +376,9 @@ public class CacheManager implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     public static void main(String[] args) {
-        System.out.println(Base64Util.img2String("E:\\WORKSPACE\\books-drifting\\target\\books-drifting\\com-res\\common\\img\\add\\", "add.png"));
+        String s = "sada /asdasd/sdasd/sd";
+
+        System.out.println(s.substring(0,s.lastIndexOf("/")));
     }
 
 }

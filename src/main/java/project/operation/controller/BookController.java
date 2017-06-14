@@ -93,11 +93,12 @@ public class BookController {
             return Result.ERROR(ErrorCode.ILLEGAL_OPERATION);
         }
         AdminSession adminSession = AdminValidator.getAdminSession(request);
-        if (form.getId().equals("")) { //新增
-            Book book = new Book(form);
-            comService.saveDetail(book);
-            comService.saveDetail(new AdminLog(adminSession, OperationTargets.Book, OperationTypes.Create, String.valueOf(book.getId()), "书名： " + book.getName()));
-            return Result.SUCCESS(book.getId());
+        if (form.getId().equals("")) { //新增，暂未开放
+//            Book book = new Book(form);
+//            comService.saveDetail(book);
+//            comService.saveDetail(new AdminLog(adminSession, OperationTargets.Book, OperationTypes.Create, String.valueOf(book.getId()), "书名： " + book.getName()));
+//            return Result.SUCCESS(book.getId());
+            return Result.SUCCESS();
         } else { //编辑
             Book book = comService.getDetail(Book.class, Long.parseLong(form.getId()));
             book.modify(form);
