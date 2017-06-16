@@ -18,14 +18,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import project.basic.entity.InvitationCode;
+import project.basic.model.AgencyCache;
 import project.navigator.service.CacheManager;
 import project.open.model.*;
 import project.operation.entity.*;
 import project.open.util.ClientValidator;
+import project.operation.model.BookCache;
 import project.operation.model.ClientCache;
 import project.operation.pojo.BookStatus;
 import project.operation.pojo.OwnerType;
 import project.operation.pojo.ReservationStatus;
+import project.operation.service.MessageService;
 import project.resource.pojo.UploadFolders;
 import project.resource.properties.ServerProperties;
 
@@ -44,6 +47,8 @@ public class PublicUserController {
     private ComService comService;
     @Autowired
     private CacheManager cacheManager;
+    @Autowired
+    private MessageService messageService;
 
     @RequestMapping(value = "/check", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
     public String checkOpenId(HttpServletRequest request) throws Exception {
@@ -335,28 +340,31 @@ public class PublicUserController {
                 "agencyId=" + request.getParameter("aId") + ",isAdmin=0");
         Client client = comService.getDetail(Client.class, ClientValidator.getClientId(request, cacheManager));
         client.setAgencyId(Integer.parseInt(request.getParameter("aId")));
+        client.setAdmin(false);
         comService.saveDetail(client);
-        cacheManager.addClientCache(new ClientCache(client));
+        cacheManager.getClientCache(client.getId()).setAgencyId(-1);
         return Result.SUCCESS();
     }
 
     @ResponseBody
     @RequestMapping(value = "/nickname/submit", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object submitUserNickname(HttpServletRequest request) throws Exception {
+        String nickname = request.getParameter("n");
         Client client = comService.getDetail(Client.class, ClientValidator.getClientId(request, cacheManager));
-        client.setNickName(request.getParameter("n"));
+        client.setNickName(nickname);
         comService.saveDetail(client);
-        cacheManager.addClientCache(new ClientCache(client));
+        cacheManager.getClientCache(client.getId()).setNickName(nickname);
         return Result.SUCCESS();
     }
 
     @ResponseBody
     @RequestMapping(value = "/name/submit", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object submitUserName(HttpServletRequest request) throws Exception {
+        String name = request.getParameter("n");
         Client client = comService.getDetail(Client.class, ClientValidator.getClientId(request, cacheManager));
-        client.setName(request.getParameter("n"));
+        client.setName(name);
         comService.saveDetail(client);
-        cacheManager.addClientCache(new ClientCache(client));
+        cacheManager.getClientCache(client.getId()).setName(name);
         return Result.SUCCESS();
     }
 
@@ -416,7 +424,7 @@ public class PublicUserController {
     @RequestMapping(value = "/message", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object getUserMessage(HttpServletRequest request) throws Exception {
         String p = request.getParameter("p");
-        List<Message> messages = comService.getList(Message.class, Integer.parseInt(p), 10,"clientId=" + ClientValidator.getClientId(request, cacheManager), "id desc");
+        List<Message> messages = comService.getList(Message.class, Integer.parseInt(p), 10, "clientId=" + ClientValidator.getClientId(request, cacheManager), "id desc");
         List<UserMessageList> list = new ArrayList<>();
         for (Message message : messages) {
             if (message.getSenderId() == -1) {
@@ -425,7 +433,119 @@ public class PublicUserController {
                 list.add(new UserMessageList(message, cacheManager.getClientCache(message.getSenderId())));
             }
         }
+        ClientValidator.getClientCache(request, cacheManager).getNews().clear();
         return Result.SUCCESS(list);
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/book/release", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object submitUserBookRelease(HttpServletRequest request) throws Exception {
+        String id = request.getParameter("id");
+        Book book = comService.getDetail(Book.class, Long.parseLong(id));
+        if (book.getStatus().equals(BookStatus.UNPREPARED) || (book.getStatus().equals(BookStatus.IN_STOCK) && book.getStackType().equals(OwnerType.INDIVIDUAL))) {
+            book.setStatus(BookStatus.FROZEN);
+        } else {
+            book.setStatus(BookStatus.RELEASED);
+            if (book.getReservationId() != -1) {
+                Reservation r = comService.getDetail(Reservation.class, book.getReservationId());
+                Client sender = comService.getDetail(Client.class, ClientValidator.getClientId(request, cacheManager));
+                messageService.send(-1, r.getClientId(), "您借阅的图书【" + book.getName() + "】已被图书所有人申请出库，您阅读完后可以直接与用户【"
+                        + sender.getName() + "(" + sender.getMobile() + ")】联系"
+                        + (book.getStackType().equals(OwnerType.AGENCY) ? ("，或将图书归还至【" + cacheManager.getAgencyCache((int) book.getStackId()).getName() + "】") : "。"));
+            }
+        }
+        comService.saveDetail(book);
+        cacheManager.getBookCache(book.getId()).setStatus(book.getStatus());
+        return Result.SUCCESS(book.getStatus().getName());
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/book/in", method = RequestMethod.POST, produces = "application/json;cahrset=utf-8")
+    public Object submitUserBookInStore(HttpServletRequest request) throws Exception {
+        String id = request.getParameter("id");
+        Book book = comService.getDetail(Book.class, Long.parseLong(id));
+        String m;
+        Client sender = comService.getDetail(Client.class, ClientValidator.getClientId(request, cacheManager));
+        if (book.getStatus().equals(BookStatus.FROZEN)) {
+            if (book.getStackType().equals(OwnerType.AGENCY)) {
+                book.setStatus(BookStatus.UNPREPARED);
+            } else {
+                book.setStatus(BookStatus.IN_STOCK);
+            }
+            m = "您现在可以与用户【" + sender.getName() + "(" + sender.getMobile() + ")】联系借阅图书啦。";
+        } else {
+            if (book.getReservationId() == -1) {
+                book.setStatus(BookStatus.IN_STOCK);
+                m = "您现在可以前往【" + cacheManager.getAgencyCache((int) book.getStackId()).getName() + "】借阅图书啦。";
+            } else {
+                book.setStatus(BookStatus.BORROWED);
+                m = "当前有用户正在借阅，您可以与该用户联系以申请流转";
+            }
+        }
+        comService.saveDetail(book);
+        cacheManager.getBookCache(book.getId()).setStatus(book.getStatus());
+        List<Reservation> list = comService.getList(Reservation.class, "bookId=" + book.getId() + " and ownerId=-1");
+        for (Reservation r : list) {
+            if (r.getClientId() != sender.getId()) {
+                messageService.send(-1, r.getClientId(), "您预约的图书【" + book.getName() + "】已入库，" + m);
+            }
+        }
+        return Result.SUCCESS(book.getStatus().getName());
+    }
+
+    @ResponseBody
+    @RequestMapping(value = "/book/recede", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
+    public Object getUserBookRecede(HttpServletRequest request) throws Exception {
+        String id = request.getParameter("id");
+        Map<String, Object> map = new HashMap<>();
+        Book book = comService.getDetail(Book.class, Long.parseLong(id));
+        if (book.getStatus().equals(BookStatus.FROZEN) || book.getStatus().equals(BookStatus.RELEASED)) {
+            List<DataFormerLabelValue> list1 = new ArrayList<>();
+            Client client = comService.getDetail(Client.class, book.getOwnerId());
+            list1.add(new DataFormerLabelValue("用户名", client.getNickName()));
+            list1.add(new DataFormerLabelValue("联系电话", client.getMobile()));
+            if (book.getStackType().equals(OwnerType.INDIVIDUAL)) {
+                Stacks stack = comService.getDetail(Stacks.class, book.getStackId());
+                list1.add(new DataFormerLabelValue("建议地点", stack.getLocation()));
+                list1.add(new DataFormerLabelValue("建议时间", stack.getOpenTime()));
+            }else {
+                List<DataFormerLabelValue> list2 = new ArrayList<>();
+                AgencyCache agencyCache = cacheManager.getAgencyCache((int)book.getStackId());
+                list2.add(new DataFormerLabelValue("单位名称", agencyCache.getName()));
+                list2.add(new DataFormerLabelValue("所在地", agencyCache.getStack().getLocation()));
+                list2.add(new DataFormerLabelValue("开放时间", agencyCache.getStack().getOpenTime()));
+                map.put("list2", list2);
+                map.put("label2", "图书管理机构");
+            }
+            map.put("list1", list1);
+            map.put("label1", "图书所有人");
+        } else {
+            List<Object[]> res = comService.query("select r,c from Reservation r,Client c where r.clientId=c.id and r.bookId=" + id
+                    + " and r.status='" + ReservationStatus.RESERVE + "'", 1, 5);
+            List<ReservationListWithMobile> list = new ArrayList<>();
+            for (Object[] o : res) {
+                list.add(new ReservationListWithMobile((Reservation) o[0], (Client) o[1], cacheManager));
+            }
+            map.put("list", list);
+            List<DataFormerLabelValue> list1 = new ArrayList<>();
+            if (book.getStackType().equals(OwnerType.INDIVIDUAL)){
+                Client client = comService.getDetail(Client.class, book.getOwnerId());
+                list1.add(new DataFormerLabelValue("用户名", client.getNickName()));
+                list1.add(new DataFormerLabelValue("联系电话", client.getMobile()));
+                Stacks stack = comService.getDetail(Stacks.class, book.getStackId());
+                list1.add(new DataFormerLabelValue("建议地点", stack.getLocation()));
+                list1.add(new DataFormerLabelValue("建议时间", stack.getOpenTime()));
+                map.put("label1", "图书所有人");
+            } else {
+                AgencyCache agencyCache = cacheManager.getAgencyCache((int)book.getStackId());
+                list1.add(new DataFormerLabelValue("单位名称", agencyCache.getName()));
+                list1.add(new DataFormerLabelValue("所在地", agencyCache.getStack().getLocation()));
+                list1.add(new DataFormerLabelValue("开放时间", agencyCache.getStack().getOpenTime()));
+                map.put("label1", "图书管理机构");
+            }
+            map.put("list1", list1);
+        }
+        return Result.SUCCESS(map);
     }
 
 

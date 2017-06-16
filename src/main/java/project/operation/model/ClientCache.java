@@ -36,6 +36,15 @@ public class ClientCache {
         this.agencyId = client.isAdmin()?client.getAgencyId():-1;
     }
 
+    public void modify(Client client) {
+        this.avatar = Base64Util.img2String(client.getAvatar());
+        this.nickName = client.getNickName();
+        this.name = client.getName();
+        this.loginTime = DateUtil.date2String(client.getLoginTime(), DateUtil.PATTERN_A);
+        this.borrowingSum = client.getBorrowingSum();
+        this.agencyId = client.isAdmin()?client.getAgencyId():-1;
+    }
+
     public long getId() {
         return id;
     }

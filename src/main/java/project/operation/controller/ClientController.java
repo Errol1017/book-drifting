@@ -107,7 +107,8 @@ public class ClientController {
             Client client = new Client(form);
             client.setId(Long.parseLong(form.getId()));
             comService.saveDetail(client);
-            cacheManager.addClientCache(new ClientCache(client));
+//            cacheManager.addClientCache(new ClientCache(client));
+            cacheManager.getClientCache(client.getId()).modify(client);
             comService.saveDetail(new AdminLog(adminSession, OperationTargets.Client, OperationTypes.Update, String.valueOf(client.getId()), "用户姓名： " + client.getName()));
             return Result.SUCCESS();
         }
@@ -142,7 +143,7 @@ public class ClientController {
         }
         messageService.send(-1, client.getId(), content);
         comService.saveDetail(client);
-        cacheManager.addClientCache(new ClientCache(client));
+        cacheManager.getClientCache(client.getId()).setAgencyId(client.isAdmin()?client.getAgencyId():-1);
         AdminSession adminSession = AdminValidator.getAdminSession(request);
         comService.saveDetail(new AdminLog(adminSession, OperationTargets.Client, OperationTypes.Update, String.valueOf(client.getId()),
                 s + "用户： " + client.getNickName() + "（" + client.getName() + "） 对 " + agName + " 的图书管理权限"));

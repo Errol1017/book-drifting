@@ -1,6 +1,7 @@
 package project.open.model;
 
 import common.CRUD.service.ComService;
+import common.ServerAdvice.util.LogUtil;
 import project.navigator.service.CacheManager;
 import project.operation.entity.Book;
 import project.operation.pojo.BookStatus;
@@ -25,6 +26,9 @@ public class UserBookList extends BookListParent {
         } else {
             this.releasable = "1";
         }
+        LogUtil.debug(status.toString());
+        LogUtil.debug(book.getStackType().toString());
+        LogUtil.debug(String.valueOf(book.getStackType().equals(OwnerType.INDIVIDUAL) && status.equals(BookStatus.IN_STOCK)));
         if (status.equals(BookStatus.UNPREPARED) || status.equals(BookStatus.FROZEN) || (book.getStackType().equals(OwnerType.INDIVIDUAL) && status.equals(BookStatus.IN_STOCK))) {
             this.editable = "1";
         } else {

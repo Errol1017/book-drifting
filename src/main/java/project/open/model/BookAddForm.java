@@ -1,5 +1,8 @@
 package project.open.model;
 
+import project.operation.entity.Book;
+import project.operation.pojo.OwnerType;
+
 /**
  * Created by Errol on 17/5/9.
  */
@@ -18,6 +21,18 @@ public class BookAddForm {
     private String qrCode;
 
     public BookAddForm() {
+    }
+
+    public BookAddForm(Book book) {
+        this.id = String.valueOf(book.getId());
+        this.name = book.getName();
+        this.author = book.getAuthor();
+        this.classId = String.valueOf(book.getClassificationId());
+        this.intro = book.getIntroduction();
+        this.pictures = book.getPictures();
+        this.stackType = book.getStackType().equals(OwnerType.AGENCY)?"a":"c";
+        this.stackId = String.valueOf(book.getStackId());
+        this.qrCode = "null";
     }
 
     public String getId() {

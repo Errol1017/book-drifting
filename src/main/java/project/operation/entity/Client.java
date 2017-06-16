@@ -67,7 +67,7 @@ public class Client {
     private Date loginTime = new Date();
     //当前借阅的书数量 ？ 是否添加预约数量
     @Column(nullable = false)
-    private int borrowingSum;
+    private int borrowingSum = 0;
 
     public Client() {
     }

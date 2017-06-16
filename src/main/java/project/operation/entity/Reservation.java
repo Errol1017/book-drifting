@@ -23,7 +23,7 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private OwnerType ownerType = OwnerType.AGENCY;
-    //当前持有人id（借出方）
+    //当前持有人id（借出方） 委托机构管理则为审核的管理员id
     @Column(nullable = false)
     private long ownerId = -1;
     //借书用户id（借入方）

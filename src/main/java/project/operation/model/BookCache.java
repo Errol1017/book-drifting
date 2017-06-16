@@ -34,6 +34,16 @@ public class BookCache {
         this.agencyId = book.getStackType().equals(OwnerType.AGENCY) ? (int) (book.getStackId()) : -1;
         this.status = book.getStatus();
     }
+    public void modify(Book book){
+//        this.code = book.getQrCode();
+//        this.id = book.getId();
+        this.name = book.getName();
+        this.face = Base64Util.img2String(book.getFace());
+        this.author = book.getAuthor();
+        this.ownerId = book.getOwnerId();
+        this.agencyId = book.getStackType().equals(OwnerType.AGENCY) ? (int) (book.getStackId()) : -1;
+        this.status = book.getStatus();
+    }
 
     public String getCode() {
         return code;

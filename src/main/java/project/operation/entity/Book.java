@@ -140,6 +140,38 @@ public class Book {
         }
     }
 
+    //用户编辑图书
+    public void modify(BookAddForm form) {
+        this.name = form.getName();
+        this.author = form.getAuthor();
+        this.classificationId = Integer.parseInt(form.getClassId());
+        this.introduction = form.getIntro();
+        if (!this.pictures.equals(form.getPictures())) {
+            String[] pics = form.getPictures().split(",");
+            String f = "";
+            StringBuffer pictures = new StringBuffer();
+            for (String s : pics) {
+                String c = ImgUtil.cut(s, 3, 4);
+                if (f.equals("")) {
+                    f = c;
+                }
+                pictures.append(FileManager.save(c, UploadFolders.img) + ",");
+            }
+            pictures.deleteCharAt(pictures.length() - 1);
+            this.pictures = pictures.toString();
+            this.face = FileManager.save(ImgUtil.scale(f, 132), UploadFolders.img);
+        }
+        this.stackType = form.getStackType().equals("a") ? OwnerType.AGENCY : OwnerType.INDIVIDUAL;
+        this.stackId = Long.parseLong(form.getStackId());
+//        this.qrCode = form.getQrCode();
+        if (this.status.equals(BookStatus.UNPREPARED) && this.stackType.equals(OwnerType.INDIVIDUAL)) {
+            this.status = BookStatus.IN_STOCK;
+        }
+        if (this.status.equals(BookStatus.IN_STOCK) && this.stackType.equals(OwnerType.AGENCY)) {
+            this.status = BookStatus.UNPREPARED;
+        }
+    }
+
     //后台修改图书
     public void modify(BookForm form) {
         this.name = form.getName();

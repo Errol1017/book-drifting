@@ -3,6 +3,7 @@ package project.open.util;
 import common.CRUD.service.ComService;
 import common.DataFormatter.ErrorCode;
 import common.DataFormatter.Result;
+import project.navigator.service.CacheManager;
 import project.operation.entity.Book;
 import project.operation.entity.Reservation;
 import project.operation.model.BookCache;
@@ -71,7 +72,7 @@ public class ScanUtil {
     }
 
     //根据图书状态记录用户id
-    public static Result setFirstScanConfirm(BookCache bookCache, ClientCache clientCache, ComService comService) {
+    public static Result setFirstScanConfirm(BookCache bookCache, ClientCache clientCache, ComService comService, CacheManager cacheManager) {
         if (bookCache.getStatus().equals(BookStatus.UNPREPARED)) {
             if (bookCache.getOwnerId() == clientCache.getId()) { //所有人 -- 入库
                 saveFirstScanRecord(bookCache, clientCache);
@@ -98,12 +99,12 @@ public class ScanUtil {
             }
         } else if (bookCache.getStatus().equals(BookStatus.RELEASED)) {
             if (bookCache.getOwnerId() == clientCache.getId()) { //等待出库且用户即图书所有人 -- 直接出库
-                ReservationUtil.dealWidthRecede(bookCache, BookStatus.FROZEN, comService);
+                ReservationUtil.dealWidthRecede(bookCache, BookStatus.FROZEN, comService, cacheManager);
                 bookCache.setAgencyId(-1);
                 bookCache.setStatus(BookStatus.FROZEN);
                 return Result.SUCCESS("图书已出库");
             } else if (bookCache.getAgencyId() != -1 && bookCache.getAgencyId() == clientCache.getAgencyId()) {   //图书由机构管理且用户有管理权限 -- 机构暂收
-                ReservationUtil.dealWidthRecede(bookCache, BookStatus.RELEASED, comService);
+                ReservationUtil.dealWidthRecede(bookCache, BookStatus.RELEASED, comService, cacheManager);
                 return Result.SUCCESS("图书已归还");
             } else {
                 return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "无效操作。该图书已申请出库，无法再借阅或流转。");
@@ -166,7 +167,7 @@ public class ScanUtil {
     }
 
     //建立或修改相关reservation
-    public static Result setSecondScanConfirm(BookCache bookCache, ClientCache clientCache, ComService comService) {
+    public static Result setSecondScanConfirm(BookCache bookCache, ClientCache clientCache, ComService comService, CacheManager cacheManager) {
         if (bookCache.getStatus().equals(BookStatus.UNPREPARED)) {
             if (bookCache.getOwnerId() == bookCache.getScannerId()) { //所有人 -- 入库中
                 if (clientCache.getAgencyId() != -1 && bookCache.getAgencyId() == clientCache.getAgencyId()) {  //用户有图书委托的机构管理权限，否则中断入库流程
@@ -177,7 +178,7 @@ public class ScanUtil {
                 }
             } else { //图书入库前就流转中
                 if (bookCache.getOwnerId() == clientCache.getId()) { //用户就是图书所有人，否则中断入库前流转
-                    ReservationUtil.dealWidthBorrow(bookCache, clientCache, comService);
+                    ReservationUtil.dealWidthBorrow(bookCache, clientCache, comService, cacheManager);
                     clearFirstScanRecord(bookCache);
                     return Result.SUCCESS("图书已借阅");
                 }
@@ -185,27 +186,27 @@ public class ScanUtil {
         } else if (bookCache.getStatus().equals(BookStatus.IN_STOCK)) {   //图书借阅中
             if (bookCache.getAgencyId() == -1) { //用户自己管理
                 if (bookCache.getOwnerId() == clientCache.getId()) { //用户就是图书所有人，否则中断
-                    ReservationUtil.dealWidthBorrow(bookCache, clientCache, comService);
+                    ReservationUtil.dealWidthBorrow(bookCache, clientCache, comService, cacheManager);
                     return Result.SUCCESS("图书已借阅");
                 }
             } else { //委托机构管理
                 if (clientCache.getAgencyId() != -1 && bookCache.getAgencyId() == clientCache.getAgencyId()) {    //用户有图书委托的机构管理权限，否则中断
-                    ReservationUtil.dealWidthBorrow(bookCache, clientCache, comService);
+                    ReservationUtil.dealWidthBorrow(bookCache, clientCache, comService, cacheManager);
                     return Result.SUCCESS("图书已借阅");
                 }
             }
         } else if (bookCache.getStatus().equals(BookStatus.BORROWED) || bookCache.getStatus().equals(BookStatus.EXPIRED)) {
             if (bookCache.getHolderId() == bookCache.getScannerId()) {    //第一次扫描是持有人
                 if ((bookCache.getAgencyId() == -1 && bookCache.getOwnerId() == clientCache.getId()) || (bookCache.getAgencyId() != -1 && bookCache.getAgencyId() == clientCache.getAgencyId())) {
-                    ReservationUtil.dealWidthRecede(bookCache, BookStatus.IN_STOCK, comService);
+                    ReservationUtil.dealWidthRecede(bookCache, BookStatus.IN_STOCK, comService, cacheManager);
                     return Result.SUCCESS("图书已归还");
                 } else if (bookCache.getHolderId() != clientCache.getId()) { //不是管理员且不是持有人
-                    ReservationUtil.dealWidthBorrow(bookCache, clientCache, comService);
+                    ReservationUtil.dealWidthBorrow(bookCache, clientCache, comService, cacheManager);
                     return Result.SUCCESS("图书已借阅");
                 }
             } else { //第一次扫描是普通用户，流转中
                 if (bookCache.getHolderId() == clientCache.getId()) { //第二次扫描是持有人，否则中断
-                    ReservationUtil.dealWidthBorrow(bookCache, clientCache, comService);
+                    ReservationUtil.dealWidthBorrow(bookCache, clientCache, comService, cacheManager);
                     return Result.SUCCESS("图书已借阅");
                 }
             }
