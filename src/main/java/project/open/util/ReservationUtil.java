@@ -53,6 +53,16 @@ public class ReservationUtil {
         reservation.setStatus(ReservationStatus.BORROW);
         comService.saveDetail(reservation);
 
+        if (holderType.equals(OwnerType.INDIVIDUAL) && ownerId != bookCache.getOwnerId()) {
+            Reservation end = comService.getFirst(Reservation.class, "bookId=" + bookCache.getId() + " and clientId=" + ownerId +
+                    " and status='" + ReservationStatus.BORROW + "'", "id desc");
+            if (end != null) {
+                end.setRecedeTime(new Date());
+                end.setStatus(ReservationStatus.RECEDE);
+                comService.saveDetail(end);
+            }
+        }
+
         Book book = comService.getDetail(Book.class, bookCache.getId());
         book.setReservationId(reservation.getId());
         book.setStatus(BookStatus.BORROWED);

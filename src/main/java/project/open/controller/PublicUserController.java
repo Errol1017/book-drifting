@@ -64,9 +64,9 @@ public class PublicUserController {
             } else {
                 long max = comService.getCount(Client.class);
                 Client client = comService.getList(Client.class, (new Random().nextInt((int) max)), 1).get(0);
-                request.getSession().setMaxInactiveInterval(60 * 60 * 24 * 7);
                 request.getSession().setAttribute("openId", client.getOpenId());
             }
+            request.getSession().setMaxInactiveInterval(60 * 60 * 24 * 7);
             return ServerProperties.getInstance().getRedirect() + "public/user/check";
         }
 

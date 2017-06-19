@@ -5,6 +5,7 @@ import common.DataFormatter.DataManager;
 import common.DataFormatter.ErrorCode;
 import common.DataFormatter.Result;
 import common.FileProcessor.FileType;
+import common.FileProcessor.image.ImgUtil;
 import common.HttpClient.util.HttpClientUtil;
 import common.Util.Base64Util;
 import common.WeChat.util.WeChatMediaUtil;
@@ -54,7 +55,7 @@ public class PublicBookController {
         if (q2 != null && (q2.equals("1") || q2.equals("2"))) {
             sb.append("status='" + (q2.equals("1") ? BookStatus.IN_STOCK : BookStatus.BORROWED) + "'");
         } else {
-            sb.append("status='" + BookStatus.UNPREPARED + "' or status='" + BookStatus.IN_STOCK + "' or status='" + BookStatus.BORROWED + "'");
+            sb.append("(status='" + BookStatus.UNPREPARED + "' or status='" + BookStatus.IN_STOCK + "' or status='" + BookStatus.BORROWED + "')");
         }
         if (q1 != null && q1.equals("1")) {
             ClientCache cc = ClientValidator.getClientCache(request, cacheManager);
@@ -67,11 +68,11 @@ public class PublicBookController {
             s = s.replace("《", "");
             String[] a = s.split("》 ");
             if (a.length == 1) {
-                sb = new StringBuffer("name like '%" + a[0] + "%' or author like '%" + a[0] + "%'");
+                sb = new StringBuffer("(name like '%" + a[0] + "%' or author like '%" + a[0] + "%')");
             } else {
-                sb = new StringBuffer("name like '%" + a[0] + "%' or author like '%" + a[1] + "%'");
+                sb = new StringBuffer("(name like '%" + a[0] + "%' or author like '%" + a[1] + "%')");
             }
-            sb.append(" and status='" + BookStatus.UNPREPARED + "' or status='" + BookStatus.IN_STOCK + "' or status='" + BookStatus.BORROWED + "'");
+            sb.append(" and (status='" + BookStatus.UNPREPARED + "' or status='" + BookStatus.IN_STOCK + "' or status='" + BookStatus.BORROWED + "')");
         }
         List<Book> books = comService.getList(Book.class, p == null ? 1 : Integer.parseInt(p), 10, sb.toString(), "id desc");
         List<BookList> list = new ArrayList<>();
@@ -115,13 +116,13 @@ public class PublicBookController {
     @RequestMapping(value = "/add/submit", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
     public Object submitBookAdd(HttpServletRequest request) throws Exception {
         BookAddForm form = DataManager.string2Object(request.getParameter("data"), BookAddForm.class);
-        BookQrCode bookQrCode = comService.getFirst(BookQrCode.class, "code='" + form.getQrCode() + "'");
-        if (bookQrCode == null || bookQrCode.getBookId() != -1) {
-            return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "二维码错误或已被使用");
-        }
         if (form != null) {
             Book book;
             if (form.getId().equals("")) {
+                BookQrCode bookQrCode = comService.getFirst(BookQrCode.class, "code='" + form.getQrCode() + "'");
+                if (bookQrCode == null || bookQrCode.getBookId() != -1) {
+                    return Result.ERROR(ErrorCode.CUSTOMIZED_ERROR, "二维码错误或已被使用");
+                }
                 book = new Book(form, ClientValidator.getClientId(request, cacheManager));
                 comService.saveDetail(book);
                 cacheManager.addBookCache(new BookCache(book));
@@ -396,7 +397,9 @@ public class PublicBookController {
         if (ids != null && !ids.equals("")) {
             String[] arr = ids.split(",");
             for (String s : arr) {
-                String filename = HttpClientUtil.fetch(WeChatMediaUtil.getRequestUrlForDownloadMedia(s), FileType.jpg);
+                String img = HttpClientUtil.fetch(WeChatMediaUtil.getRequestUrlForDownloadMedia(s), FileType.jpg);
+                String filename = ImgUtil.cut(img, 3, 4);
+//                String filename = ImgUtil.scale(cut, 720);
                 pictures.add(filename);
                 pics.add(Base64Util.img2String(filename));
             }

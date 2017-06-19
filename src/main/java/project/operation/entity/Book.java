@@ -119,11 +119,11 @@ public class Book {
         String f = "";
         StringBuffer pictures = new StringBuffer();
         for (String s : pics) {
-            String c = ImgUtil.cut(s, 3, 4);
+//            String c = ImgUtil.cut(s, 3, 4);
             if (f.equals("")) {
-                f = c;
+                f = s;
             }
-            pictures.append(FileManager.save(c, UploadFolders.img) + ",");
+            pictures.append(FileManager.save(s, UploadFolders.img) + ",");
         }
         pictures.deleteCharAt(pictures.length() - 1);
         this.pictures = pictures.toString();
@@ -151,11 +151,11 @@ public class Book {
             String f = "";
             StringBuffer pictures = new StringBuffer();
             for (String s : pics) {
-                String c = ImgUtil.cut(s, 3, 4);
+//                String c = ImgUtil.cut(s, 3, 4);
                 if (f.equals("")) {
-                    f = c;
+                    f = s;
                 }
-                pictures.append(FileManager.save(c, UploadFolders.img) + ",");
+                pictures.append(FileManager.save(s, UploadFolders.img) + ",");
             }
             pictures.deleteCharAt(pictures.length() - 1);
             this.pictures = pictures.toString();
