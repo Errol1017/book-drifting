@@ -52,23 +52,23 @@ public class PublicUserController {
 
     @RequestMapping(value = "/check", method = RequestMethod.GET, produces = "text/html;charset=utf-8")
     public String checkOpenId(HttpServletRequest request) throws Exception {
-        String openid = String.valueOf(request.getSession().getAttribute("openId"));
-        String k = request.getParameter("k");
-        if (k != null) {
-            if (k.equals("1")) {
-                request.getSession().setAttribute("openId", "hiU47jOZQpCx");
-            } else if (k.equals("2")) {
-                request.getSession().setAttribute("openId", "8PCdldvgp7ok");
-            } else if (k.equals("3")) {
-                request.getSession().setAttribute("openId", "Z8RnFPafBI5U");
-            } else {
-                long max = comService.getCount(Client.class);
-                Client client = comService.getList(Client.class, (new Random().nextInt((int) max)), 1).get(0);
-                request.getSession().setAttribute("openId", client.getOpenId());
-            }
-            request.getSession().setMaxInactiveInterval(60 * 60 * 24 * 7);
-            return ServerProperties.getInstance().getRedirect() + "public/user/check";
-        }
+//        String openid = String.valueOf(request.getSession().getAttribute("openId"));
+//        String k = request.getParameter("k");
+//        if (k != null) {
+//            if (k.equals("1")) {
+//                request.getSession().setAttribute("openId", "hiU47jOZQpCx");
+//            } else if (k.equals("2")) {
+//                request.getSession().setAttribute("openId", "8PCdldvgp7ok");
+//            } else if (k.equals("3")) {
+//                request.getSession().setAttribute("openId", "Z8RnFPafBI5U");
+//            } else {
+//                long max = comService.getCount(Client.class);
+//                Client client = comService.getList(Client.class, (new Random().nextInt((int) max)), 1).get(0);
+//                request.getSession().setAttribute("openId", client.getOpenId());
+//            }
+//            request.getSession().setMaxInactiveInterval(60 * 60 * 24 * 7);
+//            return ServerProperties.getInstance().getRedirect() + "public/user/check";
+//        }
 
 
         Result result = ClientValidator.ClientValidate(request, cacheManager);

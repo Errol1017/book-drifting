@@ -1,7 +1,6 @@
 package common.WeChat.util;
 
 import common.HttpClient.util.HttpClientUtil;
-import common.ServerAdvice.util.LogUtil;
 import project.resource.properties.WeChatProperties;
 
 import java.util.Date;
@@ -35,5 +34,4 @@ public class WeChatApiUtil {
             }
         }
     }
-
 }

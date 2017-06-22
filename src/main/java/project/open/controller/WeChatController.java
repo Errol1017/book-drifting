@@ -7,12 +7,14 @@ import common.FileProcessor.image.ImgUtil;
 import common.HttpClient.util.HttpClientUtil;
 import common.ServerAdvice.util.LogUtil;
 import common.Util.Base64Util;
+import common.Util.EncryptUtil;
 import common.WeChat.pojo.WeChatOAuth2Scope;
 import common.WeChat.util.WeChatOAuth2Util;
 import common.pojo.Gender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import project.navigator.service.CacheManager;
 import project.operation.entity.Client;
 import project.operation.model.ClientCache;
@@ -20,6 +22,7 @@ import project.resource.pojo.UploadFolders;
 import project.resource.properties.ServerProperties;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.MessageDigest;
 import java.util.Map;
 
 /**
